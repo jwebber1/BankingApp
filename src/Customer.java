@@ -1,5 +1,5 @@
 public class Customer {
-    private String socialSecurityNumber;
+    private int socialSecurityNumber;    //customerID in account classes
     private String streetAddress;
     private String city;
     private String state;
