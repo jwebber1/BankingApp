@@ -1,13 +1,12 @@
 import java.util.Date;
 
 class CheckingAccount extends Account{
-    protected String accountType;
     protected Byte indicatedOverdraftProtection;    // 1=true   0=false
     protected int overdraftsThisMonth;
-    protected Date dateAccountOpened;
 
     //constructor for the Checking Account
     public CheckingAccount(int cusIDIn, double accBalIn, String accTypeIn, Byte OvProIn, int odThisMonth, Date dateAccOpened){
+<<<<<<< HEAD
 <<<<<<< HEAD
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
@@ -15,11 +14,14 @@ class CheckingAccount extends Account{
         super(cusIDIn,accBalIn);
 >>>>>>> JonTextInBranch
         this.accountType = accTypeIn;
+=======
+        super(cusIDIn,accBalIn, dateAccOpened, accTypeIn);
+>>>>>>> JonTextInBranch
         this.indicatedOverdraftProtection = OvProIn;
         this.overdraftsThisMonth = odThisMonth;
-        this.dateAccountOpened = dateAccOpened;
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     //getters
     public String getAccountType() {return accountType;}
@@ -36,6 +38,12 @@ class CheckingAccount extends Account{
 =======
 >>>>>>> JonTextInBranch
     //other methods to be decided
+=======
+    public Byte getIndicatedOverdraftProtection() {return indicatedOverdraftProtection;}
+    public void setIndicatedOverdraftProtection(Byte indicatedOverdraftProtection) {this.indicatedOverdraftProtection = indicatedOverdraftProtection;}
+    public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
+    public void setOverdraftsThisMonth(int overdraftsThisMonth) {this.overdraftsThisMonth = overdraftsThisMonth;}
+>>>>>>> JonTextInBranch
 
     @Override
     public String toString() {
@@ -48,4 +56,8 @@ class CheckingAccount extends Account{
                 ", accountBalance=" + accountBalance + 
                 '}';
     }
+
+    //other methods to be decided
+
+
 }//end of CheckingAccount

@@ -2,19 +2,22 @@ import java.util.Date;
 
 class SavingAccount extends Account{
     protected double currentInterestRate;
-    protected Date dateAccountOpened;
     protected Date dateCDDue;
 
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn){
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         super(cusIDIn, accBalIn);
+>>>>>>> JonTextInBranch
+=======
+        super(cusIDIn, accBalIn, dateAccOpenedIn, "Saving");
 >>>>>>> JonTextInBranch
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
-        this.dateAccountOpened = dateAccOpenedIn;
+        this.dateCDDue = null;
     }
 
 <<<<<<< HEAD
@@ -23,15 +26,19 @@ class SavingAccount extends Account{
 =======
     //overloading SavingAccount to CD
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn){
+<<<<<<< HEAD
         super(cusIDIn, accBalIn);
+>>>>>>> JonTextInBranch
+=======
+        super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
 >>>>>>> JonTextInBranch
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
-        this.dateAccountOpened = dateAccOpenedIn;
         this.dateCDDue = dateCDDueIn;
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     //getters
     public double getCurrentInterestRate() {return currentInterestRate;}
@@ -46,6 +53,12 @@ class SavingAccount extends Account{
 =======
 >>>>>>> JonTextInBranch
     //other methods to be decided
+=======
+    public double getCurrentInterestRate() {return currentInterestRate;}
+    public void setCurrentInterestRate(double currentInterestRate) {this.currentInterestRate = currentInterestRate;}
+    public Date getDateCDDue() {return dateCDDue;}
+    public void setDateCDDue(Date dateCDDue) {this.dateCDDue = dateCDDue;}
+>>>>>>> JonTextInBranch
 
     @Override
     public String toString() {
@@ -57,4 +70,8 @@ class SavingAccount extends Account{
                 ", accountBalance=" + accountBalance + 
                 '}';
     }
+
+    //other methods to be decided
+
+
 }//end of SavingAccount

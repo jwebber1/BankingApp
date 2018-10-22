@@ -5,12 +5,15 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class Main extends Application {
+    //used to format money, will probably need to be moved to "controller" for the GUI
+    NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -21,7 +24,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        //launch(args);
 
         //importing data
 
@@ -45,22 +48,27 @@ public class Main extends Application {
         }
 
 
-        /*
-        debugging
 
-        for(Customer customer: customers){
-            System.out.println(customer.toString());
-        }
-        for(LoanAccount loan: loans){
-            System.out.println(loan.toString());
-        }
-        for(CheckingAccount checking: checkings){
-            System.out.println(checking.toString());
-        }
-        for(SavingAccount saving: savings){
-            System.out.println(saving.toString());
-        }
+        //debugging the import process
+        /*
+        for(Customer customer: customers){System.out.println(customer.toString());}
+        for(LoanAccount loan: loans){System.out.println(loan.toString());}
+        for(CheckingAccount checking: checkings){System.out.println(checking.toString());}
+        for(SavingAccount saving: savings){System.out.println(saving.toString());}
         */
+
+        //exporting data
+
+        try {
+            exportCustomers(customers);
+            exportLoans(loans);
+            exportCheckings(checkings);
+            exportSavings(savings);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        System.exit(0); //currently stops the program, may want to remove later
     }
 
     //current method to grab data from the customers textfile in "memory"
@@ -112,7 +120,7 @@ public class Main extends Application {
         //close the bufferfile and return the ArrayList
         customersBR.close();
         return importCustomer;
-    }//end of checking data import method
+    }//end of customer data import method
 
     //current method to grab data from the loans textfile in "memory"
     public static ArrayList<LoanAccount> loansImportFile() throws IOException, ParseException {
@@ -148,7 +156,7 @@ public class Main extends Application {
                 String description = splitLine[1];
                 double balance = Double.parseDouble(splitLine[2]);
                 double rate = Double.parseDouble(splitLine[3]);
-                Date payDueDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
+                Date payDueDate =   new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
                 Date notifyPayDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
                 double currPayDue = Double.parseDouble(splitLine[6]);
                 Date lastPayDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[7]);
@@ -217,9 +225,10 @@ public class Main extends Application {
         //close the bufferfile and return the ArrayList
         checkingsBR.close();
         return importChecking;
+
     }//end of checking data import method
 
-    //current method to grab data from the checkings textfile in "memory"
+    //current method to grab data from the savings textfile in "memory"
     public static ArrayList<SavingAccount> savingsImportFile() throws IOException, ParseException {
 
         //creates a file referencing the text file in the memory folder
@@ -275,10 +284,100 @@ public class Main extends Application {
         savingsBR.close();
         return importSaving;
 
-    }//end of checking data import method
+    }//end of saving data import method
 
-    //method to export data to a file
-    public void exportCustomers(ArrayList<Customer> customers){
-        System.out.println("To be finished later");
-    }
-}
+    //method to export customers data to a file
+    public static void exportCustomers(ArrayList<Customer> customers) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter writer = new PrintWriter("memory/customers"+String.valueOf(System.currentTimeMillis())+".txt");
+
+        //printing the headers of the file
+        writer.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,");
+
+        //print the info for each customer
+        for(Customer customer: customers) {
+            writer.println(customer.getSocialSecurityNumber() + "," + customer.getStreetAddress() + "," +
+                    customer.getCity() + "," + customer.getState() + "," + customer.getZipCode() + "," +
+                    customer.getFirstName() + "," + customer.getLastName() + ",");
+        }
+
+        //close the PrintWriter object
+        writer.close();
+
+    }//end of exportCustomers
+
+    //method to export loans data to a file
+    public static void exportLoans(ArrayList<LoanAccount> loans) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter writer = new PrintWriter("memory/loans"+String.valueOf(System.currentTimeMillis())+".txt");
+
+        //printing the headers of the file
+        writer.println("CustomerID,Description,CurrentBalance,CurrentInterestRate,DatePaymentDue,DateNotifiedOfPayment,CurrentPaymentDue,DateSinceLastPaymentMade,MissedPaymentFlag,AccountType,");
+
+        //print the info for each loan
+        for(LoanAccount loan: loans) {
+            writer.println(loan.getCustomerID() + "," + loan.getDescription() + "," + loan.getAccountBalance() + "," +
+                    loan.getCurrentInterestRate() + "," +
+                    new SimpleDateFormat("MM/dd/yyy").format(loan.getDatePaymentDue()) + "," +
+                    new SimpleDateFormat("MM/dd/yyy").format(loan.getDatePaymentNotified()) + "," +
+                    new SimpleDateFormat("MM/dd/yyy").format(loan.getCurrentPaymentDue()) + "," +
+                    new SimpleDateFormat("MM/dd/yyy").format(loan.getLastPaymentDate()) + "," +
+                    loan.getMissedPaymentFlag() + "," + loan.getAccountType() + ",");
+        }
+
+        //close the PrintWriter object
+        writer.close();
+
+    }//end of exportLoans
+
+    //method to export checkings data to a file
+    public static void exportCheckings(ArrayList<CheckingAccount> checkings) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter writer = new PrintWriter("memory/checkings"+String.valueOf(System.currentTimeMillis())+".txt");
+
+        //printing the headers of the file
+        writer.println("CustomerID,CheckingBalance,CheckingAccountType,hasBackup,Overdrafts,DateOpened,");
+
+        //print the info for each checking
+        for(CheckingAccount checking: checkings) {
+            writer.println(checking.getCustomerID() + "," + checking.getAccountBalance() + "," +
+                    checking.getAccountType() + "," + checking.getIndicatedOverdraftProtection() + "," +
+                    checking.getOverdraftsThisMonth() + "," +
+                    new SimpleDateFormat("MM/dd/yyy").format(checking.getDateAccountOpened()) + ",");
+        }
+
+        //close the PrintWriter object
+        writer.close();
+
+    }//end of exportCheckings
+
+    //method to export savings data to a file
+    public static void exportSavings(ArrayList<SavingAccount> savings) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter writer = new PrintWriter("memory/savings"+String.valueOf(System.currentTimeMillis())+".txt");
+
+        //printing the headers of the file
+        writer.println("CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,");
+
+        //print the info for each saving
+        for(SavingAccount saving: savings) {
+
+            //check to see if it is a CD just a regular savings account
+            if(saving.getDateCDDue()==null) {
+                writer.println(saving.getCustomerID() + "," + saving.getAccountBalance() + "," +
+                        saving.getCurrentInterestRate() + "," + saving.getDateAccountOpened() + ",,");
+            }
+            else{
+                writer.println(saving.getCustomerID() + "," + saving.getAccountBalance() + "," +
+                        saving.getCurrentInterestRate() + "," +
+                        new SimpleDateFormat("MM/dd/yyy").format(saving.getDateAccountOpened()) + "," +
+                        new SimpleDateFormat("MM/dd/yyy").format(saving.getDateCDDue()) + ",");
+            }
+        }
+
+        //close the PrintWriter object
+        writer.close();
+
+    }//end of exportSavings
+
+}//end of main
