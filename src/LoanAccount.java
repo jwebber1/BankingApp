@@ -1,17 +1,27 @@
 import java.util.Date;
 
 class LoanAccount extends Account{
-    protected String loanType;      //long term = "LT"  short term = "ST"   credit card = "CC"
     protected double currentInterestRate;
+<<<<<<< HEAD
+=======
+    protected String description;
+>>>>>>> JonTextInBranch
     protected Date datePaymentDue;
     protected double currentPaymentDue;
     protected Date datePaymentNotified;
     protected Date lastPaymentDate;
     protected Byte missedPaymentFlag;   // 1=true   0=false
+    protected String loanType;      //long term = "LT"  short term = "ST"   credit card = "CC"
 
+<<<<<<< HEAD
     public LoanAccount(int cusIDIn, double accBalIn, String loanTypeIn, double currIntRate, Date datePayDue, double currPayDue, Date datePayNotifIn, Date lastPayDateIn, Byte missPayFlagIn){
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
+=======
+    public LoanAccount(int cusIDIn, String desc, double accBalIn, double currIntRate, Date datePayDue, double currPayDue, Date datePayNotifIn, Date lastPayDateIn, Byte missPayFlagIn, String loanTypeIn){
+        super(cusIDIn, accBalIn);
+        this.description = desc;
+>>>>>>> JonTextInBranch
         this.loanType = loanTypeIn;
         this.currentInterestRate = currIntRate;
         this.datePaymentDue = datePayDue;
@@ -21,6 +31,7 @@ class LoanAccount extends Account{
         this.missedPaymentFlag = missPayFlagIn;
     }
 
+<<<<<<< HEAD
     //getters
     public String getLoanType() {return loanType;}
     public double getCurrentInterestRate() {return currentInterestRate;}
@@ -39,10 +50,23 @@ class LoanAccount extends Account{
     public void setLastPaymentDate(Date lastPaymentDate) {this.lastPaymentDate = lastPaymentDate;}
     public void setMissedPaymentFlag(Byte missedPaymentFlag) {this.missedPaymentFlag = missedPaymentFlag;}
 
+=======
+>>>>>>> JonTextInBranch
     //other methods to be decided
 
-
-
-
-
+    @Override
+    public String toString() {
+        return "LoanAccount{" + 
+                "currentInterestRate=" + currentInterestRate + 
+                ", description='" + description + '\'' + 
+                ", datePaymentDue=" + datePaymentDue + 
+                ", currentPaymentDue=" + currentPaymentDue + 
+                ", datePaymentNotified=" + datePaymentNotified + 
+                ", lastPaymentDate=" + lastPaymentDate + 
+                ", missedPaymentFlag=" + missedPaymentFlag + 
+                ", loanType='" + loanType + '\'' + 
+                ", customerID=" + customerID + 
+                ", accountBalance=" + accountBalance + 
+                '}';
+    }
 }//end of LoanAccount

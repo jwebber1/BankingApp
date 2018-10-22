@@ -8,14 +8,19 @@ class CheckingAccount extends Account{
 
     //constructor for the Checking Account
     public CheckingAccount(int cusIDIn, double accBalIn, String accTypeIn, Byte OvProIn, int odThisMonth, Date dateAccOpened){
+<<<<<<< HEAD
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
+=======
+        super(cusIDIn,accBalIn);
+>>>>>>> JonTextInBranch
         this.accountType = accTypeIn;
         this.indicatedOverdraftProtection = OvProIn;
         this.overdraftsThisMonth = odThisMonth;
         this.dateAccountOpened = dateAccOpened;
     }
 
+<<<<<<< HEAD
     //getters
     public String getAccountType() {return accountType;}
     public Byte getIndicatedOverdraftProtection() {return indicatedOverdraftProtection;}
@@ -28,10 +33,19 @@ class CheckingAccount extends Account{
     public void setOverdraftsThisMonth(int overdraftsThisMonth) {this.overdraftsThisMonth = overdraftsThisMonth;}
     public void setDateAccountOpened(Date dateAccountOpened) {this.dateAccountOpened = dateAccountOpened;}
 
+=======
+>>>>>>> JonTextInBranch
     //other methods to be decided
 
-
-
-
-
+    @Override
+    public String toString() {
+        return "CheckingAccount{" + 
+                "accountType='" + accountType + '\'' + 
+                ", indicatedOverdraftProtection=" + indicatedOverdraftProtection + 
+                ", overdraftsThisMonth=" + overdraftsThisMonth + 
+                ", dateAccountOpened=" + dateAccountOpened + 
+                ", customerID=" + customerID + 
+                ", accountBalance=" + accountBalance + 
+                '}';
+    }
 }//end of CheckingAccount
