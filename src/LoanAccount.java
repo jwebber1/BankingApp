@@ -7,13 +7,11 @@ class LoanAccount extends Account{
     protected double currentPaymentDue;
     protected Date datePaymentNotified;
     protected Date lastPaymentDate;
-    protected Byte missedPaymentFlag;   // 1=true   0=false
-    protected String loanType;      //long term = "LT"  short term = "ST"   credit card = "CC"
+    protected Byte missedPaymentFlag;   //1=true   0=false
 
     public LoanAccount(int cusIDIn, String desc, double accBalIn, double currIntRate, Date datePayDue, double currPayDue, Date datePayNotifIn, Date lastPayDateIn, Byte missPayFlagIn, String loanTypeIn){
-        super(cusIDIn, accBalIn);
+        super(cusIDIn, accBalIn, null, loanTypeIn);
         this.description = desc;
-        this.loanType = loanTypeIn;
         this.currentInterestRate = currIntRate;
         this.datePaymentDue = datePayDue;
         this.currentPaymentDue = currPayDue;
@@ -33,11 +31,9 @@ class LoanAccount extends Account{
     public Date getDatePaymentNotified() { return datePaymentNotified;}
     public void setDatePaymentNotified(Date datePaymentNotified) {this.datePaymentNotified = datePaymentNotified;}
     public Date getLastPaymentDate() {return lastPaymentDate;}
-    public void setLastPaymentDate(Date lastPaymentDate) {this.lastPaymentDate = lastPaymentDate; }
+    public void setLastPaymentDate(Date lastPaymentDate) {this.lastPaymentDate = lastPaymentDate;}
     public Byte getMissedPaymentFlag() {return missedPaymentFlag;}
-    public void setMissedPaymentFlag(Byte missedPaymentFlag) {this.missedPaymentFlag = missedPaymentFlag; }
-    public String getLoanType() { return loanType;}
-    public void setLoanType(String loanType) {this.loanType = loanType;}
+    public void setMissedPaymentFlag(Byte missedPaymentFlag) {this.missedPaymentFlag = missedPaymentFlag;}
 
     @Override
     public String toString() {
@@ -48,8 +44,7 @@ class LoanAccount extends Account{
                 ", currentPaymentDue=" + currentPaymentDue + 
                 ", datePaymentNotified=" + datePaymentNotified + 
                 ", lastPaymentDate=" + lastPaymentDate + 
-                ", missedPaymentFlag=" + missedPaymentFlag + 
-                ", loanType='" + loanType + '\'' + 
+                ", missedPaymentFlag=" + missedPaymentFlag +
                 ", customerID=" + customerID + 
                 ", accountBalance=" + accountBalance + 
                 '}';

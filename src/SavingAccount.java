@@ -2,29 +2,30 @@ import java.util.Date;
 
 class SavingAccount extends Account{
     protected double currentInterestRate;
-    protected Date dateAccountOpened;
     protected Date dateCDDue;
 
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn){
-        super(cusIDIn, accBalIn);
+        super(cusIDIn, accBalIn, dateAccOpenedIn, "Saving");
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
-        this.dateAccountOpened = dateAccOpenedIn;
+        this.dateCDDue = null;
     }
 
     //overloading SavingAccount to CD
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn){
-        super(cusIDIn, accBalIn);
+        super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
-        this.dateAccountOpened = dateAccOpenedIn;
         this.dateCDDue = dateCDDueIn;
     }
 
-    //other methods to be decided
+    public double getCurrentInterestRate() {return currentInterestRate;}
+    public void setCurrentInterestRate(double currentInterestRate) {this.currentInterestRate = currentInterestRate;}
+    public Date getDateCDDue() {return dateCDDue;}
+    public void setDateCDDue(Date dateCDDue) {this.dateCDDue = dateCDDue;}
 
     @Override
     public String toString() {
@@ -36,4 +37,8 @@ class SavingAccount extends Account{
                 ", accountBalance=" + accountBalance + 
                 '}';
     }
+
+    //other methods to be decided
+
+
 }//end of SavingAccount
