@@ -7,14 +7,16 @@ class SavingAccount extends Account{
 
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn){
+        super(cusIDIn, accBalIn);
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
         this.dateAccountOpened = dateAccOpenedIn;
     }
 
-    //overloading constructor if it is a CD
+    //overloading SavingAccount to CD
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn){
+        super(cusIDIn, accBalIn);
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
@@ -22,20 +24,16 @@ class SavingAccount extends Account{
         this.dateCDDue = dateCDDueIn;
     }
 
-    //getters
-    public double getCurrentInterestRate() {return currentInterestRate;}
-    public Date getDateAccountOpened() {return dateAccountOpened;}
-    public Date getDateCDDue() {return dateCDDue;}
-
-    //setters
-    public void setCurrentInterestRate(double currentInterestRate) {this.currentInterestRate = currentInterestRate;}
-    public void setDateAccountOpened(Date dateAccountOpened) {this.dateAccountOpened = dateAccountOpened;}
-    public void setDateCDDue(Date dateCDDue) {this.dateCDDue = dateCDDue;}
-
     //other methods to be decided
 
-
-
-
-
+    @Override
+    public String toString() {
+        return "SavingAccount{" + 
+                "currentInterestRate=" + currentInterestRate + 
+                ", dateAccountOpened=" + dateAccountOpened + 
+                ", dateCDDue=" + dateCDDue + 
+                ", customerID=" + customerID + 
+                ", accountBalance=" + accountBalance + 
+                '}';
+    }
 }//end of SavingAccount

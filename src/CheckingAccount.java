@@ -8,30 +8,24 @@ class CheckingAccount extends Account{
 
     //constructor for the Checking Account
     public CheckingAccount(int cusIDIn, double accBalIn, String accTypeIn, Byte OvProIn, int odThisMonth, Date dateAccOpened){
-        this.customerID = cusIDIn;
-        this.accountBalance = accBalIn;
+        super(cusIDIn,accBalIn);
         this.accountType = accTypeIn;
         this.indicatedOverdraftProtection = OvProIn;
         this.overdraftsThisMonth = odThisMonth;
         this.dateAccountOpened = dateAccOpened;
     }
 
-    //getters
-    public String getAccountType() {return accountType;}
-    public Byte getIndicatedOverdraftProtection() {return indicatedOverdraftProtection;}
-    public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
-    public Date getDateAccountOpened() {return dateAccountOpened;}
-
-    //setters
-    public void setAccountType(String accountType) {this.accountType = accountType;}
-    public void setIndicatedOverdraftProtection(Byte indicatedOverdraftProtection) {this.indicatedOverdraftProtection = indicatedOverdraftProtection;}
-    public void setOverdraftsThisMonth(int overdraftsThisMonth) {this.overdraftsThisMonth = overdraftsThisMonth;}
-    public void setDateAccountOpened(Date dateAccountOpened) {this.dateAccountOpened = dateAccountOpened;}
-
     //other methods to be decided
 
-
-
-
-
+    @Override
+    public String toString() {
+        return "CheckingAccount{" + 
+                "accountType='" + accountType + '\'' + 
+                ", indicatedOverdraftProtection=" + indicatedOverdraftProtection + 
+                ", overdraftsThisMonth=" + overdraftsThisMonth + 
+                ", dateAccountOpened=" + dateAccountOpened + 
+                ", customerID=" + customerID + 
+                ", accountBalance=" + accountBalance + 
+                '}';
+    }
 }//end of CheckingAccount
