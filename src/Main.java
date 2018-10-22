@@ -21,7 +21,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        //launch(args);
 
         //importing data
 
@@ -46,7 +46,7 @@ public class Main extends Application {
 
 
         /*
-        debugging
+        //debugging the import process
 
         for(Customer customer: customers){
             System.out.println(customer.toString());
@@ -61,6 +61,16 @@ public class Main extends Application {
             System.out.println(saving.toString());
         }
         */
+
+        //exporting data
+        try {
+            //exportCustomers(customers);
+            exportLoans(loans);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        System.exit(0);
     }
 
     //current method to grab data from the customers textfile in "memory"
@@ -277,8 +287,43 @@ public class Main extends Application {
 
     }//end of checking data import method
 
-    //method to export data to a file
-    public void exportCustomers(ArrayList<Customer> customers){
-        System.out.println("To be finished later");
+    //method to export customers data to a file
+    public static void exportCustomers(ArrayList<Customer> customers) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter writer = new PrintWriter("memory/customers"+String.valueOf(System.currentTimeMillis())+".txt");
+
+        //printing the headers of the file
+        writer.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,");
+
+        //print the info for each customer
+        for(Customer customer: customers) {
+            writer.println(customer.getSocialSecurityNumber() + "," + customer.getStreetAddress() + "," +
+                    customer.getCity() + "," + customer.getState() + "," + customer.getZipCode() + "," +
+                    customer.getFirstName() + "," + customer.getLastName() + ",");
+        }
+
+        //close the PrintWriter object
+        writer.close();
     }
+
+    //method to export loans data to a file
+    public static void exportLoans(ArrayList<LoanAccount> loans) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter writer = new PrintWriter("memory/loans"+String.valueOf(System.currentTimeMillis())+".txt");
+
+        //printing the headers of the file
+        writer.println("CustomerID,Description,CurrentBalance,CurrentInterestRate,DatePaymentDue,DateNotifiedOfPayment,CurrentPaymentDue,DateSinceLastPaymentMade,MissedPaymentFlag,AccountType,");
+
+        //print the info for each customer
+        for(LoanAccount loan: loans) {
+            writer.println(loan.getCustomerID() + "," + loan.getDescription() + "," + loan.getAccountBalance() + "," +
+                    loan.getCurrentInterestRate() + "," + loan.getDatePaymentDue() + "," +
+                    loan.getDatePaymentNotified() + "," + loan.getCurrentPaymentDue() + "," +
+                    loan.getLastPaymentDate() + "," + loan.getMissedPaymentFlag() + "," + loan.getLoanType() + ",");
+        }
+
+        //close the PrintWriter object
+        writer.close();
+    }
+
 }

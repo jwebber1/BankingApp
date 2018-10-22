@@ -22,7 +22,22 @@ class LoanAccount extends Account{
         this.missedPaymentFlag = missPayFlagIn;
     }
 
-    //other methods to be decided
+    public double getCurrentInterestRate() {return currentInterestRate;}
+    public void setCurrentInterestRate(double currentInterestRate) {this.currentInterestRate = currentInterestRate;}
+    public String getDescription() {return description;}
+    public void setDescription(String description) {this.description = description;}
+    public Date getDatePaymentDue() {return datePaymentDue;}
+    public void setDatePaymentDue(Date datePaymentDue) {this.datePaymentDue = datePaymentDue;}
+    public double getCurrentPaymentDue() {return currentPaymentDue;}
+    public void setCurrentPaymentDue(double currentPaymentDue) {this.currentPaymentDue = currentPaymentDue;}
+    public Date getDatePaymentNotified() { return datePaymentNotified;}
+    public void setDatePaymentNotified(Date datePaymentNotified) {this.datePaymentNotified = datePaymentNotified;}
+    public Date getLastPaymentDate() {return lastPaymentDate;}
+    public void setLastPaymentDate(Date lastPaymentDate) {this.lastPaymentDate = lastPaymentDate; }
+    public Byte getMissedPaymentFlag() {return missedPaymentFlag;}
+    public void setMissedPaymentFlag(Byte missedPaymentFlag) {this.missedPaymentFlag = missedPaymentFlag; }
+    public String getLoanType() { return loanType;}
+    public void setLoanType(String loanType) {this.loanType = loanType;}
 
     @Override
     public String toString() {
@@ -39,4 +54,7 @@ class LoanAccount extends Account{
                 ", accountBalance=" + accountBalance + 
                 '}';
     }
+
+    //other methods to be decided
+
 }//end of LoanAccount
