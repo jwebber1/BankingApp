@@ -7,8 +7,6 @@ class SavingAccount extends Account{
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn){
         super(cusIDIn, accBalIn, dateAccOpenedIn, "Saving");
-        this.customerID = cusIDIn;
-        this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = null;
     }

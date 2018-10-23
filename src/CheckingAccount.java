@@ -32,4 +32,9 @@ class CheckingAccount extends Account{
     //other methods to be decided
 
 
+<<<<<<< HEAD
 }//end of CheckingAccount
+=======
+
+}//end of CheckingAccount
+>>>>>>> JonTextInBranch

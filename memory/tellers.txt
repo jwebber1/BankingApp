@@ -1,0 +1,4 @@
+EmployeeID,FirstName,LastName,Password,
+00000001,Spongebob,Squarepants,bikini,
+00000002,Ferris,Beuller,dayoff,
+00000003,Ronald,McDonald,burger,
