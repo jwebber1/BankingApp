@@ -6,7 +6,6 @@ class CheckingAccount extends Account{
 
     //constructor for the Checking Account
     public CheckingAccount(int cusIDIn, double accBalIn, String accTypeIn, Byte OvProIn, int odThisMonth, Date dateAccOpened){
-
         super(cusIDIn,accBalIn, dateAccOpened, accTypeIn);
         this.indicatedOverdraftProtection = OvProIn;
         this.overdraftsThisMonth = odThisMonth;
@@ -30,6 +29,7 @@ class CheckingAccount extends Account{
     }
 
     //other methods to be decided
+
 
 
 }//end of CheckingAccount
