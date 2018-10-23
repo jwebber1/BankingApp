@@ -1,9 +1,5 @@
 import java.util.Date;
 
-/**
- * TODO:
- */
-
 class SavingAccount extends Account{
     protected double currentInterestRate;
     protected Date dateCDDue;
@@ -11,8 +7,6 @@ class SavingAccount extends Account{
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn){
         super(cusIDIn, accBalIn, dateAccOpenedIn, "Saving");
-        this.customerID = cusIDIn;
-        this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = null;
     }
