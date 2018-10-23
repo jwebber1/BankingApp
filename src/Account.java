@@ -1,6 +1,4 @@
-/**
- * TODO:
- */
+import java.util.Date;
 
 abstract class Account {
     protected int customerID;
@@ -30,4 +28,13 @@ abstract class Account {
 
     //other methods to be decided
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "customerID=" + customerID +
+                ", accountBalance=" + accountBalance +
+                ", dateAccountOpened=" + dateAccountOpened +
+                ", accountType='" + accountType + '\'' +
+                '}';
+    }
 }//end of Account
