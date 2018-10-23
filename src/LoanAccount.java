@@ -1,5 +1,9 @@
 import java.util.Date;
 
+/**
+ * TODO:
+ */
+
 class LoanAccount extends Account{
     protected String loanType;      //long term = "LT"  short term = "ST"   credit card = "CC"
     protected double currentInterestRate;

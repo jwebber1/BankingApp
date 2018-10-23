@@ -1,5 +1,7 @@
 package UI;
 
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -14,41 +16,49 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.time.LocalDate;
+
 public class AccountCreationScene {
     public StackPane root = new StackPane();
 
-    // Properties fields are bound to.
-    private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
+    // TODO: Get customers correctly.
+    private ObservableList<String> customers = FXCollections.observableArrayList(
+    "Customer 1",
+            "Customer 2",
+            "Customer 3"
+    );
+
+    // Fields Needed By All Account Types
+    private final StringProperty customerProperty = new SimpleStringProperty("");
     private final StringProperty accountTypeProperty = new SimpleStringProperty("");
     private final StringProperty accountBalanceProperty = new SimpleStringProperty("$");
-    private final StringProperty firstNameProperty = new SimpleStringProperty("");
-    private final StringProperty lastNameProperty = new SimpleStringProperty("");
 
-    private final StringProperty loanTypeProperty = new SimpleStringProperty("");
+    // Checking Account Specific Fields
     private final StringProperty checkingAccountTypeProperty = new SimpleStringProperty("");
 
-    // Account Type-specific Fields
+    // Loan Specific Fields
+    private final StringProperty loanTypeProperty = new SimpleStringProperty("");
+    private final Property<LocalDate> datePaymentDue = new SimpleObjectProperty<>();
+
+    // Boxes to Hold Nodes
     private VBox savingsAccountFieldsVBox = new VBox();
     private VBox checkingAccountFieldsVBox = new VBox();
     private VBox loanFieldsVBox = new VBox();
-
     private HBox buttonHBox = new HBox();
 
     private ObservableList<String> accountTypes = FXCollections.observableArrayList(
-            "Savings",
+    "Savings",
             "Checking",
             "Loan"
     );
-
     private ObservableList<String> loanTypes = FXCollections.observableArrayList(
             "Long Term",
             "Short Term",
             "Credit Card"
     );
-
     private ObservableList<String> checkingAccountTypes = FXCollections.observableArrayList(
-            "That's My Bank",
-            "Gold/Diamond"
+    "That's My Bank",
+            "Gold"
     );
 
     private VBox fieldVBox = new VBox();
@@ -59,21 +69,25 @@ public class AccountCreationScene {
         createLoanFields();
 
         fieldVBox.setSpacing(8);
+        savingsAccountFieldsVBox.setSpacing(8);
+        checkingAccountFieldsVBox.setSpacing(8);
+        loanFieldsVBox.setSpacing(8);
+
         root.getChildren().add(fieldVBox);
         root.setPadding(new Insets(20));
     }
 
     // Creates base fields that are used by all account types.
     private void createBaseAccountCreationNodes() {
+        ComboBox customerBox = UICreationHelpers.createComboBox(customers, customerProperty);
+        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Customer:", customerBox));
+
         ComboBox accountTypeBox = UICreationHelpers.createComboBox(accountTypes, accountTypeProperty);
         accountTypeBox.valueProperty().addListener((observable, oldValue, newValue) -> updateAccountType(newValue.toString()));
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("Account Type:", accountTypeBox));
 
         HBox hBox = UICreationHelpers.createHBox("Account Balance:", UICreationHelpers.createBalanceField(accountBalanceProperty));
         fieldVBox.getChildren().add(hBox);
-
-//        createTextField("First Name:", firstNameProperty);
-//        createTextField("Last Name:", lastNameProperty);
 
         // Save Button
         Button saveButton = new Button("Save");
@@ -94,28 +108,28 @@ public class AccountCreationScene {
         ComboBox loanTypeBox = UICreationHelpers.createComboBox(loanTypes, loanTypeProperty);
         loanFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Loan Type:", loanTypeBox));
 
-        DatePicker datePicker = UICreationHelpers.createDatePicker(loanTypeProperty);
+        DatePicker datePicker = UICreationHelpers.createDatePicker(datePaymentDue);
         loanFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Date Payment Due:", datePicker));
     }
 
-
     // Runs when the "Save" button is pressed.
     private void saveAccount() {
+        System.out.println(datePaymentDue);
         String errorMessage = "";
 
-        errorMessage += UICreationHelpers.checkNumberField("Social Security #", socialSecurityProperty);
-        // Extra Check for SSN (EXACTLY 9 Characters)
-        if (socialSecurityProperty.get().length() == 9) {
-            errorMessage += "Social Security # field must contain exactly nine digits.\n";
+        if (customerProperty.get().isEmpty()) {
+            errorMessage += "Customer must be selected.\n";
         }
 
-        //
+//        errorMessage += UICreationHelpers.checkNumberField("Social Security #", socialSecurityProperty);
+        // Extra Check for SSN (EXACTLY 9 Characters)
+//        if (socialSecurityProperty.get().length() == 9) {
+//            errorMessage += "Social Security # field must contain exactly nine digits.\n";
+//        }
+
         if (accountTypeProperty.get().isEmpty()) {
             errorMessage += "Account Type must be selected.\n";
         }
-
-//        errorMessage += checkTextField("First Name", firstNameProperty);
-//        errorMessage += checkTextField("Last Name", lastNameProperty);
 
         if (!errorMessage.isEmpty()) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -129,8 +143,6 @@ public class AccountCreationScene {
             successfulAlert.setContentText("The user has been saved successfully.");
             successfulAlert.showAndWait();
         }
-//        System.out.println(firstNameProperty.get());
-//        System.out.println(lastNameProperty.get());
     }
 
     // Runs when Account Type is changed to add fields related to account type and remove fields of other account types.

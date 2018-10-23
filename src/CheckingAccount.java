@@ -1,8 +1,12 @@
 import java.util.Date;
 
+/**
+ * TODO:
+ */
+
 class CheckingAccount extends Account{
     protected String accountType;
-    protected Byte indicatedOverdraftProtection;    // 1 = true   0 = false
+    protected Byte indicatedOverdraftProtection; // 1 = true   0 = false
     protected int overdraftsThisMonth;
     protected Date dateAccountOpened;
 

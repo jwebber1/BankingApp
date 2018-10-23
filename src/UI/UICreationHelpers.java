@@ -1,5 +1,6 @@
 package UI;
 
+import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -7,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 
+import java.time.LocalDate;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -36,7 +38,6 @@ class UICreationHelpers {
         Pattern validEditingState = Pattern.compile("\\$-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?");
         UnaryOperator<TextFormatter.Change> filter = c -> {
             String text = c.getControlNewText();
-            System.out.println(text);
             if (validEditingState.matcher(text).matches()) {
                 return c;
             } else {
@@ -75,9 +76,10 @@ class UICreationHelpers {
         return comboBox;
     }
 
-    static DatePicker createDatePicker(StringProperty property) {
+    static DatePicker createDatePicker(Property<LocalDate> date) {
         DatePicker datePicker = new DatePicker();
         datePicker.setPrefSize(fieldWidth, fieldHeight);
+        datePicker.valueProperty().bindBidirectional(date);
         return datePicker;
     }
 
