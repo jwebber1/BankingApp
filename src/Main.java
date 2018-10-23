@@ -58,7 +58,7 @@ public class Main extends Application {
         */
 
         //exporting data
-
+        /*
         try {
             exportCustomers(customers);
             exportLoans(loans);
@@ -66,6 +66,12 @@ public class Main extends Application {
             exportSavings(savings);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }
+        */
+
+        ArrayList<Account> searchResults = SearchAccounts(423453245, savings, checkings, loans);
+        for (Account account: searchResults) {
+            System.out.println(account.toString());
         }
 
         System.exit(0); //currently stops the program, may want to remove later
@@ -108,9 +114,10 @@ public class Main extends Application {
                 String zipCode = splitLine[4];
                 String firstName = splitLine[5];
                 String lastName = splitLine[6];
+                String pin = splitLine[7];
 
                 //add the new data (in our case checking) to the ArrayList
-                importCustomer.add(new Customer(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName));
+                importCustomer.add(new Customer(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName, pin));
             }
 
             //increment the line number
@@ -121,6 +128,103 @@ public class Main extends Application {
         customersBR.close();
         return importCustomer;
     }//end of customer data import method
+
+    //current method to grab data from the tellers textfile in "memory"
+    public static ArrayList<Teller> tellerImportFile() throws IOException, ParseException {
+
+        //creates a file referencing the text file in the memory folder
+        File tellersFileIn = new File("memory/tellers.txt");
+
+        //creates a bufferedreader to read from a file
+        BufferedReader tellersBR = null;
+        tellersBR = new BufferedReader(new InputStreamReader(new FileInputStream(tellersFileIn)));
+
+        //buffer string to temporarily hold the line retrieved
+        String line;
+
+        //creates the ArrayList of data
+        ArrayList<Teller> importTeller = new ArrayList<>();
+
+        //generic counter to know the line currently on
+        int lineNum = 0;
+
+        //while loop to go through the file
+        while ((line = tellersBR.readLine()) != null) {
+
+            //if the file has a header, this if statement is to avoid that
+            //remove "if" if final file has no header
+            if(lineNum > 0) {
+
+                //split the line into an array of strings
+                String[] splitLine = line.split(",");
+
+                //create temp variable to hold info from the split lines
+                int employeeID = Integer.parseInt(splitLine[0]);
+
+                String firstName = splitLine[1];
+                String lastName = splitLine[2];
+                String password = splitLine[3];
+
+                //add the new data (in our case checking) to the ArrayList
+                importTeller.add(new Teller(employeeID, firstName, lastName, password));
+            }
+
+            //increment the line number
+            lineNum++;
+        }
+
+        //close the bufferfile and return the ArrayList
+        tellersBR.close();
+        return importTeller;
+    }//end of teller data import method
+
+    //current method to grab data from the customers textfile in "memory"
+    public static ArrayList<Manager> managerImportFile() throws IOException, ParseException {
+
+        //creates a file referencing the text file in the memory folder
+        File managersFileIn = new File("memory/managers.txt");
+
+        //creates a bufferedreader to read from a file
+        BufferedReader managersBR = null;
+        managersBR = new BufferedReader(new InputStreamReader(new FileInputStream(managersFileIn)));
+
+        //buffer string to temporarily hold the line retrieved
+        String line;
+
+        //creates the ArrayList of data
+        ArrayList<Manager> importManager = new ArrayList<>();
+
+        //generic counter to know the line currently on
+        int lineNum = 0;
+
+        //while loop to go through the file
+        while ((line = managersBR.readLine()) != null) {
+
+            //if the file has a header, this if statement is to avoid that
+            //remove "if" if final file has no header
+            if(lineNum > 0) {
+
+                //split the line into an array of strings
+                String[] splitLine = line.split(",");
+
+                //create temp variable to hold info from the split lines
+                int employeeID = Integer.parseInt(splitLine[0]);
+                String firstName = splitLine[1];
+                String lastName = splitLine[2];
+                String password = splitLine[3];
+
+                //add the new data (in our case checking) to the ArrayList
+                importManager.add(new Manager(employeeID, firstName, lastName, password));
+            }
+
+            //increment the line number
+            lineNum++;
+        }
+
+        //close the bufferfile and return the ArrayList
+        managersBR.close();
+        return importManager;
+    }//end of manager data import method
 
     //current method to grab data from the loans textfile in "memory"
     public static ArrayList<LoanAccount> loansImportFile() throws IOException, ParseException {
@@ -296,9 +400,9 @@ public class Main extends Application {
 
         //print the info for each customer
         for(Customer customer: customers) {
-            writer.println(customer.getSocialSecurityNumber() + "," + customer.getStreetAddress() + "," +
+            writer.println(customer.getId() + "," + customer.getStreetAddress() + "," +
                     customer.getCity() + "," + customer.getState() + "," + customer.getZipCode() + "," +
-                    customer.getFirstName() + "," + customer.getLastName() + ",");
+                    customer.getfName() + "," + customer.getlName() + ",");
         }
 
         //close the PrintWriter object
@@ -379,5 +483,30 @@ public class Main extends Application {
         writer.close();
 
     }//end of exportSavings
+
+    //search all the savingaccounts for a matching customerID
+    public static ArrayList<Account> SearchAccounts(int custID, ArrayList<SavingAccount> savings, ArrayList<CheckingAccount> checkings, ArrayList<LoanAccount> loans){
+
+        //create an arraylist for any account type
+        ArrayList<Account> searchResults = new ArrayList<>();
+
+        for(int i=0; i<savings.size()-1; i++){
+            if(savings.get(i).getCustomerID()==custID){
+                searchResults.add(savings.get(i));
+            }
+        }
+        for(int i=0; i<checkings.size()-1; i++){
+            if(checkings.get(i).getCustomerID()==custID){
+                searchResults.add(checkings.get(i));
+            }
+        }
+        for(int i=0; i<loans.size()-1; i++){
+            if(loans.get(i).getCustomerID()==custID){
+                searchResults.add(loans.get(i));
+            }
+        }
+
+        return searchResults;
+    }
 
 }//end of main
