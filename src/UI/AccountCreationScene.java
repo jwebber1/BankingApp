@@ -19,7 +19,7 @@ import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 
 public class AccountCreationScene {
-    public StackPane root = new StackPane();
+    private StackPane root = new StackPane();
 
     // TODO: Get customers correctly.
     private ObservableList<String> customers = FXCollections.observableArrayList(
@@ -41,10 +41,10 @@ public class AccountCreationScene {
     private final Property<LocalDate> datePaymentDue = new SimpleObjectProperty<>();
 
     // Boxes to Hold Nodes
+    private HBox buttonHBox = new HBox();
     private VBox savingsAccountFieldsVBox = new VBox();
     private VBox checkingAccountFieldsVBox = new VBox();
     private VBox loanFieldsVBox = new VBox();
-    private HBox buttonHBox = new HBox();
 
     private ObservableList<String> accountTypes = FXCollections.observableArrayList(
     "Savings",
@@ -75,6 +75,10 @@ public class AccountCreationScene {
 
         root.getChildren().add(fieldVBox);
         root.setPadding(new Insets(20));
+    }
+
+    public StackPane getRoot() {
+        return root;
     }
 
     // Creates base fields that are used by all account types.
@@ -120,12 +124,6 @@ public class AccountCreationScene {
         if (customerProperty.get().isEmpty()) {
             errorMessage += "Customer must be selected.\n";
         }
-
-//        errorMessage += UICreationHelpers.checkNumberField("Social Security #", socialSecurityProperty);
-        // Extra Check for SSN (EXACTLY 9 Characters)
-//        if (socialSecurityProperty.get().length() == 9) {
-//            errorMessage += "Social Security # field must contain exactly nine digits.\n";
-//        }
 
         if (accountTypeProperty.get().isEmpty()) {
             errorMessage += "Account Type must be selected.\n";
