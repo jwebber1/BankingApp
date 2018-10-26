@@ -3,6 +3,7 @@ import java.util.Date;
 class SavingAccount extends Account{
     protected double currentInterestRate;
     protected Date dateCDDue;
+    //Jacob Testing his git connection
 
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn){
