@@ -85,8 +85,9 @@ class UICreationHelpers {
 
     // Creates a text field with Label having text "labelText." The text in the field is bound bidirectionally to the
     // StringProperty "property."
-    static TextField createTextField(String labelText, StringProperty property) {
+    static TextField createTextField(StringProperty property) {
         TextField textField = new TextField();
+        textField.setPrefSize(fieldWidth, fieldHeight);
         textField.textProperty().bindBidirectional(property);
         return textField;
     }
