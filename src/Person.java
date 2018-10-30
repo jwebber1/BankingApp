@@ -1,37 +1,5 @@
-<<<<<<< HEAD
-abstract class Person {
-    protected int id;
-    protected String fName;
-    protected String lName;
-    protected String password;
+import java.util.ArrayList;
 
-    public Person(int id, String fName, String lName, String pw){
-        this.id = id;
-        this.fName = fName;
-        this.lName = lName;
-        this.password = pw;
-    }
-
-    public int getId() {return id;}
-    public void setId(int id) {this.id = id;}
-    public String getfName() {return fName;}
-    public void setfName(String fName) {this.fName = fName;}
-    public String getlName() {return lName;}
-    public void setlName(String lName) {this.lName = lName;}
-    public String getPassword() {return password;}
-    public void setPassword(String password) {this.password = password;}
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", fName='" + fName + '\'' +
-                ", lName='" + lName + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
-}//end of Person
-=======
 public class Person {
     protected int id;   //social security number
     protected String streetAddress;
@@ -41,8 +9,9 @@ public class Person {
     protected String fName;
     protected String lName;
     protected int userLevel;    // 1 = customer, 2 = teller, 3 = manager
+    protected ArrayList<ArrayList> accounts;
 
-    public Person(int id, String addr, String city, String state, String zip, String fName, String lName, int uLevel){
+    public Person(int id, String addr, String city, String state, String zip, String fName, String lName, int uLevel, ArrayList<ArrayList> accounts){
         this.id = id;
         this.streetAddress = addr;
         this.city = city;
@@ -51,6 +20,7 @@ public class Person {
         this.fName = fName;
         this.lName = lName;
         this.userLevel = uLevel;
+        this.accounts = accounts;
     }
 
     //getters and setters
@@ -71,6 +41,14 @@ public class Person {
     public int getUserLevel() {return userLevel;}
     public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
 
+    public ArrayList<ArrayList> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(ArrayList<ArrayList> accounts) {
+        this.accounts = accounts;
+    }
+
     @Override
     public String toString() {
         return "Person{" +
@@ -86,4 +64,3 @@ public class Person {
     }
 
 }//end of Person
->>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
