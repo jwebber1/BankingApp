@@ -10,6 +10,7 @@ class SavingAccount extends Account{
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = null;
     }
+    //TESTING GIT CONNECTING WITH FORK
 
     //overloading SavingAccount to CD
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn){
