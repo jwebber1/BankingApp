@@ -1,9 +1,5 @@
 import java.util.Date;
 
-/**
- * TODO:
- */
-
 class LoanAccount extends Account{
     protected double currentInterestRate;
     protected String description;

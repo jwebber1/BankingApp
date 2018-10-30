@@ -1,3 +1,6 @@
+import UI.AccountCreationScene;
+import UI.CustomerCreationScene;
+import UI.LoginScene;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,26 +20,27 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Banking App");
-        primaryStage.setScene(new Scene(root, 640, 480));
+        Scene scene = new Scene(new CustomerCreationScene().getRoot(), 640, 480);
+        scene.getStylesheets().add("stylesheet.css");
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public static void main(String[] args) {
-        //launch(args);
+        launch(args);
 
         //importing data
 
         //creating arraylists to hold the objects
-        ArrayList<Customer> customers = new ArrayList<>();
+        ArrayList<Person> persons = new ArrayList<>();
         ArrayList<LoanAccount> loans = new ArrayList<>();
         ArrayList<CheckingAccount> checkings = new ArrayList<>();
         ArrayList<SavingAccount> savings = new ArrayList<>();
 
         //attempting to import the data into the arraylists
         try {
-            customers = customerImportFile();
+            persons = personsImportFile();
             loans = loansImportFile();
             checkings = checkingsImportFile();
             savings = savingsImportFile();
@@ -51,47 +55,59 @@ public class Main extends Application {
 
         //debugging the import process
         /*
-        for(Customer customer: customers){System.out.println(customer.toString());}
+        for(Person person: persons){System.out.println(person.toString());}
         for(LoanAccount loan: loans){System.out.println(loan.toString());}
         for(CheckingAccount checking: checkings){System.out.println(checking.toString());}
         for(SavingAccount saving: savings){System.out.println(saving.toString());}
         */
 
         //exporting data
-
-        try {
-            exportCustomers(customers);
+        /*
+        try {a
+            exportPersons(persons);
             exportLoans(loans);
             exportCheckings(checkings);
             exportSavings(savings);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        */
+
+
+
+        //debugging the SearchAccounts method
+        ArrayList<ArrayList> searchResults = SearchAccounts(423453245, savings, checkings, loans);
+        for (int i = 0; i<3; i++){
+            for(int j=0; j<searchResults.get(i).size(); j++){
+                System.out.println(searchResults.get(i).get(j).toString());
+            }
+        }
+
 
         System.exit(0); //currently stops the program, may want to remove later
     }
 
     //current method to grab data from the customers textfile in "memory"
-    public static ArrayList<Customer> customerImportFile() throws IOException, ParseException {
+    public static ArrayList<Person> personsImportFile() throws IOException, ParseException {
 
         //creates a file referencing the text file in the memory folder
-        File customersFileIn = new File("memory/customers.txt");
+        File personsFileIn = new File("memory/persons.txt");
 
         //creates a bufferedreader to read from a file
-        BufferedReader customersBR = null;
-        customersBR = new BufferedReader(new InputStreamReader(new FileInputStream(customersFileIn)));
+        BufferedReader personsBR = null;
+        personsBR = new BufferedReader(new InputStreamReader(new FileInputStream(personsFileIn)));
 
         //buffer string to temporarily hold the line retrieved
         String line;
 
         //creates the ArrayList of data
-        ArrayList<Customer> importCustomer = new ArrayList<>();
+        ArrayList<Person> importPerson = new ArrayList<>();
 
         //generic counter to know the line currently on
         int lineNum = 0;
 
         //while loop to go through the file
-        while ((line = customersBR.readLine()) != null) {
+        while ((line = personsBR.readLine()) != null) {
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
@@ -108,9 +124,14 @@ public class Main extends Application {
                 String zipCode = splitLine[4];
                 String firstName = splitLine[5];
                 String lastName = splitLine[6];
+                int userLevel = 1;  //default to customer
+                //hard code userLevel to ssn
+                if (socialSecurityNumber == 000000002 || socialSecurityNumber == 000000001){userLevel = 2;}
+                else if (socialSecurityNumber == 000000000){userLevel = 3;}
+
 
                 //add the new data (in our case checking) to the ArrayList
-                importCustomer.add(new Customer(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName));
+                importPerson.add(new Person(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName, userLevel));
             }
 
             //increment the line number
@@ -118,8 +139,8 @@ public class Main extends Application {
         }
 
         //close the bufferfile and return the ArrayList
-        customersBR.close();
-        return importCustomer;
+        personsBR.close();
+        return importPerson;
     }//end of customer data import method
 
     //current method to grab data from the loans textfile in "memory"
@@ -287,18 +308,18 @@ public class Main extends Application {
     }//end of saving data import method
 
     //method to export customers data to a file
-    public static void exportCustomers(ArrayList<Customer> customers) throws FileNotFoundException {
+    public static void exportPersons(ArrayList<Person> persons) throws FileNotFoundException {
         //create a new PrintWriter to write to a file
-        PrintWriter writer = new PrintWriter("memory/customers"+String.valueOf(System.currentTimeMillis())+".txt");
+        PrintWriter writer = new PrintWriter("memory/persons"+String.valueOf(System.currentTimeMillis())+".txt");
 
         //printing the headers of the file
         writer.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,");
 
         //print the info for each customer
-        for(Customer customer: customers) {
-            writer.println(customer.getSocialSecurityNumber() + "," + customer.getStreetAddress() + "," +
-                    customer.getCity() + "," + customer.getState() + "," + customer.getZipCode() + "," +
-                    customer.getFirstName() + "," + customer.getLastName() + ",");
+        for(Person person: persons) {
+            writer.println(person.getId() + "," + person.getStreetAddress() + "," +
+                    person.getCity() + "," + person.getState() + "," + person.getZipCode() + "," +
+                    person.getfName() + "," + person.getlName() + ",");
         }
 
         //close the PrintWriter object
@@ -379,5 +400,50 @@ public class Main extends Application {
         writer.close();
 
     }//end of exportSavings
+
+    //search all the savingaccounts for a matching customerID
+    public static ArrayList<ArrayList> SearchAccounts(int custID, ArrayList<SavingAccount> savings, ArrayList<CheckingAccount> checkings, ArrayList<LoanAccount> loans){
+
+        //create an arraylist for any account arraylist type
+        ArrayList<ArrayList> searchResults = new ArrayList<>();
+
+        //create temporary arraylists to put the found info into
+        ArrayList<SavingAccount> personSavingsAccounts = new ArrayList<>();
+        ArrayList<CheckingAccount> personCheckingsAccounts = new ArrayList<>();
+        ArrayList<LoanAccount> personLoansAccounts = new ArrayList<>();
+
+        for(int i=0; i<savings.size()-1; i++){
+            if(savings.get(i).getCustomerID()==custID){
+                personSavingsAccounts.add(savings.get(i));
+            }
+        }
+        searchResults.add(0, personSavingsAccounts);
+
+        for(int i=0; i<checkings.size()-1; i++){
+            if(checkings.get(i).getCustomerID()==custID){
+                personCheckingsAccounts.add(checkings.get(i));
+            }
+        }
+        searchResults.add(1, personCheckingsAccounts);
+
+        for(int i=0; i<loans.size()-1; i++){
+            if(loans.get(i).getCustomerID()==custID){
+                personLoansAccounts.add(loans.get(i));
+            }
+        }
+        searchResults.add(2, personLoansAccounts);
+
+
+        //will return an arraylist in the format of searchResult = (savingsArrayList, checkingArrayList, loanArrayList)
+        //each of these individual array lists may have between 0 to many accounts in them
+        return searchResults;
+    }
+
+
+
+
+
+
+
 
 }//end of main
