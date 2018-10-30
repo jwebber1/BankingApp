@@ -28,6 +28,7 @@ abstract class Account {
 
     //other methods to be decided
 
+<<<<<<< HEAD
     @Override
     public String toString() {
         return "Account{" +

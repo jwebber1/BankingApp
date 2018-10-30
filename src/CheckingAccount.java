@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Date;
 
 class CheckingAccount extends Account{
@@ -6,7 +7,6 @@ class CheckingAccount extends Account{
 
     //constructor for the Checking Account
     public CheckingAccount(int cusIDIn, double accBalIn, String accTypeIn, Byte OvProIn, int odThisMonth, Date dateAccOpened){
-
         super(cusIDIn,accBalIn, dateAccOpened, accTypeIn);
         this.indicatedOverdraftProtection = OvProIn;
         this.overdraftsThisMonth = odThisMonth;
@@ -31,6 +31,20 @@ class CheckingAccount extends Account{
 
     //other methods to be decided
 
+    @Override
+    public int withdraw(ArrayList<ArrayList> cusAccounts, double withdrawlAmt){
+
+
+        return 0;
+    }
+
+    @Override
+    public int deposit(ArrayList<ArrayList> cusAccounts, double depositAmt){
+
+
+
+        return 0;
+    }
 
 <<<<<<< HEAD
 }//end of CheckingAccount

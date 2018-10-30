@@ -59,8 +59,12 @@ public class Main extends Application {
 
         //exporting data
         /*
+<<<<<<< HEAD
         try {
             exportCustomers(customers);
+=======
+        try {a
+>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
             exportLoans(loans);
             exportCheckings(checkings);
             exportSavings(savings);
@@ -69,10 +73,13 @@ public class Main extends Application {
         }
         */
 
+<<<<<<< HEAD
         ArrayList<Account> searchResults = SearchAccounts(423453245, savings, checkings, loans);
         for (Account account: searchResults) {
             System.out.println(account.toString());
         }
+=======
+>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
 
         System.exit(0); //currently stops the program, may want to remove later
     }
@@ -92,6 +99,7 @@ public class Main extends Application {
 
         //creates the ArrayList of data
         ArrayList<Customer> importCustomer = new ArrayList<>();
+        ArrayList<Person> importPerson = new ArrayList<>();
 
         //generic counter to know the line currently on
         int lineNum = 0;
@@ -114,10 +122,13 @@ public class Main extends Application {
                 String zipCode = splitLine[4];
                 String firstName = splitLine[5];
                 String lastName = splitLine[6];
+<<<<<<< HEAD
                 String pin = splitLine[7];
 
                 //add the new data (in our case checking) to the ArrayList
                 importCustomer.add(new Customer(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName, pin));
+=======
+>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
             }
 
             //increment the line number
@@ -399,10 +410,13 @@ public class Main extends Application {
         writer.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,");
 
         //print the info for each customer
+<<<<<<< HEAD
         for(Customer customer: customers) {
             writer.println(customer.getId() + "," + customer.getStreetAddress() + "," +
                     customer.getCity() + "," + customer.getState() + "," + customer.getZipCode() + "," +
                     customer.getfName() + "," + customer.getlName() + ",");
+=======
+>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
         }
 
         //close the PrintWriter object
@@ -485,6 +499,7 @@ public class Main extends Application {
     }//end of exportSavings
 
     //search all the savingaccounts for a matching customerID
+<<<<<<< HEAD
     public static ArrayList<Account> SearchAccounts(int custID, ArrayList<SavingAccount> savings, ArrayList<CheckingAccount> checkings, ArrayList<LoanAccount> loans){
 
         //create an arraylist for any account type
@@ -509,4 +524,4 @@ public class Main extends Application {
         return searchResults;
     }
 
-}//end of main
+}//end of main>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640

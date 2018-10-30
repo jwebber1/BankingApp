@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 abstract class Person {
     protected int id;
     protected String fName;
@@ -30,3 +31,5 @@ abstract class Person {
                 '}';
     }
 }//end of Person
+=======
+>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
