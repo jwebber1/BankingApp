@@ -10,17 +10,17 @@ class SavingAccount extends Account {
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = null;
     }
-    //TESTING GIT CONNECTING WITH FORK
-    //TEST push 2
 
-    //overloading SavingAccount to CD
-    private SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
-        super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
-        this.customerID = cusIDIn;
-        this.accountBalance = accBalIn;
-        this.currentInterestRate = currIntRateIn;
-        this.dateCDDue = dateCDDueIn;
-    }
+
+       //overloading SavingAccount to CD
+    //Moved to CD class
+//    private SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
+//        super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
+//        this.customerID = cusIDIn;
+//        this.accountBalance = accBalIn;
+//        this.currentInterestRate = currIntRateIn;
+//        this.dateCDDue = dateCDDueIn;
+//    }
 
     private double getCurrentInterestRate() {
         return currentInterestRate;
