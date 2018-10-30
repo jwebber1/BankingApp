@@ -1,5 +1,6 @@
 import UI.AccountCreationScene;
 import UI.CustomerCreationScene;
+import UI.LoginScene;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,7 +21,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Banking App");
-        primaryStage.setScene(new Scene(new CustomerCreationScene().getRoot(), 640, 480));
+        Scene scene = new Scene(new CustomerCreationScene().getRoot(), 640, 480);
+        scene.getStylesheets().add("stylesheet.css");
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 

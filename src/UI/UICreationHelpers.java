@@ -2,10 +2,15 @@ package UI;
 
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
@@ -20,10 +25,22 @@ class UICreationHelpers {
     private static double fieldWidth = 140;
     private static double fieldHeight = 20;
 
+    static ObservableList<String> userLevels = FXCollections.observableArrayList(
+            "Customer",
+            "Teller",
+            "Manager"
+    );
+
+    static void setBaseSceneSettings(Pane root, VBox fieldVBox) {
+        fieldVBox.setSpacing(8);
+        root.setPadding(new Insets(20));
+    }
+
     // Creates a field's HBox (i.e. a field of any type, and a label for that field).
     static HBox createHBox(String labelText, Node node) {
         Label label = new Label(labelText);
-        label.setPrefSize(fieldWidth, fieldHeight);
+        label.setPrefSize(fieldWidth, fieldHeight + 10);
+        label.setAlignment(Pos.BASELINE_LEFT);
         HBox hBox = new HBox();
         hBox.getChildren().addAll(label, node);
         hBox.setSpacing(10);

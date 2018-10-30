@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -12,8 +11,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class CustomerCreationScene {
-    private StackPane root = new StackPane();
-
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
     private final StringProperty streetAddressProperty = new SimpleStringProperty("");
     private final StringProperty cityProperty = new SimpleStringProperty("");
@@ -26,12 +23,7 @@ public class CustomerCreationScene {
     private VBox fieldVBox = new VBox();
     private HBox buttonHBox = new HBox();
 
-
-    private ObservableList<String> userLevels = FXCollections.observableArrayList(
-    "Customer",
-            "Teller",
-            "Manager"
-    );
+    private StackPane root = new StackPane(fieldVBox, buttonHBox);
 
     private ObservableList<String> states = FXCollections.observableArrayList(
     "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
@@ -44,12 +36,8 @@ public class CustomerCreationScene {
     );
 
     public CustomerCreationScene() {
+        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
         createBaseCustomerCreationNodes();
-
-        fieldVBox.setSpacing(8);
-
-        root.getChildren().add(fieldVBox);
-        root.setPadding(new Insets(20));
     }
 
     public StackPane getRoot() {
@@ -79,7 +67,7 @@ public class CustomerCreationScene {
         TextField lastNameField = UICreationHelpers.createTextField(lastNameProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("Last Name:", lastNameField));
 
-        ComboBox userLevelField = UICreationHelpers.createComboBox(userLevels, userLevelProperty);
+        ComboBox userLevelField = UICreationHelpers.createComboBox(UICreationHelpers.userLevels, userLevelProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("User Level:", userLevelField));
 
         // Save Button
