@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Date;
 
 abstract class Account {
@@ -16,7 +17,7 @@ abstract class Account {
         this.accountType = accTypeIn;
     }
 
-    //getters/setters
+    //getters and setters
     public int getCustomerID() {return customerID;}
     public void setCustomerID(int customerID) {this.customerID = customerID;}
     public double getAccountBalance() {return accountBalance;}
@@ -25,8 +26,6 @@ abstract class Account {
     public void setDateAccountOpened(Date dateAccountOpened) {this.dateAccountOpened = dateAccountOpened;}
     public String getAccountType() {return accountType;}
     public void setAccountType(String accountType) {this.accountType = accountType;}
-
-    //other methods to be decided
 
     @Override
     public String toString() {
@@ -37,4 +36,9 @@ abstract class Account {
                 ", accountType='" + accountType + '\'' +
                 '}';
     }
+
+    //other methods to be decided
+
+
+
 }//end of Account
