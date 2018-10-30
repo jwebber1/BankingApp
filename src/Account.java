@@ -28,7 +28,6 @@ abstract class Account {
 
     //other methods to be decided
 
-<<<<<<< HEAD
     @Override
     public String toString() {
         return "Account{" +
@@ -38,6 +37,4 @@ abstract class Account {
                 ", accountType='" + accountType + '\'' +
                 '}';
     }
-=======
->>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
 }//end of Account
