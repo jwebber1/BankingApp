@@ -1,0 +1,2 @@
+CustomerID,CheckID,CheckAmt,PayTo,DateCheck,Memo,
+423148894,00001,500.0,Menards,09/04/2018,Couch,
