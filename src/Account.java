@@ -40,13 +40,5 @@ abstract class Account {
     //other methods to be decided
 
 
-    public int withdraw(ArrayList<ArrayList> cusAccounts, double withdrawlAmt){
-        return 0;
-    }
-
-    public int deposit(ArrayList<ArrayList> cusAccounts, double depositAmt){
-        return 0;
-    }
-
 
 }//end of Account

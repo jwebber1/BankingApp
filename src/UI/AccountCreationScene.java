@@ -19,7 +19,6 @@ import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 
 public class AccountCreationScene {
-    private StackPane root = new StackPane();
 
     // TODO: Get customers correctly.
     private ObservableList<String> customers = FXCollections.observableArrayList(
@@ -62,19 +61,18 @@ public class AccountCreationScene {
     );
 
     private VBox fieldVBox = new VBox();
+    private StackPane root = new StackPane(fieldVBox);
 
     public AccountCreationScene() {
         createBaseAccountCreationNodes();
         createCheckingFields();
         createLoanFields();
 
-        fieldVBox.setSpacing(8);
         savingsAccountFieldsVBox.setSpacing(8);
         checkingAccountFieldsVBox.setSpacing(8);
         loanFieldsVBox.setSpacing(8);
 
-        root.getChildren().add(fieldVBox);
-        root.setPadding(new Insets(20));
+        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
     }
 
     public StackPane getRoot() {
