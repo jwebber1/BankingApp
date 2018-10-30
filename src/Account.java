@@ -38,4 +38,6 @@ abstract class Account {
                 ", accountType='" + accountType + '\'' +
                 '}';
     }
+=======
+>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
 }//end of Account

@@ -37,6 +37,7 @@ public class Main extends Application {
         //attempting to import the data into the arraylists
         try {
             customers = customerImportFile();
+            persons = personsImportFile();
             loans = loansImportFile();
             checkings = checkingsImportFile();
             savings = savingsImportFile();
@@ -525,3 +526,6 @@ public class Main extends Application {
     }
 
 }//end of main>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
+}//end of main
+=======
+>>>>>>> 736bc916e3ffe68950eeeb99f2c258c398c2a640
