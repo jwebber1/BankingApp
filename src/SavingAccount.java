@@ -11,7 +11,7 @@ class SavingAccount extends Account {
         this.dateCDDue = null;
     }
     //TESTING GIT CONNECTING WITH FORK
-    //TEST push
+    //TEST push 2
 
     //overloading SavingAccount to CD
     private SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
