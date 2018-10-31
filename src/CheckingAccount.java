@@ -56,7 +56,7 @@ class CheckingAccount extends Account{
 
 
         //charge $0.50 for withdrawl from checking if not a gold account
-        if(accountType != "gold") {charge += 0.5;}
+        if(!accountType.equals("gold")) {charge += 0.5;}
 
         //begin the if-elses to determine amount left in account
         if(customerWithdrawTooMuch && !hasOverdraftProtection){
@@ -69,7 +69,7 @@ class CheckingAccount extends Account{
             charge += 20.0;
 
             //change account type if fall below $1000 (just in case)
-            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
+            if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
 
             //increment amount of withdraws today
             withdrawsToday++;
@@ -86,7 +86,7 @@ class CheckingAccount extends Account{
             customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
 
             //change account type if fall below $1000 (just in case)
-            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
+            if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
 
             //increment amount of withdraws today
             withdrawsToday++;
@@ -133,7 +133,7 @@ class CheckingAccount extends Account{
         if(transferAmt < 0.0) {return -1;}
 
         //charge $0.50 for withdrawl from checking if not a gold account
-        if(accountType != "gold") {charge += 0.75;}
+        if(!accountType.equals("gold")) {charge += 0.75;}
 
         //transfer the money from checking to saving
         setAccountBalance(accountBalance - transferAmt);
@@ -154,7 +154,7 @@ class CheckingAccount extends Account{
         accountBalance -= charge;
 
         //change account type if fall below $1000 (just in case)
-        if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
+        if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
 
         //return which error was encountered:
         // -1 account overdraft
@@ -167,7 +167,7 @@ class CheckingAccount extends Account{
     public int deposit(double depositAmt){
 
         //charge $0.50 for deposit into checking if not a gold account
-        if(accountType != "gold") {accountBalance = accountBalance - 0.5;}
+        if(!accountType.equals("gold")) {accountBalance = accountBalance - 0.5;}
 
         //some data validation
         if(depositAmt < 0.0) {
@@ -179,7 +179,7 @@ class CheckingAccount extends Account{
         accountBalance = accountBalance + depositAmt;
 
         //change account type if the person has > $1000
-        if(accountType != "gold" && accountBalance > 1000.0){accountType = "regular";}
+        if(!accountType.equals("gold") && accountBalance > 1000.0){accountType = "regular";}
 
         //return 0 for successful transaction
         return 0;
@@ -189,9 +189,8 @@ class CheckingAccount extends Account{
 
     //method to stop a check
     public void stopCheck(int checkNum){
-
+        // TODO
     }
-
 
 
 }//end of CheckingAccount

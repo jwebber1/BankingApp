@@ -1,12 +1,9 @@
-package UI;
-
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -16,16 +13,23 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 public class AccountCreationScene {
 
     // TODO: Get customers correctly.
-    private ObservableList<String> customers = FXCollections.observableArrayList(
-    "Customer 1",
-            "Customer 2",
-            "Customer 3"
-    );
+//    private HashMap<Integer, String> customers = new HashMap<>();
+//            FXCollections.observableArrayList(
+//                    "Customer 1",
+//                    "Customer 2",
+//                    "Customer 3"
+//            );
 
     // Fields Needed By All Account Types
     private final StringProperty customerProperty = new SimpleStringProperty("");
@@ -46,7 +50,7 @@ public class AccountCreationScene {
     private VBox loanFieldsVBox = new VBox();
 
     private ObservableList<String> accountTypes = FXCollections.observableArrayList(
-    "Savings",
+            "Savings",
             "Checking",
             "Loan"
     );
@@ -56,7 +60,7 @@ public class AccountCreationScene {
             "Credit Card"
     );
     private ObservableList<String> checkingAccountTypes = FXCollections.observableArrayList(
-    "That's My Bank",
+            "That's My Bank",
             "Gold"
     );
 
@@ -64,6 +68,10 @@ public class AccountCreationScene {
     private StackPane root = new StackPane(fieldVBox);
 
     public AccountCreationScene() {
+//        for (Person person: Main.persons) {
+//            customers.put(person.id, person.lName + ", " + person.fName);
+//        }
+
         createBaseAccountCreationNodes();
         createCheckingFields();
         createLoanFields();
@@ -79,9 +87,16 @@ public class AccountCreationScene {
         return root;
     }
 
+    ComboBox customerBox;
+
     // Creates base fields that are used by all account types.
     private void createBaseAccountCreationNodes() {
-        ComboBox customerBox = UICreationHelpers.createComboBox(customers, customerProperty);
+        ObservableList<String> personNames = FXCollections.observableArrayList();
+        for (Person person : Main.persons) {
+            personNames.add(person.lName + ", " + person.fName);
+
+        }
+        customerBox = UICreationHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("Customer:", customerBox));
 
         ComboBox accountTypeBox = UICreationHelpers.createComboBox(accountTypes, accountTypeProperty);
@@ -93,7 +108,13 @@ public class AccountCreationScene {
 
         // Save Button
         Button saveButton = new Button("Save");
-        saveButton.setOnAction(x -> saveAccount());
+        saveButton.setOnAction(x -> {
+            try {
+                saveAccount();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         buttonHBox.getChildren().add(saveButton);
         buttonHBox.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(buttonHBox);
@@ -115,13 +136,17 @@ public class AccountCreationScene {
     }
 
     // Runs when the "Save" button is pressed.
-    private void saveAccount() {
-        System.out.println(datePaymentDue);
+    private void saveAccount() throws IOException, ParseException {
         String errorMessage = "";
 
+        int customerId = 0;
         if (customerProperty.get().isEmpty()) {
             errorMessage += "Customer must be selected.\n";
+        } else {
+            customerId = Main.persons.get(customerBox.getSelectionModel().getSelectedIndex()).id;
         }
+
+        double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
 
         if (accountTypeProperty.get().isEmpty()) {
             errorMessage += "Account Type must be selected.\n";
@@ -133,7 +158,51 @@ public class AccountCreationScene {
             errorAlert.setContentText(errorMessage);
             errorAlert.showAndWait();
         } else {
-            // TODO: Save to account. Autoset date account opened.
+            switch (accountTypes.indexOf(accountTypeProperty.get())) {
+                case 0:
+                    ArrayList<SavingAccount> savingAccounts = Main.savingsImportFile();
+                    SavingAccount savingAccount = new SavingAccount(
+                            customerId,
+                            accountBalance,
+                            0.2,
+                            new Date()
+                    );
+                    savingAccounts.add(savingAccount);
+                    Main.exportSavings(savingAccounts);
+                    break;
+                case 1:
+                    ArrayList<CheckingAccount> checkingAccounts = Main.checkingsImportFile(new ArrayList<>());
+                    CheckingAccount checkingAccount = new CheckingAccount(
+                            customerId,
+                            accountBalance,
+                            checkingAccountTypeProperty.get(),
+                            null,
+                            null,
+                            0,
+                            new Date(),
+                            new ArrayList<>()
+                    );
+                    checkingAccounts.add(checkingAccount);
+                    Main.exportCheckings(checkingAccounts);
+                    break;
+                case 2:
+                    ArrayList<LoanAccount> loanAccounts = Main.loansImportFile();
+                    LoanAccount loanAccount = new LoanAccount(
+                            customerId,
+                            "",
+                            accountBalance,
+                            0.2,
+                            new Date(),
+                            0,
+                            new Date(),
+                            new Date(),
+                            null,
+                            ""
+                    );
+                    loanAccounts.add(loanAccount);
+                    Main.exportLoans(loanAccounts);
+                    break;
+            }
             Alert successfulAlert = new Alert(Alert.AlertType.INFORMATION);
             successfulAlert.setHeaderText("Save Successful");
             successfulAlert.setContentText("The user has been saved successfully.");

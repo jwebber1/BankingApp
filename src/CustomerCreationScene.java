@@ -1,5 +1,3 @@
-package UI;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -9,6 +7,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class CustomerCreationScene {
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
@@ -26,7 +27,7 @@ public class CustomerCreationScene {
     private StackPane root = new StackPane(fieldVBox, buttonHBox);
 
     private ObservableList<String> states = FXCollections.observableArrayList(
-    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
             "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
             "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi",
             "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York",
@@ -90,7 +91,7 @@ public class CustomerCreationScene {
         errorMessage += UICreationHelpers.checkTextField("Street Address", streetAddressProperty);
         errorMessage += UICreationHelpers.checkTextField("City", cityProperty);
         errorMessage += UICreationHelpers.checkTextField("State", stateProperty);
-        errorMessage += UICreationHelpers.checkTextField("Zip Code", zipCodeProperty);
+        errorMessage += UICreationHelpers.checkNumberField("Zip Code", zipCodeProperty);
         errorMessage += UICreationHelpers.checkTextField("First Name", firstNameProperty);
         errorMessage += UICreationHelpers.checkTextField("Last Name", lastNameProperty);
         errorMessage += UICreationHelpers.checkTextField("User Level", userLevelProperty);
@@ -103,6 +104,24 @@ public class CustomerCreationScene {
             errorAlert.showAndWait();
         } else {
             // TODO: Save to file.
+            try {
+
+                Person person = new Person(
+                        Integer.parseInt(socialSecurityProperty.get()),
+                        streetAddressProperty.get(),
+                        cityProperty.get(),
+                        stateProperty.get(),
+                        zipCodeProperty.get(),
+                        firstNameProperty.get(),
+                        lastNameProperty.get(),
+                        UICreationHelpers.userLevels.indexOf(userLevelProperty.get()),
+                        new ArrayList<>()
+                );
+                Main.persons.add(person);
+                Main.exportToFile(Main.persons);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             Alert successfulAlert = new Alert(Alert.AlertType.INFORMATION);
             successfulAlert.setHeaderText("Save Successful");
             successfulAlert.setContentText("The user has been saved successfully.");
