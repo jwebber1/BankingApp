@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.io.*;
 import java.text.ParseException;
 
-class SavingAccount extends Account {
+class  SavingAccount extends Account {
     protected double currentInterestRate;
     protected Date dateCDDue;
 
