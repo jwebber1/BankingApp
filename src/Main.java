@@ -1,4 +1,6 @@
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -8,35 +10,35 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 public class Main extends Application {
-    public static ArrayList<Person> persons = new ArrayList<>();
-
     //used to format money, will probably need to be moved to "controller" for the GUI
     NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Banking App");
-        Scene scene = new Scene(new AccountCreationScene().getRoot(), 640, 480);
-        scene.getStylesheets().add("stylesheet.css");
-        primaryStage.setScene(scene);
+        primaryStage.setScene(new Scene(root, 640, 480));
         primaryStage.show();
     }
 
     public static void main(String[] args) {
+        //launch(args);
 
         //importing data
         //creating arraylists to hold the objects
 
+        ArrayList<Person> persons = new ArrayList<>();
 
         //attempting to import the data into the arraylists
         try {
             persons = importFromFiles();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        catch (IOException e) {e.printStackTrace();}
+        catch (ParseException e) {e.printStackTrace();}
+
+
 
         //debugging the import process
         //debugImport(persons);
@@ -46,11 +48,11 @@ public class Main extends Application {
 
         //exporting data
 
-//        try {
-//            exportToFile(persons);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            exportToFile(persons);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
 
 //used to format money, will probably need to be moved to "controller" for the GUI
@@ -69,10 +71,9 @@ public class Main extends Application {
         */
 
 
-        launch(args);
 
         //currently stops the program, may want to remove later
-//        System.exit(0);
+        System.exit(0);
     }
 
     //importing data
@@ -102,7 +103,7 @@ public class Main extends Application {
 
         //creates the ArrayList of data
         ArrayList<Person> importPerson = new ArrayList<>();
-        ArrayList<ArrayList> accounts;
+        ArrayList<ArrayList> accounts = new ArrayList<>();
 
         //generic counter to know the line currently on
         int lineNum = 0;
@@ -112,7 +113,7 @@ public class Main extends Application {
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
-            if (lineNum > 0) {
+            if(lineNum > 0) {
 
                 //split the line into an array of strings
                 String[] splitLine = line.split(",");
@@ -127,11 +128,8 @@ public class Main extends Application {
                 String lastName = splitLine[6];
                 int userLevel = 1;  //default to customer
                 //hard code userLevel to ssn
-                if (socialSecurityNumber == 2 || socialSecurityNumber == 1) {
-                    userLevel = 2;
-                } else if (socialSecurityNumber == 0) {
-                    userLevel = 3;
-                }
+                if (socialSecurityNumber == 000000002 || socialSecurityNumber == 000000001){userLevel = 2;}
+                else if (socialSecurityNumber == 000000000){userLevel = 3;}
                 accounts = searchAccounts(socialSecurityNumber, savingsIn, checkingIn, loansIn);
 
                 //add the new data (in our case checking) to the ArrayList
@@ -157,7 +155,7 @@ public class Main extends Application {
         File savingsFileIn = new File("memory/savings.txt");
 
         //creates a bufferedreader to read from a file
-        BufferedReader savingsBR;
+        BufferedReader savingsBR = null;
         savingsBR = new BufferedReader(new InputStreamReader(new FileInputStream(savingsFileIn)));
 
         //buffer string to temporarily hold the line retrieved
@@ -174,7 +172,7 @@ public class Main extends Application {
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
-            if (lineNum > 0) {
+            if(lineNum > 0) {
 
                 //split the line into an array of strings
                 String[] splitLine = line.split(",", -1);
@@ -183,16 +181,13 @@ public class Main extends Application {
                 int cusID = Integer.parseInt(splitLine[0]);
                 double balance = Double.parseDouble(splitLine[1]);
                 double currentInterestRate = Double.parseDouble(splitLine[2]);
-                Date dateAccountOpened = new Date();
-                if (splitLine[3] != null && !splitLine[3].isEmpty()) {
-                    dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy", new Locale("en_US")).parse(splitLine[3]);
-                }
+                Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[3]);
 
-
-                if (splitLine[4].equals("")) {
+                if(splitLine[4].equals("")) {
                     //add the new data (in our case savings) to the ArrayList
                     importSaving.add(new SavingAccount(cusID, balance, currentInterestRate, dateAccountOpened));
-                } else {
+                }
+                else{
                     //if it is a CD...
                     Date dateCDDue = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
                     importSaving.add(new SavingAccount(cusID, balance, currentInterestRate, dateAccountOpened, dateCDDue));
@@ -220,7 +215,7 @@ public class Main extends Application {
         File checkingsFileIn = new File("memory/checkings.txt");
 
         //creates a bufferedreader to read from a file
-        BufferedReader checkingsBR;
+        BufferedReader checkingsBR = null;
         checkingsBR = new BufferedReader(new InputStreamReader(new FileInputStream(checkingsFileIn)));
 
         //buffer string to temporarily hold the line retrieved
@@ -228,7 +223,7 @@ public class Main extends Application {
 
         //creates the ArrayList of data
         ArrayList<CheckingAccount> importChecking = new ArrayList<>();
-        ArrayList<Check> checks;
+        ArrayList<Check> checks = new ArrayList<>();
 
         //generic counter to know the line currently on
         int lineNum = 0;
@@ -238,7 +233,7 @@ public class Main extends Application {
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
-            if (lineNum > 0) {
+            if(lineNum > 0) {
 
                 //split the line into an array of strings
                 String[] splitLine = line.split(",");
@@ -254,7 +249,7 @@ public class Main extends Application {
                 checks = searchChecks(cusID, checksIn);
 
                 //add the new data (in our case checking) to the ArrayList
-                importChecking.add(new CheckingAccount(cusID, balance, accountType, hasOverdraftProtection, connectedToATMCard, overdraftsThisMonth, dateAccountOpened, checks));
+                importChecking.add(new CheckingAccount(cusID, balance, accountType, hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened, checks));
 
                 //debugging importChecking
                 //System.out.println("count: " + (lineNum) + "\t" + importChecking.get(lineNum-1).toString());
@@ -277,7 +272,7 @@ public class Main extends Application {
         File checksFileIn = new File("memory/checks.txt");
 
         //creates a bufferedreader to read from a file
-        BufferedReader checksBR;
+        BufferedReader checksBR = null;
         checksBR = new BufferedReader(new InputStreamReader(new FileInputStream(checksFileIn)));
 
         //buffer string to temporarily hold the line retrieved
@@ -294,7 +289,7 @@ public class Main extends Application {
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
-            if (lineNum > 0) {
+            if(lineNum > 0) {
 
                 //split the line into an array of strings
                 String[] splitLine = line.split(",");
@@ -331,14 +326,11 @@ public class Main extends Application {
         File loansFileIn = new File("memory/loans.txt");
 
         //creates a bufferedreader to read from a file
-        BufferedReader loansBR;
+        BufferedReader loansBR = null;
         loansBR = new BufferedReader(new InputStreamReader(new FileInputStream(loansFileIn)));
 
         //buffer string to temporarily hold the line retrieved
         String line;
-
-        //creates the ArrayList of data
-        ArrayList<LoanAccount> importLoans = new ArrayList<>();
 
         //generic counter to know the line currenly on
         int lineNum = 0;
@@ -348,25 +340,24 @@ public class Main extends Application {
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
-            if (lineNum > 0) {
+            if(lineNum > 0) {
 
                 //split the line into an array of strings
                 String[] splitLine = line.split(",");
 
                 //create temp variable to hold info from the split lines
                 int cusID = Integer.parseInt(splitLine[0]);
-                String description = splitLine[1];
-                double balance = Double.parseDouble(splitLine[2]);
-                double rate = Double.parseDouble(splitLine[3]);
-                Date payDueDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
-                Date notifyPayDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
-                double currPayDue = Double.parseDouble(splitLine[6]);
-                Date lastPayDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[7]);
-                Byte missedPay = Byte.parseByte(splitLine[8]);
-                String accountType = splitLine[9];
+                double balance = Double.parseDouble(splitLine[1]);
+                double rate = Double.parseDouble(splitLine[2]);
+                Date payDueDate =   new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[3]);
+                Date notifyPayDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
+                double currPayDue = Double.parseDouble(splitLine[5]);
+                Date lastPayDate = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[6]);
+                Byte missedPay = Byte.parseByte(splitLine[7]);
+                String accountType = splitLine[8];
 
                 //add the new data (in our case loan) to the ArrayList
-                importLoans.add(new LoanAccount(cusID, description, balance, rate, payDueDate, currPayDue, notifyPayDate, lastPayDate, missedPay, accountType));
+                LoanAccount.loans.add(new LoanAccount(cusID, balance, rate, payDueDate, currPayDue, notifyPayDate, lastPayDate, missedPay, accountType));
 
                 //debugging importLoan
                 //System.out.println("count: " + (lineNum) + "\t" + importLoans.get(lineNum-1).toString());
@@ -378,16 +369,72 @@ public class Main extends Application {
 
         //close the bufferfile and return the ArrayList
         loansBR.close();
-        return importLoans;
+        return LoanAccount.loans;
 
     }//end of loans data import method
 
-    //current method to grab data from the Credit Cards textfile in "memory" (to be created later)
-    /*
-    public static ArrayList<CreditCards> ccImportFile() throws IOException, ParseException {
-        //stuff
-    }
-    */
+    //current method to grab data from the Credit Cards textfile in "memory"
+    public static ArrayList<CreditCardPurchase> ccImportFile() throws IOException, ParseException {
+        //creates a file referencing the text file in the memory folder
+        File ccFileIn = new File("memory/ccpurchases.txt");
+
+        //creates a bufferedreader to read from a file
+        BufferedReader ccBR = null;
+        ccBR = new BufferedReader(new InputStreamReader(new FileInputStream(ccFileIn)));
+
+        //buffer string to temporarily hold the line retrieved
+        String line;
+
+        //generic counter to know the line currently on
+        int lineNum = 0;
+
+        //while loop to go through the file
+        while ((line = ccBR.readLine()) != null) {
+
+            //if the file has a header, this if statement is to avoid that
+            //remove "if" if final file has no header
+            if(lineNum > 0) {
+
+                //split the line into an array of strings
+                String[] splitLine = line.split(",");
+
+                //create temp variable to hold info from the split lines
+                int cusID = Integer.parseInt(splitLine[0]);
+                String desc = splitLine[1];
+                double balance = Double.parseDouble(splitLine[2]);
+                Date dateOfPayment =   new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[3]);
+
+                //add the new data (in our case loan) to the ArrayList
+                CreditCardPurchase.purchases.add(new CreditCardPurchase(cusID, desc, balance, dateOfPayment));
+                //debugging ccImport
+                //System.out.println("count: " + (lineNum) + "\t" + importLoans.get(lineNum-1).toString());
+            }
+
+            //increment the line number
+            lineNum++;
+        }
+
+        //close the bufferfile and return the ArrayList
+        ccBR.close();
+        return CreditCardPurchase.purchases;
+    }//end of ccImportFile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     //method to export persons data to a file
@@ -398,7 +445,7 @@ public class Main extends Application {
         PrintWriter checkingWriter = new PrintWriter("memory/checkings.txt");
         PrintWriter checkWriter = new PrintWriter("memory/checks.txt");
         PrintWriter loanWriter = new PrintWriter("memory/loans.txt");
-        //PrintWriter CCWriter = new PrintWriter("memory/creditcards.txt");
+        PrintWriter CCWriter = new PrintWriter("memory/ccpurchases.txt");
 
         //printing the headers of the files
         personWriter.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,");
@@ -406,7 +453,7 @@ public class Main extends Application {
         checkingWriter.println("CustomerID,CheckingBalance,CheckingAccountType,hasBackup,Overdrafts,DateOpened,");
         checkWriter.println("CustomerID,CheckID,CheckAmt,PayTo,DateCheck,Memo,");
         loanWriter.println("CustomerID,Description,CurrentBalance,CurrentInterestRate,DatePaymentDue,DateNotifiedOfPayment,CurrentPaymentDue,DateSinceLastPaymentMade,MissedPaymentFlag,AccountType,");
-        //CCWriter.println("")
+        CCWriter.println("SSN,description,price,dateOfPurchase");
 
 
         ArrayList<SavingAccount> savings = new ArrayList<>();
@@ -414,29 +461,30 @@ public class Main extends Application {
         ArrayList<LoanAccount> loans = new ArrayList<>();
 
         //print the info for each customer
-        for (Person person : persons) {
+        for(Person person: persons) {
             personWriter.println(person.getId() + "," + person.getStreetAddress() + "," +
                     person.getCity() + "," + person.getState() + "," + person.getZipCode() + "," +
                     person.getfName() + "," + person.getlName() + ",");
 
-            if (!person.getAccounts().isEmpty()) {
-                savings = person.getAccounts().get(0);
-                checkings = person.getAccounts().get(1);
-                loans = person.getAccounts().get(2);
-            }
+            savings = person.getAccounts().get(0);
+            checkings = person.getAccounts().get(1);
+            loans = person.getAccounts().get(2);
 
             //todo- CC stuff here
-            ArrayList<Check> checks;
+            ArrayList<Check> checks = new ArrayList<>();
             //ArrayList<CreditCard> CCs = new ArrayList<>();
 
-            for (SavingAccount saving : savings) {
+            for (SavingAccount saving: savings) {
+
+
                 //check to see if it is a CD just a regular savings account
-                if (saving.getDateCDDue() == null) {
+                if(saving.getDateCDDue() == null) {
                     savingWriter.println(saving.getCustomerID() + "," +
                             saving.getAccountBalance() + "," +
                             saving.getCurrentInterestRate() + "," +
                             new SimpleDateFormat("MM/dd/yyyy").format(saving.getDateAccountOpened()) + ",,");
-                } else {
+                }
+                else{
                     savingWriter.println(saving.getCustomerID() + "," +
                             saving.getAccountBalance() + "," +
                             saving.getCurrentInterestRate() + "," +
@@ -445,7 +493,7 @@ public class Main extends Application {
                 }
 
             }
-            for (CheckingAccount checking : checkings) {
+            for (CheckingAccount checking: checkings) {
 
                 checkingWriter.println(checking.getCustomerID() + "," +
                         checking.getAccountBalance() + "," +
@@ -456,7 +504,7 @@ public class Main extends Application {
 
 
                 checks = checking.getChecks();
-                for (Check check : checks) {
+                for (Check check: checks) {
                     checkWriter.println(check.getCustomerID() + "," +
                             check.getCheckID() + "," +
                             check.getCheckAmt() + "," +
@@ -466,9 +514,8 @@ public class Main extends Application {
                 }
             }
 
-            for (LoanAccount loan : loans) {
+            for (LoanAccount loan: loans) {
                 loanWriter.println(loan.getCustomerID() + "," +
-                        loan.getDescription() + "," +
                         loan.getAccountBalance() + "," +
                         loan.getCurrentInterestRate() + "," +
                         new SimpleDateFormat("MM/dd/yyy").format(loan.getDatePaymentDue()) + "," +
@@ -478,6 +525,13 @@ public class Main extends Application {
                         loan.getMissedPaymentFlag() + "," +
                         loan.getAccountType() + ",");
             }
+
+            for (CreditCardPurchase purchase: CreditCardPurchase.purchases){
+                CCWriter.println(purchase.getSSN() + "," +
+                        purchase.getDescription() + "," +
+                        purchase.getPrice() + "," +
+                        new SimpleDateFormat("MM/dd/yyy").format(purchase.getDateOfPurchase()) + ",");
+            }
         }
 
         //close the PrintWriter objects
@@ -486,7 +540,7 @@ public class Main extends Application {
         checkingWriter.close();
         checkWriter.close();
         loanWriter.close();
-        //CCWriter.close();
+        CCWriter.close();
 
     }//end of exportPersons
 
@@ -499,14 +553,14 @@ public class Main extends Application {
         writer.println("CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,");
 
         //print the info for each saving
-        for (SavingAccount saving : savings) {
+        for(SavingAccount saving: savings) {
 
             //check to see if it is a CD just a regular savings account
-            if (saving.getDateCDDue() == null) {
+            if(saving.getDateCDDue() == null) {
                 writer.println(saving.getCustomerID() + "," + saving.getAccountBalance() + "," +
-                        saving.getCurrentInterestRate() + "," +
-                        new SimpleDateFormat("MM/dd/yyy").format(saving.getDateAccountOpened()) + ",,");
-            } else {
+                        saving.getCurrentInterestRate() + "," + saving.getDateAccountOpened() + ",,");
+            }
+            else{
                 writer.println(saving.getCustomerID() + "," + saving.getAccountBalance() + "," +
                         saving.getCurrentInterestRate() + "," +
                         new SimpleDateFormat("MM/dd/yyy").format(saving.getDateAccountOpened()) + "," +
@@ -528,7 +582,7 @@ public class Main extends Application {
         writer.println("CustomerID,CheckingBalance,CheckingAccountType,hasBackup,Overdrafts,DateOpened,");
 
         //print the info for each checking
-        for (CheckingAccount checking : checkings) {
+        for(CheckingAccount checking: checkings) {
             writer.println(checking.getCustomerID() + "," + checking.getAccountBalance() + "," +
                     checking.getAccountType() + "," + checking.getHasOverdraftProtection() + "," +
                     checking.getOverdraftsThisMonth() + "," +
@@ -549,7 +603,7 @@ public class Main extends Application {
         writer.println("CustomerID,CheckID,CheckAmt,PayTo,DateCheck,Memo,");
 
         //print the info for each checking
-        for (Check check : checks) {
+        for(Check check: checks) {
             writer.println(check.getCustomerID() + "," + check.getCheckID() + "," +
                     check.getCheckAmt() + "," + check.getPayTo() + "," +
                     check.getDateCheck() + "," +
@@ -569,8 +623,8 @@ public class Main extends Application {
         writer.println("CustomerID,Description,CurrentBalance,CurrentInterestRate,DatePaymentDue,DateNotifiedOfPayment,CurrentPaymentDue,DateSinceLastPaymentMade,MissedPaymentFlag,AccountType,");
 
         //print the info for each loan
-        for (LoanAccount loan : loans) {
-            writer.println(loan.getCustomerID() + "," + loan.getDescription() + "," + loan.getAccountBalance() + "," +
+        for(LoanAccount loan: loans) {
+            writer.println(loan.getCustomerID() + "," + loan.getAccountBalance() + "," +
                     loan.getCurrentInterestRate() + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(loan.getDatePaymentDue()) + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(loan.getDatePaymentNotified()) + "," +
@@ -593,7 +647,7 @@ public class Main extends Application {
     */
 
     //search all the accounts for a matching customerID
-    public static ArrayList<ArrayList> searchAccounts(int custID, ArrayList<SavingAccount> savings, ArrayList<CheckingAccount> checkings, ArrayList<LoanAccount> loans) {
+    public static ArrayList<ArrayList> searchAccounts(int custID, ArrayList<SavingAccount> savings, ArrayList<CheckingAccount> checkings, ArrayList<LoanAccount> loans){
 
         //create an arraylist for any account arraylist type
         ArrayList<ArrayList> searchResults = new ArrayList<>();
@@ -603,22 +657,22 @@ public class Main extends Application {
         ArrayList<CheckingAccount> personCheckingsAccounts = new ArrayList<>();
         ArrayList<LoanAccount> personLoansAccounts = new ArrayList<>();
 
-        for (int i = 0; i < savings.size() - 1; i++) {
-            if (savings.get(i).getCustomerID() == custID) {
+        for(int i=0; i<savings.size()-1; i++){
+            if(savings.get(i).getCustomerID()==custID){
                 personSavingsAccounts.add(savings.get(i));
             }
         }
         searchResults.add(0, personSavingsAccounts);
 
-        for (int i = 0; i < checkings.size() - 1; i++) {
-            if (checkings.get(i).getCustomerID() == custID) {
+        for(int i=0; i<checkings.size()-1; i++){
+            if(checkings.get(i).getCustomerID()==custID){
                 personCheckingsAccounts.add(checkings.get(i));
             }
         }
         searchResults.add(1, personCheckingsAccounts);
 
-        for (int i = 0; i < loans.size() - 1; i++) {
-            if (loans.get(i).getCustomerID() == custID) {
+        for(int i=0; i<loans.size()-1; i++){
+            if(loans.get(i).getCustomerID()==custID){
                 personLoansAccounts.add(loans.get(i));
             }
         }
@@ -631,14 +685,14 @@ public class Main extends Application {
     }//end of searchAccounts
 
     //search all checks for customer ID
-    public static ArrayList<Check> searchChecks(int custID, ArrayList<Check> checks) {
+    public static ArrayList<Check> searchChecks(int custID, ArrayList<Check> checks){
 
         //create a temporary arraylist for checks belonging to a customer
         ArrayList<Check> searchResults = new ArrayList<>();
 
-        for (Check check : checks) {
-            if (check.getCustomerID() == custID) {
-                searchResults.add(check);
+        for(int i=0; i<checks.size(); i++){
+            if(checks.get(i).getCustomerID()==custID){
+                searchResults.add(checks.get(i));
             }
         }
 
@@ -669,48 +723,61 @@ public class Main extends Application {
     */
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     //debugging the import method
-    public static void debugImport(ArrayList<Person> people) {
+    public static void debugImport(ArrayList<Person> people){
         System.out.println("Debugging import process");
 
         //temporary array lists
-        ArrayList<SavingAccount> savings;
-        ArrayList<CheckingAccount> checkings;
-        ArrayList<LoanAccount> loans;
+        ArrayList<SavingAccount> savings = new ArrayList<>();
+        ArrayList<CheckingAccount> checkings = new ArrayList<>();
+        ArrayList<LoanAccount> loans = new ArrayList<>();
 
         //looping through each person
-        for (int i = 0; i < people.size() - 1; i++) {
-            System.out.println("Person: " + (i + 1));
+        for(int i=0; i<people.size()-1; i++){
+            System.out.println("Person: " + (i+1));
             System.out.println(people.get(i).toString());
 
             savings = people.get(i).getAccounts().get(0);
             checkings = people.get(i).getAccounts().get(1);
             loans = people.get(i).getAccounts().get(2);
 
-            ArrayList<Check> checks;
+            ArrayList<Check> checks = new ArrayList<>();
             //ArrayList<CreditCard> CCs = new ArrayList<>();
 
             //looping through each saving account
-            for (SavingAccount saving : savings) {
-                System.out.println(saving.toString());
+            for(int j=0; j<savings.size(); j++){
+                System.out.println(savings.get(j).toString());
             }
 
             //looping through each checking account
-            for (CheckingAccount checking : checkings) {
-                System.out.println(checking.toString());
+            for(int j=0; j<checkings.size(); j++){
+                System.out.println(checkings.get(j).toString());
 
-                checks = checking.getChecks();
+                checks = checkings.get(j).getChecks();
 
                 //looping through each check
-                for (Check check : checks) {
-                    System.out.println(check.toString());
+                for(int k=0; k<checks.size(); k++){
+                    System.out.println(checks.get(k).toString());
                 }
             }
 
             //todo- add the CCs here after getting it
             //looping through each loan account
-            for (LoanAccount loan : loans) {
-                System.out.println(loan.toString());
+            for(int j=0; j<loans.size(); j++){
+                System.out.println(loans.get(j).toString());
 
                 /*
                 looping through each Credit card
