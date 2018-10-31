@@ -1,1 +1,2 @@
 CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,
+123456789,0.0,0.2,Wed Oct 31 15:18:52 CDT 2018,,

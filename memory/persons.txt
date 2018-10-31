@@ -1,2 +1,2 @@
 SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,
-123456789,St. Address,St. Joseph,Missouri,64505,First,Last,
+123456789,Street Address,St. Joseph,Missouri,64505,Hunter,Berten,

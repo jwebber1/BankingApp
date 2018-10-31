@@ -105,7 +105,10 @@ public class CustomerCreationScene {
         } else {
             // TODO: Save to file.
             try {
-
+                ArrayList<ArrayList> accounts = new ArrayList<>();
+                accounts.add(new ArrayList());
+                accounts.add(new ArrayList());
+                accounts.add(new ArrayList());
                 Person person = new Person(
                         Integer.parseInt(socialSecurityProperty.get()),
                         streetAddressProperty.get(),
@@ -115,7 +118,7 @@ public class CustomerCreationScene {
                         firstNameProperty.get(),
                         lastNameProperty.get(),
                         UICreationHelpers.userLevels.indexOf(userLevelProperty.get()),
-                        new ArrayList<>()
+                        accounts
                 );
                 Main.persons.add(person);
                 Main.exportToFile(Main.persons);

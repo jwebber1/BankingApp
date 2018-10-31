@@ -21,14 +21,13 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Banking App");
         primaryStage.setScene(new Scene(new CustomerCreationScene().getRoot(), 640, 480));
-        Scene scene = new Scene(new CustomerCreationScene().getRoot(), 640, 480);
+        Scene scene = new Scene(new AccountCreationScene().getRoot(), 640, 480);
         scene.getStylesheets().add("stylesheet.css");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public static void main(String[] args) {
-        launch(args);
 
         //importing data
         //creating arraylists to hold the objects
@@ -50,11 +49,11 @@ public class Main extends Application {
 
         //exporting data
 
-        try {
-            exportToFile(persons);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            exportToFile(persons);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
 
 
 //used to format money, will probably need to be moved to "controller" for the GUI
@@ -72,6 +71,7 @@ public class Main extends Application {
         System.out.println(moneyFormat.format(tempChecking.getAccountBalance()));
         */
 
+        launch(args);
 
 
         //currently stops the program, may want to remove later

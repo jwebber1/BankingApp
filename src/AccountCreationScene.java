@@ -94,7 +94,6 @@ public class AccountCreationScene {
         ObservableList<String> personNames = FXCollections.observableArrayList();
         for (Person person : Main.persons) {
             personNames.add(person.lName + ", " + person.fName);
-
         }
         customerBox = UICreationHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("Customer:", customerBox));
