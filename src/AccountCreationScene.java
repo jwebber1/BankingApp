@@ -189,7 +189,6 @@ public class AccountCreationScene {
                     ArrayList<LoanAccount> loanAccounts = Main.loansImportFile();
                     LoanAccount loanAccount = new LoanAccount(
                             customerId,
-                            "",
                             accountBalance,
                             0.2,
                             new Date(),

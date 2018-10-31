@@ -15,21 +15,23 @@ public class Main extends Application {
     //used to format money, will probably need to be moved to "controller" for the GUI
     NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
 
+    static ArrayList<Person> persons = new ArrayList<>();
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Banking App");
-        primaryStage.setScene(new Scene(root, 640, 480));
+        primaryStage.setScene(new Scene(new CustomerCreationScene().getRoot(), 640, 480));
+        Scene scene = new Scene(new CustomerCreationScene().getRoot(), 640, 480);
+        scene.getStylesheets().add("stylesheet.css");
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public static void main(String[] args) {
-        //launch(args);
+        launch(args);
 
         //importing data
         //creating arraylists to hold the objects
-
-        ArrayList<Person> persons = new ArrayList<>();
 
         //attempting to import the data into the arraylists
         try {
@@ -73,7 +75,7 @@ public class Main extends Application {
 
 
         //currently stops the program, may want to remove later
-        System.exit(0);
+//        System.exit(0);
     }
 
     //importing data
