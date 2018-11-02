@@ -23,7 +23,7 @@ class CD extends Account {
         this.dateCDDue = dateCDDueIn;
         this.beforeDueDate = beforeDueDate;
     }
-
+    //Create import, export, and search by cusID
     public double getCurrentInterestRate() {
         return currentInterestRate;
     }
