@@ -1,5 +1,3 @@
-package UI;
-
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -14,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -86,6 +85,18 @@ class UICreationHelpers {
 
     // Creates a combobox with Label having text "labelText" and containing the options passed in "options." The text
     // in the field is bound bidirectionally to the StringProperty "property."
+    static ComboBox createComboBox(HashMap<Integer, String> options, StringProperty property) {
+        ObservableList<String> values = FXCollections.observableArrayList();
+        values.addAll(options.values());
+
+        ComboBox<String> comboBox = new ComboBox<>(values);
+        comboBox.valueProperty().bindBidirectional(property);
+        comboBox.setPrefSize(fieldWidth, fieldHeight);
+        return comboBox;
+    }
+
+    // Creates a combobox with Label having text "labelText" and containing the options passed in "options." The text
+    // in the field is bound bidirectionally to the StringProperty "property."
     static ComboBox createComboBox(ObservableList<String> options, StringProperty property) {
         ComboBox<String> comboBox = new ComboBox<>(options);
         comboBox.valueProperty().bindBidirectional(property);
@@ -113,9 +124,9 @@ class UICreationHelpers {
         String errorMessage = "";
 
         // Contains ONLY Numbers
-        if (property.get().matches("[0-9]+")) {
-            errorMessage += fieldName + " field must contain only numbers.\n";
-        }
+//        if (property.get().matches("[0-9]+")) {
+//            errorMessage += fieldName + " field must contain only numbers.\n";
+//        }
 
         return errorMessage;
     }
