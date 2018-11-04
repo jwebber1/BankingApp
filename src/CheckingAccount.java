@@ -1,3 +1,6 @@
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -6,18 +9,14 @@ class CheckingAccount extends Account{
     protected Boolean connectedToATMCard;        // 1=true   0=false
     protected int overdraftsThisMonth;
     protected int withdrawsToday;
-    protected ArrayList<Check> checks;
 
     //constructor for the Checking Account
-    public CheckingAccount(int cusIdIn, double accBalIn, String accTypeIn, Byte OvProIn, Byte atm, int odThisMonth, Date dateAccOpened, ArrayList<Check> checksIn){
-        super(cusIdIn,accBalIn, dateAccOpened, accTypeIn);
-        this.hasOverdraftProtection = false;
-        if(OvProIn == 1) {this.hasOverdraftProtection = true;}
-        connectedToATMCard = false;
-        if(atm == 1) {this.connectedToATMCard = true;}
+    public CheckingAccount(int cusIdIn, double accBalIn, Byte OvProIn, Byte atm, int odThisMonth, Date dateAccOpened){
+        super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >1000.0) ? "gold" : "regular"));
+        this.hasOverdraftProtection = (OvProIn==1) ? true : false;
+        this.connectedToATMCard = (atm == 1) ? true : false;
         this.overdraftsThisMonth = odThisMonth;
-        withdrawsToday = 0;
-        this.checks = checksIn;
+        this.withdrawsToday = 0;
     }
 
     //getters and setters
@@ -29,8 +28,6 @@ class CheckingAccount extends Account{
     public void setOverdraftsThisMonth(int overdraftsThisMonth) {this.overdraftsThisMonth = overdraftsThisMonth;}
     public int getWithdrawsToday() {return withdrawsToday;}
     public void setWithdrawsToday(int withdrawsToday) {this.overdraftsThisMonth = withdrawsToday;}
-    public ArrayList<Check> getChecks() {return checks;}
-    public void setChecks(ArrayList<Check> checks) {this.checks = checks;}
 
     @Override
     public String toString() {
@@ -44,7 +41,112 @@ class CheckingAccount extends Account{
                 '}';
     }
 
-    //method for withdraw from checking
+    //current method to grab data from the checkings textfile in "memory"
+    public static ArrayList<CheckingAccount> importFile() throws IOException, ParseException {
+
+        //creates a file referencing the text file in the memory folder
+        File checkingsFileIn = new File("memory/checkings.txt");
+
+        //creates a bufferedreader to read from a file
+        BufferedReader checkingsBR = null;
+        checkingsBR = new BufferedReader(new InputStreamReader(new FileInputStream(checkingsFileIn)));
+
+        //buffer string to temporarily hold the line retrieved
+        String line;
+
+        //creates the ArrayList of data
+        ArrayList<CheckingAccount> importChecking = new ArrayList<>();
+        ArrayList<Check> checks = new ArrayList<>();
+
+        //generic counter to know the line currently on
+        int lineNum = 0;
+
+        //while loop to go through the file
+        while ((line = checkingsBR.readLine()) != null) {
+
+            //if the file has a header, this if statement is to avoid that
+            //remove "if" if final file has no header
+            if(lineNum > 0) {
+
+                //split the line into an array of strings
+                String[] splitLine = line.split(",");
+
+                //create temp variable to hold info from the split lines
+                int cusID = Integer.parseInt(splitLine[0]);
+                double balance = Double.parseDouble(splitLine[1]);
+                //String accountType = splitLine[2];
+                Byte hasOverdraftProtection = Byte.parseByte(splitLine[2]);    // 1=true   0=false
+                Byte connectedToATMCard = Byte.parseByte(splitLine[3]);    // 1=true   0=false
+                int overdraftsThisMonth = Integer.parseInt(splitLine[4]);
+                Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
+
+                //add the new data (in our case checking) to the ArrayList
+                importChecking.add(new CheckingAccount(cusID, balance, /*accountType,*/ hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened));
+
+                //debugging importChecking
+                //System.out.println("count: " + (lineNum) + "\t" + importChecking.get(lineNum-1).toString());
+            }
+
+            //increment the line number
+            lineNum++;
+        }
+
+        //close the bufferfile and return the ArrayList
+        checkingsBR.close();
+        return importChecking;
+
+    }//end of checking data import method
+
+    //export checking accounts to checkings.txt
+    public static void exportFile(ArrayList<CheckingAccount> checkings) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter checkingWriter = new PrintWriter(new FileOutputStream("memory/checkings.txt",false));
+
+        //printing the headers of the files
+        checkingWriter.println("CustomerID,CheckingBalance,CheckingAccountType,hasBackup,Overdrafts,DateOpened,");
+
+        //go through all the checking accounts
+        for (CheckingAccount checking: checkings) {
+
+            int overDBit = checking.getHasOverdraftProtection() ? 1 : 0;
+            int atmBit = checking.getConnectedToATMCard() ? 1 : 0;
+
+            checkingWriter.println(checking.getCustomerID() + "," +
+                    checking.getAccountBalance() + "," +
+                    /*checking.getAccountType() + "," +*/
+                    (checking.getHasOverdraftProtection() ? 1 : 0) + "," +
+                    (checking.getConnectedToATMCard() ? 1 : 0) + "," +
+                    checking.getOverdraftsThisMonth() + "," +
+                    new SimpleDateFormat("MM/dd/yyy").format(checking.getDateAccountOpened()) + ",");
+            checkingWriter.flush();
+        }
+
+        //close the PrintWriter objects
+        checkingWriter.flush();
+        checkingWriter.close();
+
+    }//end of exportFile()
+
+    //find all checking accounts given a customerID
+    public static ArrayList<CheckingAccount> searchCheckingAccountsByCustomerID(int custID){
+
+        //initialize searchResults to null
+        ArrayList<CheckingAccount> searchResults = null;
+
+        //loop through all checking accounts in global arraylist
+        for(CheckingAccount account: Main.checkingAccounts){
+            if(account.getCustomerID() == custID){
+                searchResults.add(account);
+            }
+        }
+
+        //return found checking accounts OR null
+        return searchResults;
+    }
+
+
+
+        //method for withdraw from checking
     public int withdraw(SavingAccount customerSaving, double withdrawlAmt){
         boolean customerWithdrawTooMuch = ((accountBalance-withdrawlAmt) < 0.0);
         boolean savingsNotEnough = (((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
@@ -56,7 +158,7 @@ class CheckingAccount extends Account{
 
 
         //charge $0.50 for withdrawl from checking if not a gold account
-        if(!accountType.equals("gold")) {charge += 0.5;}
+        if(accountType != "gold") {charge += 0.5;}
 
         //begin the if-elses to determine amount left in account
         if(customerWithdrawTooMuch && !hasOverdraftProtection){
@@ -69,7 +171,7 @@ class CheckingAccount extends Account{
             charge += 20.0;
 
             //change account type if fall below $1000 (just in case)
-            if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
+            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
 
             //increment amount of withdraws today
             withdrawsToday++;
@@ -86,7 +188,7 @@ class CheckingAccount extends Account{
             customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
 
             //change account type if fall below $1000 (just in case)
-            if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
+            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
 
             //increment amount of withdraws today
             withdrawsToday++;
@@ -133,7 +235,7 @@ class CheckingAccount extends Account{
         if(transferAmt < 0.0) {return -1;}
 
         //charge $0.50 for withdrawl from checking if not a gold account
-        if(!accountType.equals("gold")) {charge += 0.75;}
+        if(accountType != "gold") {charge += 0.75;}
 
         //transfer the money from checking to saving
         setAccountBalance(accountBalance - transferAmt);
@@ -154,7 +256,7 @@ class CheckingAccount extends Account{
         accountBalance -= charge;
 
         //change account type if fall below $1000 (just in case)
-        if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
+        if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
 
         //return which error was encountered:
         // -1 account overdraft
@@ -167,7 +269,7 @@ class CheckingAccount extends Account{
     public int deposit(double depositAmt){
 
         //charge $0.50 for deposit into checking if not a gold account
-        if(!accountType.equals("gold")) {accountBalance = accountBalance - 0.5;}
+        if(accountType != "gold") {accountBalance = accountBalance - 0.5;}
 
         //some data validation
         if(depositAmt < 0.0) {
@@ -179,18 +281,28 @@ class CheckingAccount extends Account{
         accountBalance = accountBalance + depositAmt;
 
         //change account type if the person has > $1000
-        if(!accountType.equals("gold") && accountBalance > 1000.0){accountType = "regular";}
+        if(accountType != "gold" && accountBalance > 1000.0){accountType = "regular";}
 
-        //return 0 for successful transaction
+        //return 0 for successful transa ction
         return 0;
 
     }//end of checking deposit
 
+    public static void debugImport(){
+        System.out.println("Debugging Checking Account import process");
 
-    //method to stop a check
-    public void stopCheck(int checkNum){
-        // TODO
+        int count = 1;
+        for(CheckingAccount account: Main.checkingAccounts){
+            System.out.println("Checking Account " + count + ":\n" +
+                    "accountType='" + account.getAccountType() + '\'' + "\n" +
+                    "hasOverdraftProtection=" + account.getHasOverdraftProtection() + "\n" +
+                    "overdraftsThisMonth=" + account.getOverdraftsThisMonth() + "\n" +
+                    "dateAccountOpened=" + account.getDateAccountOpened() + "\n" +
+                    "customerID=" + account.getCustomerID() + "\n" +
+                    "accountBalance=" + account.getAccountBalance());
+
+            count++;
+        }
     }
-
 
 }//end of CheckingAccount
