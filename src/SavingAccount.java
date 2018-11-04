@@ -1,28 +1,26 @@
 import java.util.Date;
 
 class SavingAccount extends Account {
-    private double currentInterestRate;
-    private Date dateCDDue;
+    protected double currentInterestRate;
+    protected Date dateCDDue;
 
     //constructor for the SavingAccount
-    private SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn) {
+    public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn) {
         super(cusIDIn, accBalIn, dateAccOpenedIn, "Saving");
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = null;
     }
 
+    //overloading SavingAccount to CD
+    public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
+        super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
+        this.customerID = cusIDIn;
+        this.accountBalance = accBalIn;
+        this.currentInterestRate = currIntRateIn;
+        this.dateCDDue = dateCDDueIn;
+    }
 
-       //overloading SavingAccount to CD
-    //Moved to CD class
-//    private SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
-//        super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
-//        this.customerID = cusIDIn;
-//        this.accountBalance = accBalIn;
-//        this.currentInterestRate = currIntRateIn;
-//        this.dateCDDue = dateCDDueIn;
-//    }
-
-    private double getCurrentInterestRate() {
+    public double getCurrentInterestRate() {
         return currentInterestRate;
     }
 
@@ -30,7 +28,7 @@ class SavingAccount extends Account {
         this.currentInterestRate = currentInterestRate;
     }
 
-    private Date getDateCDDue() {
+    public Date getDateCDDue() {
         return dateCDDue;
     }
 
