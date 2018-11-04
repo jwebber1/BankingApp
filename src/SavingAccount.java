@@ -87,5 +87,19 @@ class SavingAccount extends Account {
             savingsBR.close();
             return importSaving;
 
-    }
+    }//end of importFile
+
+    //export saving accounts to savings.txt
+    public static void exportFile(ArrayList<SavingAccount> savings) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter savingWriter = new PrintWriter(new FileOutputStream("memory/savings.txt",false));
+
+        //printing the headers of the files
+        savingWriter.println("CustomerID,AccountBalance,CurrentInterestRate,DateAccOpened,");
+
+
+
+
+
+    }//end of exportFile()
 }//end of SavingAccount
