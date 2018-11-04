@@ -1,4 +1,7 @@
 import java.util.Date;
+import java.util.ArrayList;
+import java.io.*;
+import java.text.ParseException;
 
 class SavingAccount extends Account {
     protected double currentInterestRate;
@@ -20,6 +23,8 @@ class SavingAccount extends Account {
         this.dateCDDue = dateCDDueIn;
     }
 
+
+    //Getters and setters
     public double getCurrentInterestRate() {
         return currentInterestRate;
     }
@@ -47,7 +52,11 @@ class SavingAccount extends Account {
                 '}';
     }
 
-    //other methods to be decided
+    //Grab the current Savings account in the file in memory
+    public static ArrayList<SavingAccount> importFile() throws IOException, ParseException {
+
+    }
+}
 
 
 }//end of SavingAccount
