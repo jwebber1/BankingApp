@@ -71,10 +71,23 @@ public class CustomerCreationScene {
         ComboBox userLevelField = UICreationHelpers.createComboBox(UICreationHelpers.userLevels, userLevelProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("User Level:", userLevelField));
 
+        // Cancel Button
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(x -> {
+            try {
+                UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        buttonHBox.getChildren().add(cancelButton);
+
         // Save Button
         Button saveButton = new Button("Save");
         saveButton.setOnAction(x -> saveAccount());
         buttonHBox.getChildren().add(saveButton);
+
+        buttonHBox.setSpacing(10);
         buttonHBox.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(buttonHBox);
     }
@@ -98,10 +111,7 @@ public class CustomerCreationScene {
         errorMessage += UICreationHelpers.checkTextField("Street Address", streetAddressProperty);
 
         if (!errorMessage.isEmpty()) {
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setHeaderText("Input Not Valid");
-            errorAlert.setContentText(errorMessage);
-            errorAlert.showAndWait();
+            UICreationHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
             // TODO: Save to file.
             try {
@@ -124,10 +134,7 @@ public class CustomerCreationScene {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            Alert successfulAlert = new Alert(Alert.AlertType.INFORMATION);
-            successfulAlert.setHeaderText("Save Successful");
-            successfulAlert.setContentText("The user has been saved successfully.");
-            successfulAlert.showAndWait();
+            UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
         }
     }
 

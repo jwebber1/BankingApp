@@ -25,8 +25,25 @@ import java.util.regex.Pattern;
  */
 
 class UICreationHelpers {
+    static int currentUserLevel = 0;
+    static Person currentUser;
     private static double fieldWidth = 140;
     private static double fieldHeight = 20;
+
+    static ObservableList<String> accountTypes = FXCollections.observableArrayList(
+            "Savings",
+            "Checking",
+            "Loan"
+    );
+    static ObservableList<String> loanTypes = FXCollections.observableArrayList(
+            "Long Term",
+            "Short Term",
+            "Credit Card"
+    );
+    static ObservableList<String> checkingAccountTypes = FXCollections.observableArrayList(
+            "That's My Bank",
+            "Gold"
+    );
 
     static ObservableList<String> userLevels = FXCollections.observableArrayList(
             "Customer",
@@ -165,4 +182,16 @@ class UICreationHelpers {
         scene.getStylesheets().add("stylesheet.css");
         Main.primaryStage.setScene(scene);
     }
+
+    public static void showAlert(Alert.AlertType alertType, String message) {
+        Alert errorAlert = new Alert(alertType);
+        if (alertType == Alert.AlertType.ERROR) {
+            errorAlert.setHeaderText("Error");
+        } else {
+            errorAlert.setHeaderText("Information");
+        }
+        errorAlert.setContentText(message);
+        errorAlert.showAndWait();
+    }
+
 }

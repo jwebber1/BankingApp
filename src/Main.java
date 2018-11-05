@@ -1,9 +1,8 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 
 public class Main extends Application {
@@ -21,8 +20,7 @@ public class Main extends Application {
             checkingAccounts = CheckingAccount.importFile();
             checks = Check.importFile();
         }
-        catch (IOException e) {e.printStackTrace();}
-        catch (ParseException e) {e.printStackTrace();}
+        catch (Exception e) {e.printStackTrace();}
     }
 
     @Override
@@ -39,7 +37,6 @@ public class Main extends Application {
         Person.debugImport();
         CheckingAccount.debugImport();
         Check.debugImport();
-
 
         try {
             Person.exportFile(people);

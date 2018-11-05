@@ -1,15 +1,24 @@
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class NavigationScene {
+class NavigationScene {
     private VBox fieldVBox = new VBox();
     private StackPane root = new StackPane(fieldVBox);
 
     public NavigationScene() {
-        UICreationHelpers.createButton("Person Creation", fieldVBox, x -> personCreation());
-        UICreationHelpers.createButton("Account Creation", fieldVBox, x -> accountCreation());
-
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+
+        Label nameLabel = new Label(UICreationHelpers.currentUser.lName + ", " + UICreationHelpers.currentUser.fName);
+        nameLabel.setAlignment(Pos.BASELINE_RIGHT);
+        fieldVBox.getChildren().add(nameLabel);
+        if (UICreationHelpers.currentUserLevel > 0) {
+            UICreationHelpers.createButton("Person Creation", fieldVBox, x -> personCreation());
+            UICreationHelpers.createButton("Account Creation", fieldVBox, x -> accountCreation());
+        } else {
+
+        }
     }
 
     public StackPane getRoot() {
