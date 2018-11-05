@@ -48,6 +48,14 @@ class CD extends Account {
         this.beforeDueDate = beforeDueDate;
     }
 
+    //Be able to withdraw the amount of the CD and delete
+    public double withdrawCD(){
+        double amtToReturn;
+        amtToReturn = accountBalance;
+        accountBalance = 0;
+        return amtToReturn;
+    }
+
     public static ArrayList<CD> importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
         File cdFileIn = new File("memory/cds.txt");
@@ -109,7 +117,10 @@ class CD extends Account {
 
         //go through all the checking accounts
         for (CD cd : cds) {
-
+            //Check to see if the Balance is 0 and if it is delete it
+            /*if (cd.getAccountBalance() == 0){
+                cds.remove();
+            }*/
 
            cdWriter.println(cd.getCustomerID() + "," +
                     cd.getAccountBalance() + "," +
