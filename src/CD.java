@@ -48,13 +48,6 @@ class CD extends Account {
         this.beforeDueDate = beforeDueDate;
     }
 
-    //Be able to withdraw the amount of the CD and delete
-    public double withdrawCD(){
-        double amtToReturn;
-        amtToReturn = accountBalance;
-        accountBalance = 0;
-        return amtToReturn;
-    }
 
     public static ArrayList<CD> importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
@@ -122,7 +115,7 @@ class CD extends Account {
                 cds.remove();
             }*/
 
-           cdWriter.println(cd.getCustomerID() + "," +
+            cdWriter.println(cd.getCustomerID() + "," +
                     cd.getAccountBalance() + "," +
                     cd.getAccountType() + "," +
                     cd.getCurrentInterestRate() + "," +
@@ -153,6 +146,29 @@ class CD extends Account {
         //return found checking accounts OR null
         return searchResults;
     }
+
+    public int withdraw(CD customerCD) {
+
+        int errors = 0;
+        double charge = 0.0;//Charge if withdrawn before due date
+
+
+        //begin the if-elses to determine if it is before the CD date
+        if (dateCDDue.compareTo(dateNow) >= 0) {
+            setAccountBalance(0);
+            errors = 0;
+        } else
+            setAccountBalance(0);
+        errors = -1;
+
+
+        //return which error was encountered:
+        // -1 withdrawal before due date
+        // 0 default, withdrawal after date
+
+        return errors;
+
+    }//end of CD withdraw
 
 
 }//end of CD
