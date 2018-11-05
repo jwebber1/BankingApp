@@ -2,9 +2,13 @@ import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -149,4 +153,16 @@ class UICreationHelpers {
         return errorMessage;
     }
 
+    public static Button createButton(String buttonText, VBox fieldVBox, EventHandler<ActionEvent> lambda) {
+        Button button = new Button(buttonText);
+        button.setOnAction(lambda);
+        fieldVBox.getChildren().add(button);
+        return button;
+    }
+
+    public static void navigateToScene(Parent root) {
+        Scene scene = new Scene(root, 640, 480);
+        scene.getStylesheets().add("stylesheet.css");
+        Main.primaryStage.setScene(scene);
+    }
 }

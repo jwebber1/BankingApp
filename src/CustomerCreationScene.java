@@ -117,11 +117,10 @@ public class CustomerCreationScene {
                         zipCodeProperty.get(),
                         firstNameProperty.get(),
                         lastNameProperty.get(),
-                        UICreationHelpers.userLevels.indexOf(userLevelProperty.get()),
-                        accounts
+                        UICreationHelpers.userLevels.indexOf(userLevelProperty.get())
                 );
-                Main.persons.add(person);
-                Main.exportToFile(Main.persons);
+                Main.people.add(person);
+                Person.exportFile(Main.people);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

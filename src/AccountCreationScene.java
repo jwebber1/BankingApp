@@ -68,10 +68,6 @@ public class AccountCreationScene {
     private StackPane root = new StackPane(fieldVBox);
 
     public AccountCreationScene() {
-//        for (Person person: Main.persons) {
-//            customers.put(person.id, person.lName + ", " + person.fName);
-//        }
-
         createBaseAccountCreationNodes();
         createCheckingFields();
         createLoanFields();
@@ -92,7 +88,7 @@ public class AccountCreationScene {
     // Creates base fields that are used by all account types.
     private void createBaseAccountCreationNodes() {
         ObservableList<String> personNames = FXCollections.observableArrayList();
-        for (Person person : Main.persons) {
+        for (Person person : Main.people) {
             personNames.add(person.lName + ", " + person.fName);
         }
         customerBox = UICreationHelpers.createComboBox(personNames, customerProperty);
@@ -104,6 +100,18 @@ public class AccountCreationScene {
 
         HBox hBox = UICreationHelpers.createHBox("Account Balance:", UICreationHelpers.createBalanceField(accountBalanceProperty));
         fieldVBox.getChildren().add(hBox);
+
+        // Cancel Button
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(x -> {
+            try {
+                UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        buttonHBox.getChildren().add(cancelButton);
+        buttonHBox.setAlignment(Pos.BASELINE_RIGHT);
 
         // Save Button
         Button saveButton = new Button("Save");
@@ -142,7 +150,7 @@ public class AccountCreationScene {
         if (customerProperty.get().isEmpty()) {
             errorMessage += "Customer must be selected.\n";
         } else {
-            customerId = Main.persons.get(customerBox.getSelectionModel().getSelectedIndex()).id;
+            customerId = Main.people.get(customerBox.getSelectionModel().getSelectedIndex()).id;
         }
 
         double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
@@ -159,33 +167,31 @@ public class AccountCreationScene {
         } else {
             switch (accountTypes.indexOf(accountTypeProperty.get())) {
                 case 0:
-                    ArrayList<SavingAccount> savingAccounts = Main.savingsImportFile();
+//                    ArrayList<SavingAccount> savingAccounts = Main.savingsImportFile();
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
                             accountBalance,
                             0.2,
                             new Date()
                     );
-                    savingAccounts.add(savingAccount);
-                    Main.exportSavings(savingAccounts);
+//                    savingAccounts.add(savingAccount);
+//                    SavingAccount.export(savingAccounts);
                     break;
                 case 1:
-                    ArrayList<CheckingAccount> checkingAccounts = Main.checkingsImportFile(new ArrayList<>());
+                    ArrayList<CheckingAccount> checkingAccounts = CheckingAccount.importFile();
                     CheckingAccount checkingAccount = new CheckingAccount(
                             customerId,
                             accountBalance,
-                            checkingAccountTypeProperty.get(),
                             null,
                             null,
                             0,
-                            new Date(),
-                            new ArrayList<>()
+                            new Date()
                     );
                     checkingAccounts.add(checkingAccount);
-                    Main.exportCheckings(checkingAccounts);
+                    CheckingAccount.exportFile(checkingAccounts);
                     break;
                 case 2:
-                    ArrayList<LoanAccount> loanAccounts = Main.loansImportFile();
+//                    ArrayList<LoanAccount> loanAccounts = LoanAccount.loansImportFile();
                     LoanAccount loanAccount = new LoanAccount(
                             customerId,
                             accountBalance,
@@ -197,14 +203,15 @@ public class AccountCreationScene {
                             null,
                             ""
                     );
-                    loanAccounts.add(loanAccount);
-                    Main.exportLoans(loanAccounts);
+//                    loanAccounts.add(loanAccount);
+//                    LoanAccount.(loanAccounts);
                     break;
             }
             Alert successfulAlert = new Alert(Alert.AlertType.INFORMATION);
             successfulAlert.setHeaderText("Save Successful");
             successfulAlert.setContentText("The user has been saved successfully.");
             successfulAlert.showAndWait();
+            UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
         }
     }
 

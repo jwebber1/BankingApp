@@ -1,6 +1,7 @@
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.StackPane;
@@ -16,18 +17,19 @@ public class LoginScene {
         ComboBox userLevelField = UICreationHelpers.createComboBox(UICreationHelpers.userLevels, userLevelProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("User Level:", userLevelField));
 
-
         // Save Button
-        Button loginButton = new Button("Login");
-//        saveButton.setOnAction(x -> saveAccount());
-//        buttonHBox.getChildren().add(saveButton);
+
+        Button loginButton = UICreationHelpers.createButton("Login", fieldVBox, x -> login());
         loginButton.setAlignment(Pos.BASELINE_RIGHT);
-        fieldVBox.getChildren().add(loginButton);
 
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
     }
 
     public StackPane getRoot() {
         return root;
+    }
+
+    private void login() {
+        UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
     }
 }

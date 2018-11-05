@@ -1,20 +1,16 @@
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Main extends Application {
     //used to format money, will probably need to be moved to "controller" for the GUI
     static NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
 
+    static Stage primaryStage;
     static ArrayList<Person> people;
     static ArrayList<CheckingAccount> checkingAccounts;
     static ArrayList<Check> checks;
@@ -29,12 +25,11 @@ public class Main extends Application {
         catch (ParseException e) {e.printStackTrace();}
     }
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Main.primaryStage = primaryStage;
         primaryStage.setTitle("Banking App");
-        primaryStage.setScene(new Scene(root, 640, 480));
+        UICreationHelpers.navigateToScene(new LoginScene().getRoot());
         primaryStage.show();
     }
 
