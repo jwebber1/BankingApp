@@ -1,82 +1,68 @@
 import java.io.*;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class Person {
-    protected int id;   //social security number
-    protected String streetAddress;
-    protected String city;
-    protected String state;
-    protected String zipCode;
-    protected String fName;
-    protected String lName;
-    protected int userLevel;    // 1 = customer, 2 = teller, 3 = manager
+class CheckingAccount extends Account{
+    protected Boolean hasOverdraftProtection;    // 1=true   0=false
+    protected Boolean connectedToATMCard;        // 1=true   0=false
+    protected int overdraftsThisMonth;
+    protected int withdrawsToday;
 
-    public Person(int id, String addr, String city, String state, String zip, String fName, String lName, int uLevel){
-        this.id = id;
-        this.streetAddress = addr;
-        this.city = city;
-        this.state = state;
-        this.zipCode = zip;
-        this.fName = fName;
-        this.lName = lName;
-        this.userLevel = uLevel;
+    //constructor for the Checking Account
+    public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
+        super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >= 1000.0) ? "gold" : "regular"));
+        this.hasOverdraftProtection = OvProIn;
+        this.connectedToATMCard = atm;
+        this.overdraftsThisMonth = odThisMonth;
+        this.withdrawsToday = 0;
     }
 
     //getters and setters
-    public int getId() {return id;}
-    public void setId(int id) {this.id = id;}
-    public String getStreetAddress() {return streetAddress;}
-    public void setStreetAddress(String streetAddress) {this.streetAddress = streetAddress;}
-    public String getCity() {return city;}
-    public void setCity(String city) {this.city = city;}
-    public String getState() {return state;}
-    public void setState(String state) {this.state = state;}
-    public String getZipCode() {return zipCode;}
-    public void setZipCode(String zipCode) {this.zipCode = zipCode;}
-    public String getfName() {return fName;}
-    public void setfName(String fName) {this.fName = fName;}
-    public String getlName() {return lName;}
-    public void setlName(String lName) {this.lName = lName;}
-    public int getUserLevel() {return userLevel;}
-    public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
+    public Boolean getHasOverdraftProtection() {return hasOverdraftProtection;}
+    public void setHasOverdraftProtection(Boolean hasOverdraftProtection) {this.hasOverdraftProtection = hasOverdraftProtection;}
+    public Boolean getConnectedToATMCard() {return connectedToATMCard;}
+    public void setConnectedToATMCard(Boolean connectedToATMCard) {this.connectedToATMCard = connectedToATMCard;}
+    public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
+    public void setOverdraftsThisMonth(int overdraftsThisMonth) {this.overdraftsThisMonth = overdraftsThisMonth;}
+    public int getWithdrawsToday() {return withdrawsToday;}
+    public void setWithdrawsToday(int withdrawsToday) {this.overdraftsThisMonth = withdrawsToday;}
 
     @Override
     public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", streetAddress='" + streetAddress + '\'' +
-                ", city='" + city + '\'' +
-                ", state='" + state + '\'' +
-                ", zipCode='" + zipCode + '\'' +
-                ", fName='" + fName + '\'' +
-                ", lName='" + lName + '\'' +
-                ", userLevel=" + userLevel +
+        return "CheckingAccount{" +
+                "accountType='" + accountType + '\'' +
+                ", hasOverdraftProtection=" + hasOverdraftProtection +
+                ", overdraftsThisMonth=" + overdraftsThisMonth +
+                ", dateAccountOpened=" + dateAccountOpened +
+                ", customerID=" + customerID +
+                ", accountBalance=" + accountBalance +
                 '}';
     }
 
-    //current method to grab data from the persons textfile in "memory"
-    public static ArrayList<Person> importFile() throws IOException, ParseException {
+    //current method to grab data from the checkings textfile in "memory"
+    public static ArrayList<CheckingAccount> importFile() throws IOException, ParseException {
 
         //creates a file referencing the text file in the memory folder
-        File personsFileIn = new File("memory/people.txt");
+        File checkingsFileIn = new File("memory/checkings.txt");
 
         //creates a bufferedreader to read from a file
-        BufferedReader personsBR = null;
-        personsBR = new BufferedReader(new InputStreamReader(new FileInputStream(personsFileIn)));
+        BufferedReader checkingsBR = null;
+        checkingsBR = new BufferedReader(new InputStreamReader(new FileInputStream(checkingsFileIn)));
 
         //buffer string to temporarily hold the line retrieved
         String line;
 
         //creates the ArrayList of data
-        ArrayList<Person> importPerson = new ArrayList<>();
-        ArrayList<ArrayList> accounts = new ArrayList<>();
+        ArrayList<CheckingAccount> importChecking = new ArrayList<>();
+        ArrayList<Check> checks = new ArrayList<>();
 
         //generic counter to know the line currently on
         int lineNum = 0;
 
         //while loop to go through the file
-        while ((line = personsBR.readLine()) != null) {
+        while ((line = checkingsBR.readLine()) != null) {
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
@@ -86,23 +72,18 @@ public class Person {
                 String[] splitLine = line.split(",");
 
                 //create temp variable to hold info from the split lines
-                int socialSecurityNumber = Integer.parseInt(splitLine[0]);//customerID in account classes
-                String streetAddress = splitLine[1];
-                String city = splitLine[2];
-                String state = splitLine[3];
-                String zipCode = splitLine[4];
-                String firstName = splitLine[5];
-                String lastName = splitLine[6];
-                int userLevel = 1;  //default to customer
-                //hard code userLevel to ssn
-                if (socialSecurityNumber == 000000002 || socialSecurityNumber == 000000001){userLevel = 2;}
-                else if (socialSecurityNumber == 000000000){userLevel = 3;}
+                int cusID = Integer.parseInt(splitLine[0]);
+                double balance = Double.parseDouble(splitLine[1]);
+                boolean hasOverdraftProtection = Boolean.parseBoolean(splitLine[2]);    // 1=true   0=false
+                boolean connectedToATMCard =  Boolean.parseBoolean(splitLine[3]);  // 1=true   0=false
+                int overdraftsThisMonth = Integer.parseInt(splitLine[4]);
+                Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
 
                 //add the new data (in our case checking) to the ArrayList
-                importPerson.add(new Person(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName, userLevel));
+                importChecking.add(new CheckingAccount(cusID, balance, hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened));
 
-                //debugging importPersons
-                //System.out.println("count: " + (lineNum) + "\t" + importPerson.get(lineNum-1).toString());
+                //debugging importChecking
+                //System.out.println("count: " + (lineNum) + "\t" + importChecking.get(lineNum-1).toString());
             }
 
             //increment the line number
@@ -110,70 +91,216 @@ public class Person {
         }
 
         //close the bufferfile and return the ArrayList
-        personsBR.close();
-        return importPerson;
-    }//end of person data import method
+        checkingsBR.close();
+        return importChecking;
 
-    //export people to people.txt
-    public static void exportFile(ArrayList<Person> people) throws FileNotFoundException {
+    }//end of checking data import method
 
+    //export checking accounts to checkings.txt
+    public static void exportFile(ArrayList<CheckingAccount> checkings) throws FileNotFoundException {
         //create a new PrintWriter to write to a file
-        PrintWriter personWriter = new PrintWriter(new FileOutputStream("memory/people.txt",false));
+        PrintWriter checkingWriter = new PrintWriter(new FileOutputStream("memory/checkings.txt",false));
 
         //printing the headers of the files
-        personWriter.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,");
+        checkingWriter.println("CustomerID,CheckingBalance,hasBackup,hasATM,Overdrafts,DateOpened,");
 
+        //go through all the checking accounts
+        for (CheckingAccount checking: checkings) {
 
-        for(Person person: people) {
-            personWriter.println(person.getId() + "," + person.getStreetAddress() + "," +
-                    person.getCity() + "," + person.getState() + "," + person.getZipCode() + "," +
-                    person.getfName() + "," + person.getlName() + ",");
+            int overDBit = checking.getHasOverdraftProtection() ? 1 : 0;
+            int atmBit = checking.getConnectedToATMCard() ? 1 : 0;
 
-            personWriter.flush();
+            checkingWriter.println(checking.getCustomerID() + "," +
+                    checking.getAccountBalance() + "," +
+                    checking.getHasOverdraftProtection() + "," +
+                    checking.getConnectedToATMCard() + "," +
+                    checking.getOverdraftsThisMonth() + "," +
+                    new SimpleDateFormat("MM/dd/yyy").format(checking.getDateAccountOpened()) + ",");
+            checkingWriter.flush();
         }
-        //close the PrintWriter object
-        personWriter.flush();
-        personWriter.close();
+
+        //close the PrintWriter objects
+        checkingWriter.flush();
+        checkingWriter.close();
 
     }//end of exportFile()
 
-    //find one person given a customerID
-    public static Person searchPeopleByCustomerID(int custId){
+    //find all checking accounts given a customerID
+    public static ArrayList<CheckingAccount> searchCheckingAccountsByCustomerID(int custID){
 
         //initialize searchResults to null
-        Person searchResults = null;
+        ArrayList<CheckingAccount> searchResults = null;
 
-        //loop through people in global arraylist
-        for (Person person: Main.people) {
-            if(person.getId() == custId){
-                searchResults = person;
+        //loop through all checking accounts in global arraylist
+        for(CheckingAccount account: Main.checkingAccounts){
+            if(account.getCustomerID() == custID){
+                searchResults.add(account);
             }
         }
 
-        //return found person OR null
+        //return found checking accounts OR null
         return searchResults;
     }
 
+
+
+    //method for withdraw from checking
+    public int withdraw(SavingAccount customerSaving, double withdrawlAmt){
+        boolean customerWithdrawTooMuch = ((accountBalance-withdrawlAmt) < 0.0);
+        boolean savingsNotEnough = (((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
+        int errors = 0;
+        double charge = 0.0;
+
+        //todo- on interface, do not allow more than $500 withdrawl   UNLESS they are a part of management
+        //todo- on interface, do not allow more than 2 withdraws      UNLESS they are a part of management
+
+
+        //charge $0.50 for withdrawl from checking if not a gold account
+        if(accountType != "gold") {charge += 0.5;}
+
+        //begin the if-elses to determine amount left in account
+        if(customerWithdrawTooMuch && !hasOverdraftProtection){
+
+            //will lead to negative balance
+            setAccountBalance(accountBalance - withdrawlAmt);
+
+            //increment overdraftsThisMonth and apply $20 overdraft charge
+            overdraftsThisMonth++;
+            charge += 20.0;
+
+            //change account type if fall below $1000 (just in case)
+            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
+
+            //increment amount of withdraws today
+            withdrawsToday++;
+
+            //return -1 for insufficient funds
+            errors = -2;
+        }
+        else if(customerWithdrawTooMuch && hasOverdraftProtection) {
+
+            //set the checking balance to $0
+            setAccountBalance(0.0);
+
+            //subtract the remaining balance not covered by the checking and set the new Savings balance (will be negative)
+            customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
+
+            //change account type if fall below $1000 (just in case)
+            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
+
+            //increment amount of withdraws today
+            withdrawsToday++;
+
+            //return -2 for insufficient funds even with a savings account
+            if(savingsNotEnough){
+                //increment overdraftsThisMonth and apply $20 overdraft charge
+                overdraftsThisMonth++;
+                charge += 20.0;
+                errors = -1;
+            }
+
+            //otherwise, return -3 for successful withdrawl, but  savings account was used.
+            errors = 1;
+        }
+        else{
+            setAccountBalance(accountBalance - withdrawlAmt);
+        }
+
+        //apply any charges accrued to the account
+        accountBalance -= charge;
+
+        //change account type if fall below $1000 (just in case)
+        if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
+
+        //increment amount of withdraws today
+        withdrawsToday++;
+
+        //return which error was encountered:
+        // -2 overdraft without backup
+        // -1 overdraft with backup
+        // 0 default, successful withdraw
+        // +1 successful withdraw, savings account was used
+        return errors;
+
+    }//end of checking withdraw
+
+    //method for transfer from checking to saving
+    public int transfer(SavingAccount customerSaving, double transferAmt){
+        int errors = 0;
+        double charge = 0.0;
+
+        //some data validation; return -1 for error; cannot transfer negative money
+        if(transferAmt < 0.0) {return -1;}
+
+        //charge $0.50 for withdrawl from checking if not a gold account
+        if(accountType != "gold") {charge += 0.75;}
+
+        //transfer the money from checking to saving
+        setAccountBalance(accountBalance - transferAmt);
+        customerSaving.setAccountBalance(customerSaving.getAccountBalance() + transferAmt);
+
+        //determine if the account is overdrafted
+        if(accountBalance < 0.0){
+
+            //increment overdraftsThisMonth and apply $20 overdraft charge
+            overdraftsThisMonth++;
+            charge += 20.0;
+
+            //return -2 for insufficient funds
+            errors = -1;
+        }
+
+        //apply any charges accrued to the account
+        accountBalance -= charge;
+
+        //change account type if fall below $1000 (just in case)
+        if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
+
+        //return which error was encountered:
+        // -1 account overdraft
+        // 0 default, successful transfer
+        return errors;
+
+    }//end of checking withdraw
+
+    //method for deposit into checking
+    public int deposit(double depositAmt){
+
+        //charge $0.50 for deposit into checking if not a gold account
+        if(accountType != "gold") {accountBalance = accountBalance - 0.5;}
+
+        //some data validation
+        if(depositAmt < 0.0) {
+            //return -3 for error; cannot deposit negative money
+            return -3;
+        }
+
+        //add the deposited amount to the current account balance
+        accountBalance = accountBalance + depositAmt;
+
+        //change account type if the person has > $1000
+        if(accountType != "gold" && accountBalance > 1000.0){accountType = "regular";}
+
+        //return 0 for successful transa ction
+        return 0;
+
+    }//end of checking deposit
+
     public static void debugImport(){
-        System.out.println("Debugging Person import process");
+        System.out.println("Debugging Checking Account import process");
 
         int count = 1;
-        for(Person person: Main.people){
-            System.out.println("Person " + count + ":\n" +
-                    "id=" + person.getId() + "\n" +
-                    "streetAddress='" + person.getStreetAddress() + '\'' + "\n" +
-                    "city='" + person.getCity() + '\'' + "\n" +
-                    "state='" + person.getState() + '\'' + "\n" +
-                    "zipCode='" + person.getZipCode() + '\'' + "\n" +
-                    "fName='" + person.getfName() + '\'' + "\n" +
-                    "lName='" + person.getlName() + '\'' + "\n" +
-                    "userLevel=" + person.getUserLevel());
+        for(CheckingAccount account: Main.checkingAccounts){
+            System.out.println("Checking Account " + count + ":\n" +
+                    "accountType='" + account.getAccountType() + '\'' + "\n" +
+                    "hasOverdraftProtection=" + account.getHasOverdraftProtection() + "\n" +
+                    "overdraftsThisMonth=" + account.getOverdraftsThisMonth() + "\n" +
+                    "dateAccountOpened=" + account.getDateAccountOpened() + "\n" +
+                    "customerID=" + account.getCustomerID() + "\n" +
+                    "accountBalance=" + account.getAccountBalance());
 
             count++;
         }
+    }
 
-    }//end of debugImport()
-
-
-
-}//end of Person
+}//end of CheckingAccount
