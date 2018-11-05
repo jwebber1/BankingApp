@@ -18,12 +18,14 @@ public class Main extends Application {
     static ArrayList<Person> people;
     static ArrayList<CheckingAccount> checkingAccounts;
     static ArrayList<Check> checks;
+    static ArrayList<CD> cds;
 
     static {
         try {
             people = Person.importFile();
             checkingAccounts = CheckingAccount.importFile();
             checks = Check.importFile();
+            cds = CD.importFile();
         }
         catch (IOException e) {e.printStackTrace();}
         catch (ParseException e) {e.printStackTrace();}

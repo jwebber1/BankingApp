@@ -1,20 +1,27 @@
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
-class CD extends Account{
+class CD extends Account {
 
     protected double currentInterestRate;
     protected Date dateCDDue;
+    protected boolean beforeDueDate;
 
-   public  CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
+    //Get the current date to check if the CD is due
+    Date dateNow = new Date();
+
+
+    public CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
         super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = dateCDDueIn;
+        this.beforeDueDate = beforeDueDate;
     }
 
     public double getCurrentInterestRate() {
@@ -33,6 +40,13 @@ class CD extends Account{
         this.dateCDDue = dateCDDue;
     }
 
+    public boolean isBeforeDueDate() {
+        return beforeDueDate;
+    }
+
+    public void setBeforeDueDate(boolean beforeDueDate) {
+        this.beforeDueDate = beforeDueDate;
+    }
 
     public static ArrayList<CD> importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
@@ -56,7 +70,7 @@ class CD extends Account{
 
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
-            if(lineNum > 0) {
+            if (lineNum > 0) {
 
                 //split the line into an array of strings
                 String[] splitLine = line.split(",");
@@ -69,7 +83,7 @@ class CD extends Account{
                 Date dateCdDue = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
 
                 //add the new data to the ArrayList
-                importCD.add(new CD(cusID, balance, currentInterest,dateAccountOpened,dateCdDue));
+                importCD.add(new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue));
 
                 //Debugging
                 //System.out.println("count: " + (lineNum) + "\t" + importCD.get(lineNum-1).toString());
@@ -84,5 +98,50 @@ class CD extends Account{
         return importCD;
 
     }//end of importFile
+
+    public static void exportFile(ArrayList<CD> cds) throws FileNotFoundException {
+        //create a new PrintWriter to write to a file
+        PrintWriter cdWriter = new PrintWriter(new FileOutputStream("memory/cds.txt", false));
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+
+        //printing the headers of the files
+        cdWriter.println("CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,");
+
+        //go through all the checking accounts
+        for (CD cd : cds) {
+
+
+           cdWriter.println(cd.getCustomerID() + "," +
+                    cd.getAccountBalance() + "," +
+                    cd.getAccountType() + "," +
+                    cd.getCurrentInterestRate() + "," +
+                    formatter.format(cd.getDateAccountOpened()) + "," +
+                    formatter.format(cd.getDateCDDue()) + ",");
+            cdWriter.flush();
+        }
+
+        //close the PrintWriter objects
+        cdWriter.flush();
+        cdWriter.close();
+
+    }//end of exportFile()
+
+    //find all checking accounts given a customerID
+    public static ArrayList<CD> searchCdAccountsByCustomerID(int custID) {
+
+        //initialize searchResults to null
+        ArrayList<CD> searchResults = null;
+
+        //loop through all checking accounts in global arraylist
+        for (CD account : Main.cds) {
+            if (account.getCustomerID() == custID) {
+                searchResults.add(account);
+            }
+        }
+
+        //return found checking accounts OR null
+        return searchResults;
+    }
+
 
 }//end of CD
