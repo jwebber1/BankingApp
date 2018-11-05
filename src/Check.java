@@ -14,14 +14,14 @@ public class Check{
     boolean isHonored;
 
     //constructor for the Check class
-    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, Byte isHonored){
+    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, boolean isHonored){
         this.customerID = cusIdIn;
         this.checkID = checkIdIn;
         this.checkAmt = checkAmtIn;
         this.payTo = payToIn;
         this.dateCheck = dateCheckIn;
         this.memo = memoIn;
-        this.isHonored = (isHonored == 1) ? true : false ;
+        this.isHonored = isHonored;
 
     }
 
@@ -89,7 +89,7 @@ public class Check{
                 String payTo = splitLine[3];
                 Date dateCheck = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
                 String memo = splitLine[5];
-                Byte isHonored = Byte.parseByte(splitLine[6]);
+                boolean isHonored = Boolean.parseBoolean(splitLine[6]);
 
                 //add the new data (in our case checking) to the ArrayList
                 importChecks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo, isHonored));
@@ -123,7 +123,7 @@ public class Check{
                     check.getPayTo() + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(check.getDateCheck()) + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(check.getDateCheck()) + "," +
-                    (check.isHonored() ? 1 : 0) + ",");
+                    check.isHonored() + ",");
             checkWriter.flush();
         }
 
@@ -177,7 +177,6 @@ public class Check{
         return -7;
     }
 
-
     public static void debugImport(){
         System.out.println("Debugging Check import process");
 
@@ -195,7 +194,5 @@ public class Check{
             count++;
         }
     }
-
-
 
 }//end of Check
