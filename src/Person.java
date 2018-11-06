@@ -8,18 +8,19 @@ public class Person {
     protected String city;
     protected String state;
     protected String zipCode;
-    protected String fName;
-    protected String lName;
+    protected String firstName;
+    protected String lastName;
     protected int userLevel;    // 1 = customer, 2 = teller, 3 = manager
+    static ArrayList<Person> people;
 
-    public Person(int id, String addr, String city, String state, String zip, String fName, String lName, int uLevel){
+    public Person(int id, String addr, String city, String state, String zip, String firstName, String lastName, int uLevel){
         this.id = id;
         this.streetAddress = addr;
         this.city = city;
         this.state = state;
         this.zipCode = zip;
-        this.fName = fName;
-        this.lName = lName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.userLevel = uLevel;
     }
 
@@ -34,26 +35,13 @@ public class Person {
     public void setState(String state) {this.state = state;}
     public String getZipCode() {return zipCode;}
     public void setZipCode(String zipCode) {this.zipCode = zipCode;}
-    public String getfName() {return fName;}
-    public void setfName(String fName) {this.fName = fName;}
-    public String getlName() {return lName;}
-    public void setlName(String lName) {this.lName = lName;}
+    public String getfirstName() {return firstName;}
+    public void setfirstName(String firstName) {this.firstName = firstName;}
+    public String getlastName() {return lastName;}
+    public void setlastName(String lastName) {this.lastName = lastName;}
     public int getUserLevel() {return userLevel;}
     public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
 
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", streetAddress='" + streetAddress + '\'' +
-                ", city='" + city + '\'' +
-                ", state='" + state + '\'' +
-                ", zipCode='" + zipCode + '\'' +
-                ", fName='" + fName + '\'' +
-                ", lName='" + lName + '\'' +
-                ", userLevel=" + userLevel +
-                '}';
-    }
 
     //current method to grab data from the persons textfile in "memory"
     public static ArrayList<Person> importFile() throws IOException, ParseException {
@@ -127,7 +115,7 @@ public class Person {
         for(Person person: people) {
             personWriter.println(person.getId() + "," + person.getStreetAddress() + "," +
                     person.getCity() + "," + person.getState() + "," + person.getZipCode() + "," +
-                    person.getfName() + "," + person.getlName() + ",");
+                    person.getfirstName() + "," + person.getlastName() + ",");
 
             personWriter.flush();
         }
@@ -144,7 +132,7 @@ public class Person {
         Person searchResults = null;
 
         //loop through people in global arraylist
-        for (Person person: Main.people) {
+        for (Person person: Person.people) {
             if(person.getId() == custId){
                 searchResults = person;
             }
@@ -153,27 +141,4 @@ public class Person {
         //return found person OR null
         return searchResults;
     }
-
-    public static void debugImport(){
-        System.out.println("Debugging Person import process");
-
-        int count = 1;
-        for(Person person: Main.people){
-            System.out.println("Person " + count + ":\n" +
-                    "id=" + person.getId() + "\n" +
-                    "streetAddress='" + person.getStreetAddress() + '\'' + "\n" +
-                    "city='" + person.getCity() + '\'' + "\n" +
-                    "state='" + person.getState() + '\'' + "\n" +
-                    "zipCode='" + person.getZipCode() + '\'' + "\n" +
-                    "fName='" + person.getfName() + '\'' + "\n" +
-                    "lName='" + person.getlName() + '\'' + "\n" +
-                    "userLevel=" + person.getUserLevel());
-
-            count++;
-        }
-
-    }//end of debugImport()
-
-
-
 }//end of Person
