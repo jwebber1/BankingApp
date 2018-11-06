@@ -12,6 +12,7 @@ public class Check{
     Date dateCheck;
     String memo;
     boolean isHonored;
+    static ArrayList<Check> checks;
 
     //constructor for the Check class
     public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, boolean isHonored){
@@ -40,18 +41,6 @@ public class Check{
     public void setMemo(String memo) {this.memo = memo;}
     public boolean isHonored() {return isHonored;}
     public void setHonored(boolean honored) {isHonored = honored;}
-
-    @Override
-    public String toString() {
-        return "Check{" +
-                "customerID=" + customerID +
-                ", checkID=" + checkID +
-                ", checkAmt=" + checkAmt +
-                ", payTo='" + payTo + '\'' +
-                ", dateCheck=" + dateCheck +
-                ", memo='" + memo + '\'' +
-                '}';
-    }
 
     //current method to grab data from the checks textfile in "memory"
     public static ArrayList<Check> importFile() throws IOException, ParseException {
@@ -140,7 +129,7 @@ public class Check{
         ArrayList<Check> searchResults = null;
 
         //loop through all checks in global arraylist
-        for(Check check: Main.checks){
+        for(Check check: Check.checks){
             if(check.getCustomerID() == custID){
                 searchResults.add(check);
             }
@@ -151,48 +140,28 @@ public class Check{
     }
 
     //find one check with a given check ID
-    public static int searchChecksByCheckID(int checkID){
+    public static String searchChecksByCheckID(int checkID){
 
         //initialize searchResults to null
         Check searchResult = null;
 
         //loop through all checks in global arraylist
-        for(Check check: Main.checks){
+        for(Check check: Check.checks){
             if(check.getCheckID() == checkID){
 
                 //if the check hasn't been honored yet, stop it
-                if(!check.isHonored()){
-                    check.setCheckAmt(0.0);
-                    return 0;
+                if(check.isHonored()){
+                    return "Check has already been honored.";
                 }
                 else{
-                    return -6;
+                    check.setCheckAmt(0.0);
+                    return "Check has bee stopped.";
+
                 }
             }
         }
 
-        //-7 = check with given checkID not found
-        //-6 = check already honored
-        // 0 = successful stop check
-        return -7;
-    }
-
-    public static void debugImport(){
-        System.out.println("Debugging Check import process");
-
-        int count = 1;
-        for(Check check: Main.checks){
-            System.out.println("Check " + count + ":\n" +
-                    "customerID=" + check.getCustomerID() +  "\n" +
-                    "checkID=" + check.getCheckID() + "\n" +
-                    "checkAmt=" + check.getCheckAmt() + "\n" +
-                    "payTo='" + check.getPayTo() + '\'' + "\n" +
-                    "dateCheck=" + check.getDateCheck() + "\n" +
-                    "memo='" + check.getMemo() + '\'' + "\n" +
-                    "isHonored=" + check.isHonored());
-
-            count++;
-        }
+        return "Check could not be found";
     }
 
 }//end of Check
