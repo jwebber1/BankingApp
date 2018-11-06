@@ -11,10 +11,10 @@ class CheckingAccount extends Account{
     protected int withdrawsToday;
 
     //constructor for the Checking Account
-    public CheckingAccount(int cusIdIn, double accBalIn, Byte OvProIn, Byte atm, int odThisMonth, Date dateAccOpened){
-        super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >1000.0) ? "gold" : "regular"));
-        this.hasOverdraftProtection = (OvProIn==1) ? true : false;
-        this.connectedToATMCard = (atm == 1) ? true : false;
+    public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
+        super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >= 1000.0) ? "gold" : "regular"));
+        this.hasOverdraftProtection = OvProIn;
+        this.connectedToATMCard = atm;
         this.overdraftsThisMonth = odThisMonth;
         this.withdrawsToday = 0;
     }
@@ -31,13 +31,13 @@ class CheckingAccount extends Account{
 
     @Override
     public String toString() {
-        return "CheckingAccount{" + 
-                "accountType='" + accountType + '\'' + 
-                ", hasOverdraftProtection=" + hasOverdraftProtection + 
-                ", overdraftsThisMonth=" + overdraftsThisMonth + 
-                ", dateAccountOpened=" + dateAccountOpened + 
-                ", customerID=" + customerID + 
-                ", accountBalance=" + accountBalance + 
+        return "CheckingAccount{" +
+                "accountType='" + accountType + '\'' +
+                ", hasOverdraftProtection=" + hasOverdraftProtection +
+                ", overdraftsThisMonth=" + overdraftsThisMonth +
+                ", dateAccountOpened=" + dateAccountOpened +
+                ", customerID=" + customerID +
+                ", accountBalance=" + accountBalance +
                 '}';
     }
 
@@ -74,14 +74,13 @@ class CheckingAccount extends Account{
                 //create temp variable to hold info from the split lines
                 int cusID = Integer.parseInt(splitLine[0]);
                 double balance = Double.parseDouble(splitLine[1]);
-                //String accountType = splitLine[2];
-                Byte hasOverdraftProtection = Byte.parseByte(splitLine[2]);    // 1=true   0=false
-                Byte connectedToATMCard = Byte.parseByte(splitLine[3]);    // 1=true   0=false
+                boolean hasOverdraftProtection = Boolean.parseBoolean(splitLine[2]);    // 1=true   0=false
+                boolean connectedToATMCard =  Boolean.parseBoolean(splitLine[3]);  // 1=true   0=false
                 int overdraftsThisMonth = Integer.parseInt(splitLine[4]);
                 Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
 
                 //add the new data (in our case checking) to the ArrayList
-                importChecking.add(new CheckingAccount(cusID, balance, /*accountType,*/ hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened));
+                importChecking.add(new CheckingAccount(cusID, balance, hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened));
 
                 //debugging importChecking
                 //System.out.println("count: " + (lineNum) + "\t" + importChecking.get(lineNum-1).toString());
@@ -103,7 +102,7 @@ class CheckingAccount extends Account{
         PrintWriter checkingWriter = new PrintWriter(new FileOutputStream("memory/checkings.txt",false));
 
         //printing the headers of the files
-        checkingWriter.println("CustomerID,CheckingBalance,CheckingAccountType,hasBackup,Overdrafts,DateOpened,");
+        checkingWriter.println("CustomerID,CheckingBalance,hasBackup,hasATM,Overdrafts,DateOpened,");
 
         //go through all the checking accounts
         for (CheckingAccount checking: checkings) {
@@ -113,9 +112,8 @@ class CheckingAccount extends Account{
 
             checkingWriter.println(checking.getCustomerID() + "," +
                     checking.getAccountBalance() + "," +
-                    /*checking.getAccountType() + "," +*/
-                    (checking.getHasOverdraftProtection() ? 1 : 0) + "," +
-                    (checking.getConnectedToATMCard() ? 1 : 0) + "," +
+                    checking.getHasOverdraftProtection() + "," +
+                    checking.getConnectedToATMCard() + "," +
                     checking.getOverdraftsThisMonth() + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(checking.getDateAccountOpened()) + ",");
             checkingWriter.flush();
@@ -146,7 +144,7 @@ class CheckingAccount extends Account{
 
 
 
-        //method for withdraw from checking
+    //method for withdraw from checking
     public int withdraw(SavingAccount customerSaving, double withdrawlAmt){
         boolean customerWithdrawTooMuch = ((accountBalance-withdrawlAmt) < 0.0);
         boolean savingsNotEnough = (((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);

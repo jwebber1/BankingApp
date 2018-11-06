@@ -42,6 +42,19 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+
+        Person.debugImport();
+        CheckingAccount.debugImport();
+        Check.debugImport();
+
+
+        try {
+            Person.exportFile(people);
+            CheckingAccount.exportFile(checkingAccounts);
+            Check.exportFile(checks);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 }//end of main
