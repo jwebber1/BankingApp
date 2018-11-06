@@ -1,4 +1,4 @@
-SSN,description,price,dateOfPurchase
+SSN,description,price,dateOfPurchase,
 345653425,Walmart,100.00,09/27/2018,
 345653425,Luigis Resturaunt,27.99,09/15/2018,
 423453245,Couch,600.09,09/20/2018,
