@@ -9,6 +9,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 public class LoginScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
@@ -17,6 +20,12 @@ public class LoginScene {
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
 
     public LoginScene() {
+        try {
+            Person.people = Person.importFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
 
         TextField socialSecurityField = UICreationHelpers.createTextField(socialSecurityProperty);

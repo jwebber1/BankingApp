@@ -139,8 +139,8 @@ public class PersonCreationScene {
                         lastNameProperty.get(),
                         UICreationHelpers.userLevels.indexOf(userLevelProperty.get())
                 );
-                Main.people.add(person);
-                Person.exportFile(Main.people);
+                Person.people.add(person);
+                Person.exportFile(Person.people);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

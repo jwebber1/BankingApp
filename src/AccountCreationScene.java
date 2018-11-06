@@ -67,7 +67,7 @@ public class AccountCreationScene {
     // Creates base fields that are used by all account types.
     private void createBaseAccountCreationNodes() {
         ObservableList<String> personNames = FXCollections.observableArrayList();
-        for (Person person : Main.people) {
+        for (Person person : Person.people) {
             personNames.add(person.lastName + ", " + person.firstName);
         }
         customerBox = UICreationHelpers.createComboBox(personNames, customerProperty);
@@ -131,7 +131,7 @@ public class AccountCreationScene {
         if (customerProperty.get().isEmpty()) {
             errorMessage += "Customer must be selected.\n";
         } else {
-            customerId = Main.people.get(customerBox.getSelectionModel().getSelectedIndex()).id;
+            customerId = Person.people.get(customerBox.getSelectionModel().getSelectedIndex()).id;
         }
 
         double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
@@ -171,17 +171,17 @@ public class AccountCreationScene {
                     break;
                 case 2:
 //                    ArrayList<LoanAccount> loanAccounts = LoanAccount.loansImportFile();
-                    LoanAccount loanAccount = new LoanAccount(
-                            customerId,
-                            accountBalance,
-                            0.2,
-                            new Date(),
-                            0,
-                            new Date(),
-                            new Date(),
-                            null,
-                            ""
-                    );
+//                    LoanAccount loanAccount = new LoanAccount(
+//                            customerId,
+//                            accountBalance,
+//                            0.2,
+//                            new Date(),
+//                            0,
+//                            new Date(),
+//                            new Date(),
+//                            null,
+//                            ""
+//                    );
 //                    loanAccounts.add(loanAccount);
 //                    LoanAccount.(loanAccounts);
                     break;

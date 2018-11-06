@@ -25,7 +25,7 @@ public class PersonSelectionScene {
         TableColumn<Person, String> state = new TableColumn<>("State");
         TableColumn<Person, String> address = new TableColumn<>("Address");
         TableColumn<Person, String> zipCode = new TableColumn<>("Zip");
-        ObservableList<Person> list=FXCollections.observableArrayList(Main.people);
+        ObservableList<Person> list=FXCollections.observableArrayList(Person.people);
 
         id.setCellValueFactory(new PropertyValueFactory<>("id"));
         fName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
