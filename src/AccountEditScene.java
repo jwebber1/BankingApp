@@ -10,7 +10,7 @@ public class AccountEditScene {
     private final StringProperty accountBalanceProperty = new SimpleStringProperty("$");
 
     private VBox fieldVBox = new VBox();
-    private StackPane root = new StackPane(fieldVBox);
+    StackPane root = new StackPane(fieldVBox);
 
     public AccountEditScene(Account selectedAccount) {
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
@@ -21,9 +21,5 @@ public class AccountEditScene {
                 "Account Balance:", UICreationHelpers.createBalanceField(accountBalanceProperty));
         fieldVBox.getChildren().add(hBox);
         UICreationHelpers.createBalanceField(accountBalanceProperty);
-    }
-
-    public StackPane getRoot() {
-        return root;
     }
 }

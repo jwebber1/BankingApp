@@ -8,18 +8,18 @@ public class Person {
     protected String city;
     protected String state;
     protected String zipCode;
-    protected String fName;
-    protected String lName;
+    protected String firstName;
+    protected String lastName;
     protected int userLevel;    // 1 = customer, 2 = teller, 3 = manager
 
-    public Person(int id, String addr, String city, String state, String zip, String fName, String lName, int uLevel){
+    public Person(int id, String addr, String city, String state, String zip, String firstName, String lastName, int uLevel){
         this.id = id;
         this.streetAddress = addr;
         this.city = city;
         this.state = state;
         this.zipCode = zip;
-        this.fName = fName;
-        this.lName = lName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.userLevel = uLevel;
     }
 
@@ -34,10 +34,10 @@ public class Person {
     public void setState(String state) {this.state = state;}
     public String getZipCode() {return zipCode;}
     public void setZipCode(String zipCode) {this.zipCode = zipCode;}
-    public String getfName() {return fName;}
-    public void setfName(String fName) {this.fName = fName;}
-    public String getlName() {return lName;}
-    public void setlName(String lName) {this.lName = lName;}
+    public String getFirstName() {return firstName;}
+    public void setFirstName(String firstName) {this.firstName = firstName;}
+    public String getLastName() {return lastName;}
+    public void setLastName(String lastName) {this.lastName = lastName;}
     public int getUserLevel() {return userLevel;}
     public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
 
@@ -49,8 +49,8 @@ public class Person {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", zipCode='" + zipCode + '\'' +
-                ", fName='" + fName + '\'' +
-                ", lName='" + lName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", userLevel=" + userLevel +
                 '}';
     }
@@ -127,7 +127,7 @@ public class Person {
         for(Person person: people) {
             personWriter.println(person.getId() + "," + person.getStreetAddress() + "," +
                     person.getCity() + "," + person.getState() + "," + person.getZipCode() + "," +
-                    person.getfName() + "," + person.getlName() + ",");
+                    person.getFirstName() + "," + person.getLastName() + ",");
 
             personWriter.flush();
         }
@@ -165,8 +165,8 @@ public class Person {
                     "city='" + person.getCity() + '\'' + "\n" +
                     "state='" + person.getState() + '\'' + "\n" +
                     "zipCode='" + person.getZipCode() + '\'' + "\n" +
-                    "fName='" + person.getfName() + '\'' + "\n" +
-                    "lName='" + person.getlName() + '\'' + "\n" +
+                    "firstName='" + person.getFirstName() + '\'' + "\n" +
+                    "lastName='" + person.getLastName() + '\'' + "\n" +
                     "userLevel=" + person.getUserLevel());
 
             count++;

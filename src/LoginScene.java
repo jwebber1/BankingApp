@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 
 public class LoginScene {
     private VBox fieldVBox = new VBox();
-    private StackPane root = new StackPane(fieldVBox);
+    StackPane root = new StackPane(fieldVBox);
 
 //    private final StringProperty userLevelProperty = new SimpleStringProperty("");
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
@@ -30,10 +30,6 @@ public class LoginScene {
         loginButton.setAlignment(Pos.BASELINE_RIGHT);
 
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
-    }
-
-    public StackPane getRoot() {
-        return root;
     }
 
     private void login() {
@@ -62,7 +58,7 @@ public class LoginScene {
 //        UICreationHelpers.currentUserLevel = UICreationHelpers.userLevels.indexOf(userLevelProperty.get());
             UICreationHelpers.currentUser = person;
             UICreationHelpers.currentUserLevel = person.userLevel;
-            UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
+            UICreationHelpers.navigateToScene(new NavigationScene().root);
         }
     }
 }

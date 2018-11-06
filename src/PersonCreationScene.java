@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-public class CustomerCreationScene {
+public class PersonCreationScene {
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
     private final StringProperty streetAddressProperty = new SimpleStringProperty("");
     private final StringProperty cityProperty = new SimpleStringProperty("");
@@ -24,7 +24,7 @@ public class CustomerCreationScene {
     private VBox fieldVBox = new VBox();
     private HBox buttonHBox = new HBox();
 
-    private StackPane root = new StackPane(fieldVBox, buttonHBox);
+    StackPane root = new StackPane(fieldVBox, buttonHBox);
 
     private ObservableList<String> states = FXCollections.observableArrayList(
             "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
@@ -36,13 +36,23 @@ public class CustomerCreationScene {
             "West Virginia", "Wisconsin", "Wyoming"
     );
 
-    public CustomerCreationScene() {
+    public PersonCreationScene() {
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
         createBaseCustomerCreationNodes();
     }
 
-    public StackPane getRoot() {
-        return root;
+    public PersonCreationScene(Person person) {
+        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        createBaseCustomerCreationNodes();
+
+        socialSecurityProperty.set(String.valueOf(person.id));
+        streetAddressProperty.set(person.streetAddress);
+        cityProperty.set(person.city);
+        stateProperty.set(person.state);
+        zipCodeProperty.set(person.zipCode);
+        firstNameProperty.set(person.firstName);
+        lastNameProperty.set(person.lastName);
+        userLevelProperty.set(UICreationHelpers.userLevels.get(person.userLevel));
     }
 
     // Creates base fields that are used by all account types.
@@ -75,7 +85,7 @@ public class CustomerCreationScene {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(x -> {
             try {
-                UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
+                UICreationHelpers.navigateToScene(new NavigationScene().root);
             } catch (Exception e) {
                 e.printStackTrace();
             }

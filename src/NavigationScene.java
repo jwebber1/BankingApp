@@ -5,31 +5,32 @@ import javafx.scene.layout.VBox;
 
 class NavigationScene {
     private VBox fieldVBox = new VBox();
-    private StackPane root = new StackPane(fieldVBox);
+    StackPane root = new StackPane(fieldVBox);
 
     public NavigationScene() {
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
 
-        Label nameLabel = new Label(UICreationHelpers.currentUser.lName + ", " + UICreationHelpers.currentUser.fName);
+        Label nameLabel = new Label(UICreationHelpers.currentUser.lastName + ", " + UICreationHelpers.currentUser.firstName);
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(nameLabel);
         if (UICreationHelpers.currentUserLevel > 0) {
             UICreationHelpers.createButton("Person Creation", fieldVBox, x -> personCreation());
             UICreationHelpers.createButton("Account Creation", fieldVBox, x -> accountCreation());
+            UICreationHelpers.createButton("Person Selection", fieldVBox, x -> personSelection());
         } else {
 
         }
     }
 
-    public StackPane getRoot() {
-        return root;
-    }
-
     private void personCreation() {
-        UICreationHelpers.navigateToScene(new CustomerCreationScene().getRoot());
+        UICreationHelpers.navigateToScene(new PersonCreationScene().root);
     }
 
     private void accountCreation() {
-        UICreationHelpers.navigateToScene(new AccountCreationScene().getRoot());
+        UICreationHelpers.navigateToScene(new AccountCreationScene().root);
+    }
+
+    private void personSelection() {
+        UICreationHelpers.navigateToScene(new PersonSelectionScene().root);
     }
 }

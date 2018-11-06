@@ -15,11 +15,9 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class AccountCreationScene {
 
@@ -50,7 +48,7 @@ public class AccountCreationScene {
     private VBox loanFieldsVBox = new VBox();
 
     private VBox fieldVBox = new VBox();
-    private StackPane root = new StackPane(fieldVBox);
+    StackPane root = new StackPane(fieldVBox);
 
     public AccountCreationScene() {
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
@@ -64,17 +62,13 @@ public class AccountCreationScene {
         loanFieldsVBox.setSpacing(8);
     }
 
-    public StackPane getRoot() {
-        return root;
-    }
-
     ComboBox customerBox;
 
     // Creates base fields that are used by all account types.
     private void createBaseAccountCreationNodes() {
         ObservableList<String> personNames = FXCollections.observableArrayList();
         for (Person person : Main.people) {
-            personNames.add(person.lName + ", " + person.fName);
+            personNames.add(person.lastName + ", " + person.firstName);
         }
         customerBox = UICreationHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("Customer:", customerBox));
@@ -91,7 +85,7 @@ public class AccountCreationScene {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(x -> {
             try {
-                UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
+                UICreationHelpers.navigateToScene(new NavigationScene().root);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -193,7 +187,7 @@ public class AccountCreationScene {
                     break;
             }
             UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
-            UICreationHelpers.navigateToScene(new NavigationScene().getRoot());
+            UICreationHelpers.navigateToScene(new NavigationScene().root);
         }
     }
 

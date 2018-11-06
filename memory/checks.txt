@@ -1,2 +1,2 @@
-CustomerID,CheckID,CheckAmt,PayTo,DateCheck,Memo,isHonored,
-423148894,00001,500.0,Menards,09/04/2018,Couch,true,
+CustomerID,CheckID,CheckAmt,PayTo,DateCheck,Memo,
+423148894,1,500.0,Menards,09/04/2018,09/04/2018,true,

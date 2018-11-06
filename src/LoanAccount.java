@@ -15,6 +15,7 @@ class LoanAccount extends Account{
     protected Byte missedPaymentFlag;   //1=true   0=false
     static ArrayList<LoanAccount> loans = new ArrayList<>();
 
+
     public LoanAccount(int cusIDIn, double accBalIn, double currIntRate, Date datePayDue, double currPayDue, Date datePayNotifIn, Date lastPayDateIn, Byte missPayFlagIn, String loanTypeIn){
         super(cusIDIn, accBalIn, null, loanTypeIn);
         currentInterestRate = currIntRate;

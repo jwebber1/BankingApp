@@ -27,7 +27,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Main.primaryStage = primaryStage;
         primaryStage.setTitle("Banking App");
-        UICreationHelpers.navigateToScene(new LoginScene().getRoot());
+        UICreationHelpers.navigateToScene(new LoginScene().root);
         primaryStage.show();
     }
 
