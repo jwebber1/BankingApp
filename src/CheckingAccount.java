@@ -9,6 +9,7 @@ class CheckingAccount extends Account{
     protected Boolean connectedToATMCard;        // 1=true   0=false
     protected int overdraftsThisMonth;
     protected int withdrawsToday;
+    static ArrayList<CheckingAccount> checkingAccounts;
 
     //constructor for the Checking Account
     public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
@@ -28,18 +29,6 @@ class CheckingAccount extends Account{
     public void setOverdraftsThisMonth(int overdraftsThisMonth) {this.overdraftsThisMonth = overdraftsThisMonth;}
     public int getWithdrawsToday() {return withdrawsToday;}
     public void setWithdrawsToday(int withdrawsToday) {this.overdraftsThisMonth = withdrawsToday;}
-
-    @Override
-    public String toString() {
-        return "CheckingAccount{" +
-                "accountType='" + accountType + '\'' +
-                ", hasOverdraftProtection=" + hasOverdraftProtection +
-                ", overdraftsThisMonth=" + overdraftsThisMonth +
-                ", dateAccountOpened=" + dateAccountOpened +
-                ", customerID=" + customerID +
-                ", accountBalance=" + accountBalance +
-                '}';
-    }
 
     //current method to grab data from the checkings textfile in "memory"
     public static ArrayList<CheckingAccount> importFile() throws IOException, ParseException {
@@ -132,7 +121,7 @@ class CheckingAccount extends Account{
         ArrayList<CheckingAccount> searchResults = null;
 
         //loop through all checking accounts in global arraylist
-        for(CheckingAccount account: Main.checkingAccounts){
+        for(CheckingAccount account: CheckingAccount.checkingAccounts){
             if(account.getCustomerID() == custID){
                 searchResults.add(account);
             }
@@ -142,13 +131,10 @@ class CheckingAccount extends Account{
         return searchResults;
     }
 
-
-
     //method for withdraw from checking
-    public int withdraw(SavingAccount customerSaving, double withdrawlAmt){
+    public void withdraw(SavingAccount customerSaving, double withdrawlAmt){
         boolean customerWithdrawTooMuch = ((accountBalance-withdrawlAmt) < 0.0);
         boolean savingsNotEnough = (((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
-        int errors = 0;
         double charge = 0.0;
 
         //todo- on interface, do not allow more than $500 withdrawl   UNLESS they are a part of management
@@ -156,7 +142,7 @@ class CheckingAccount extends Account{
 
 
         //charge $0.50 for withdrawl from checking if not a gold account
-        if(accountType != "gold") {charge += 0.5;}
+        if(accountType.equals("regular")) {charge += 0.5;}
 
         //begin the if-elses to determine amount left in account
         if(customerWithdrawTooMuch && !hasOverdraftProtection){
@@ -167,15 +153,6 @@ class CheckingAccount extends Account{
             //increment overdraftsThisMonth and apply $20 overdraft charge
             overdraftsThisMonth++;
             charge += 20.0;
-
-            //change account type if fall below $1000 (just in case)
-            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
-
-            //increment amount of withdraws today
-            withdrawsToday++;
-
-            //return -1 for insufficient funds
-            errors = -2;
         }
         else if(customerWithdrawTooMuch && hasOverdraftProtection) {
 
@@ -184,27 +161,16 @@ class CheckingAccount extends Account{
 
             //subtract the remaining balance not covered by the checking and set the new Savings balance (will be negative)
             customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
-
-            //change account type if fall below $1000 (just in case)
-            if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
-
-            //increment amount of withdraws today
-            withdrawsToday++;
+            //todo- ^^^ will need to modify when Jacob finishes his withdraw method from SavingAcount
 
             //return -2 for insufficient funds even with a savings account
             if(savingsNotEnough){
                 //increment overdraftsThisMonth and apply $20 overdraft charge
                 overdraftsThisMonth++;
                 charge += 20.0;
-                errors = -1;
             }
-
-            //otherwise, return -3 for successful withdrawl, but  savings account was used.
-            errors = 1;
         }
-        else{
-            setAccountBalance(accountBalance - withdrawlAmt);
-        }
+        else{ setAccountBalance(accountBalance - withdrawlAmt); }
 
         //apply any charges accrued to the account
         accountBalance -= charge;
@@ -214,30 +180,19 @@ class CheckingAccount extends Account{
 
         //increment amount of withdraws today
         withdrawsToday++;
-
-        //return which error was encountered:
-        // -2 overdraft without backup
-        // -1 overdraft with backup
-        // 0 default, successful withdraw
-        // +1 successful withdraw, savings account was used
-        return errors;
-
     }//end of checking withdraw
 
     //method for transfer from checking to saving
-    public int transfer(SavingAccount customerSaving, double transferAmt){
-        int errors = 0;
+    public void transfer(SavingAccount customerSaving, double transferAmt){
         double charge = 0.0;
 
-        //some data validation; return -1 for error; cannot transfer negative money
-        if(transferAmt < 0.0) {return -1;}
-
         //charge $0.50 for withdrawl from checking if not a gold account
-        if(accountType != "gold") {charge += 0.75;}
+        if(accountType.equals("regular")) {charge += 0.75;}
 
         //transfer the money from checking to saving
         setAccountBalance(accountBalance - transferAmt);
         customerSaving.setAccountBalance(customerSaving.getAccountBalance() + transferAmt);
+        //todo- consider just doing a deposit method from SavingAccount here.
 
         //determine if the account is overdrafted
         if(accountBalance < 0.0){
@@ -245,29 +200,21 @@ class CheckingAccount extends Account{
             //increment overdraftsThisMonth and apply $20 overdraft charge
             overdraftsThisMonth++;
             charge += 20.0;
-
-            //return -2 for insufficient funds
-            errors = -1;
         }
 
         //apply any charges accrued to the account
         accountBalance -= charge;
 
         //change account type if fall below $1000 (just in case)
-        if(accountType == "gold" && accountBalance < 1000.0){accountType = "regular";}
+        if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
 
-        //return which error was encountered:
-        // -1 account overdraft
-        // 0 default, successful transfer
-        return errors;
-
-    }//end of checking withdraw
+    }//end of checking transfer
 
     //method for deposit into checking
     public int deposit(double depositAmt){
 
         //charge $0.50 for deposit into checking if not a gold account
-        if(accountType != "gold") {accountBalance = accountBalance - 0.5;}
+        if(accountType.equals("regualar")) {accountBalance -= 0.5;}
 
         //some data validation
         if(depositAmt < 0.0) {
@@ -285,22 +232,4 @@ class CheckingAccount extends Account{
         return 0;
 
     }//end of checking deposit
-
-    public static void debugImport(){
-        System.out.println("Debugging Checking Account import process");
-
-        int count = 1;
-        for(CheckingAccount account: Main.checkingAccounts){
-            System.out.println("Checking Account " + count + ":\n" +
-                    "accountType='" + account.getAccountType() + '\'' + "\n" +
-                    "hasOverdraftProtection=" + account.getHasOverdraftProtection() + "\n" +
-                    "overdraftsThisMonth=" + account.getOverdraftsThisMonth() + "\n" +
-                    "dateAccountOpened=" + account.getDateAccountOpened() + "\n" +
-                    "customerID=" + account.getCustomerID() + "\n" +
-                    "accountBalance=" + account.getAccountBalance());
-
-            count++;
-        }
-    }
-
 }//end of CheckingAccount
