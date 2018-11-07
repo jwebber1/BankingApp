@@ -12,6 +12,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class PersonCreationScene {
+    Person editedPerson;
+
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
     private final StringProperty streetAddressProperty = new SimpleStringProperty("");
     private final StringProperty cityProperty = new SimpleStringProperty("");
@@ -41,18 +43,19 @@ public class PersonCreationScene {
         createBaseCustomerCreationNodes();
     }
 
-    public PersonCreationScene(Person person) {
+    public PersonCreationScene(Person editedPerson) {
+        this.editedPerson = editedPerson;
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
         createBaseCustomerCreationNodes();
 
-        socialSecurityProperty.set(String.valueOf(person.id));
-        streetAddressProperty.set(person.streetAddress);
-        cityProperty.set(person.city);
-        stateProperty.set(person.state);
-        zipCodeProperty.set(person.zipCode);
-        firstNameProperty.set(person.firstName);
-        lastNameProperty.set(person.lastName);
-        userLevelProperty.set(UICreationHelpers.userLevels.get(person.userLevel));
+        socialSecurityProperty.set(String.valueOf(editedPerson.id));
+        streetAddressProperty.set(editedPerson.streetAddress);
+        cityProperty.set(editedPerson.city);
+        stateProperty.set(editedPerson.state);
+        zipCodeProperty.set(editedPerson.zipCode);
+        firstNameProperty.set(editedPerson.firstName);
+        lastNameProperty.set(editedPerson.lastName);
+        userLevelProperty.set(UICreationHelpers.userLevels.get(editedPerson.userLevel));
     }
 
     // Creates base fields that are used by all account types.
@@ -85,7 +88,7 @@ public class PersonCreationScene {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(x -> {
             try {
-                UICreationHelpers.navigateToScene(new NavigationScene().root);
+                UICreationHelpers.navigateToScene(new PersonManagementScene().root);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -94,7 +97,7 @@ public class PersonCreationScene {
 
         // Save Button
         Button saveButton = new Button("Save");
-        saveButton.setOnAction(x -> saveAccount());
+        saveButton.setOnAction(x -> savePerson());
         buttonHBox.getChildren().add(saveButton);
 
         buttonHBox.setSpacing(10);
@@ -103,7 +106,7 @@ public class PersonCreationScene {
     }
 
     // Runs when the "Save" button is pressed.
-    private void saveAccount() {
+    private void savePerson() {
         String errorMessage = "";
 
         errorMessage += UICreationHelpers.checkNumberField("Social Security #", socialSecurityProperty);
@@ -139,6 +142,9 @@ public class PersonCreationScene {
                         lastNameProperty.get(),
                         UICreationHelpers.userLevels.indexOf(userLevelProperty.get())
                 );
+                if (editedPerson != null) {
+                    Person.people.remove(editedPerson);
+                }
                 Person.people.add(person);
                 Person.exportFile(Person.people);
             } catch (FileNotFoundException e) {
@@ -147,5 +153,4 @@ public class PersonCreationScene {
             UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
         }
     }
-
 }

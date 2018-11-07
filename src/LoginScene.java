@@ -22,6 +22,8 @@ public class LoginScene {
     public LoginScene() {
         try {
             Person.people = Person.importFile();
+            CheckingAccount.checkingAccounts = CheckingAccount.importFile();
+//            LoanAccount.importFile();
         } catch (Exception e) {
             e.printStackTrace();
         }

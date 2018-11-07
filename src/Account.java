@@ -1,6 +1,6 @@
 import java.util.Date;
 
-abstract class Account {
+public class Account {
     protected int customerID;
     protected double accountBalance;
     protected Date dateAccountOpened;

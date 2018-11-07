@@ -29,6 +29,8 @@ public class AccountCreationScene {
 //                    "Customer 3"
 //            );
 
+    Account editedAccount;
+
     // Fields Needed By All Account Types
     private final StringProperty customerProperty = new SimpleStringProperty("");
     private final StringProperty accountTypeProperty = new SimpleStringProperty("");
@@ -52,6 +54,7 @@ public class AccountCreationScene {
 
     public AccountCreationScene() {
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UICreationHelpers.setButtonSettings(buttonHBox);
 
         createBaseAccountCreationNodes();
         createCheckingFields();
@@ -60,6 +63,33 @@ public class AccountCreationScene {
         savingsAccountFieldsVBox.setSpacing(8);
         checkingAccountFieldsVBox.setSpacing(8);
         loanFieldsVBox.setSpacing(8);
+    }
+
+    public AccountCreationScene(Account editedAccount) {
+        this.editedAccount = editedAccount;
+
+        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UICreationHelpers.setButtonSettings(buttonHBox);
+
+        createBaseAccountCreationNodes();
+        createCheckingFields();
+        createLoanFields();
+
+        savingsAccountFieldsVBox.setSpacing(8);
+        checkingAccountFieldsVBox.setSpacing(8);
+        loanFieldsVBox.setSpacing(8);
+
+        customerProperty.set(String.valueOf(editedAccount.customerID));
+        accountBalanceProperty.set(String.valueOf("$" + editedAccount.accountBalance));
+
+        if (editedAccount instanceof CheckingAccount) {
+            checkingAccountTypeProperty.set(((CheckingAccount)editedAccount).accountType);
+            accountTypeProperty.set(UICreationHelpers.accountTypes.get(1));
+        } else if (editedAccount instanceof LoanAccount) {
+            loanTypeProperty.set(((LoanAccount)editedAccount).accountType);
+            accountTypeProperty.set(UICreationHelpers.accountTypes.get(2));
+//            datePaymentDue.set(((LoanAccount)editedAccount).getDatePaymentDue());
+        }
     }
 
     ComboBox customerBox;
@@ -103,8 +133,6 @@ public class AccountCreationScene {
         });
         buttonHBox.getChildren().add(saveButton);
 
-        buttonHBox.setSpacing(10);
-        buttonHBox.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(buttonHBox);
     }
 
@@ -141,9 +169,13 @@ public class AccountCreationScene {
         }
 
         if (!errorMessage.isEmpty()) {
-
             UICreationHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
+            if (editedAccount instanceof CheckingAccount) {
+                CheckingAccount.checkingAccounts.remove(editedAccount);
+            } else if (editedAccount instanceof LoanAccount) {
+                LoanAccount.loans.remove(editedAccount);
+            }
             switch (UICreationHelpers.accountTypes.indexOf(accountTypeProperty.get())) {
                 case 0:
 //                    ArrayList<SavingAccount> savingAccounts = Main.savingsImportFile();

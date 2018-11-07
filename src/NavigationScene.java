@@ -14,23 +14,18 @@ class NavigationScene {
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(nameLabel);
         if (UICreationHelpers.currentUserLevel > 0) {
-            UICreationHelpers.createButton("Person Creation", fieldVBox, x -> personCreation());
-            UICreationHelpers.createButton("Account Creation", fieldVBox, x -> accountCreation());
-            UICreationHelpers.createButton("Person Selection", fieldVBox, x -> personSelection());
+            UICreationHelpers.createButton("Person Management", fieldVBox, x -> personManagement());
+            UICreationHelpers.createButton("Account Management", fieldVBox, x -> accountManagement());
         } else {
 
         }
     }
 
-    private void personCreation() {
-        UICreationHelpers.navigateToScene(new PersonCreationScene().root);
+    private void personManagement() {
+        UICreationHelpers.navigateToScene(new PersonManagementScene().root);
     }
 
-    private void accountCreation() {
-        UICreationHelpers.navigateToScene(new AccountCreationScene().root);
-    }
-
-    private void personSelection() {
-        UICreationHelpers.navigateToScene(new PersonSelectionScene().root);
+    private void accountManagement() {
+        UICreationHelpers.navigateToScene(new AccountManagementScene().root);
     }
 }

@@ -8,34 +8,28 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class PersonSelectionScene {
+class PersonManagementScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
     TableView<Person> personTable = new TableView<>();
 
     private HBox buttonHBox = new HBox();
 
-    public PersonSelectionScene() {
+    public PersonManagementScene() {
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UICreationHelpers.setButtonSettings(buttonHBox);
 
-        TableColumn<Person, String> id = new TableColumn<>("SSN");
-        TableColumn<Person, String> fName = new TableColumn<>("First Name");
-        TableColumn<Person, String> lName = new TableColumn<>("Last Name");
-        TableColumn<Person, String> city = new TableColumn<>("City");
-        TableColumn<Person, String> state = new TableColumn<>("State");
-        TableColumn<Person, String> address = new TableColumn<>("Address");
-        TableColumn<Person, String> zipCode = new TableColumn<>("Zip");
-        ObservableList<Person> list=FXCollections.observableArrayList(Person.people);
+        setupPersonTable();
 
-        id.setCellValueFactory(new PropertyValueFactory<>("id"));
-        fName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        lName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        city.setCellValueFactory(new PropertyValueFactory<>("city"));
-        state.setCellValueFactory(new PropertyValueFactory<>("state"));
-        address.setCellValueFactory(new PropertyValueFactory<>("streetAddress"));
-        zipCode.setCellValueFactory(new PropertyValueFactory<>("zipCode"));
-        personTable.getColumns().addAll(id, fName, lName, city, state, zipCode, address);
-        personTable.setItems(list);
+        // Edit Button
+        Button addButton = new Button("Add");
+        addButton.setOnAction(x -> UICreationHelpers.navigateToScene(new PersonCreationScene().root));
+        buttonHBox.getChildren().add(addButton);
+
+        // Edit Button
+        Button editButton = new Button("Edit");
+        editButton.setOnAction(x -> editPerson());
+        buttonHBox.getChildren().add(editButton);
 
         // Cancel Button
         Button cancelButton = new Button("Cancel");
@@ -48,16 +42,35 @@ public class PersonSelectionScene {
         });
         buttonHBox.getChildren().add(cancelButton);
 
-        // Edit Button
-        Button editButton = new Button("Edit");
-        editButton.setOnAction(x -> editPerson());
-        buttonHBox.getChildren().add(editButton);
-
         fieldVBox.getChildren().addAll(personTable, buttonHBox);
+    }
+
+    public void setupPersonTable() {
+        TableColumn<Person, String> id = new TableColumn<>("SSN");
+        TableColumn<Person, String> fName = new TableColumn<>("First Name");
+        TableColumn<Person, String> lName = new TableColumn<>("Last Name");
+        TableColumn<Person, String> city = new TableColumn<>("City");
+        TableColumn<Person, String> state = new TableColumn<>("State");
+        TableColumn<Person, String> address = new TableColumn<>("Address");
+        TableColumn<Person, String> zipCode = new TableColumn<>("Zip");
+        ObservableList<Person> list= FXCollections.observableArrayList(Person.people);
+
+        id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        fName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        city.setCellValueFactory(new PropertyValueFactory<>("city"));
+        state.setCellValueFactory(new PropertyValueFactory<>("state"));
+        address.setCellValueFactory(new PropertyValueFactory<>("streetAddress"));
+        zipCode.setCellValueFactory(new PropertyValueFactory<>("zipCode"));
+        personTable.getColumns().addAll(id, fName, lName, city, state, zipCode, address);
+        personTable.setItems(list);
     }
 
     public void editPerson() {
         Person selectedPerson = personTable.getSelectionModel().getSelectedItem();
+        if (selectedPerson == null) {
+            return;
+        }
         UICreationHelpers.navigateToScene(new PersonCreationScene(selectedPerson).root);
     }
 }

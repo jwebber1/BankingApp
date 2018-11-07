@@ -194,4 +194,8 @@ class UICreationHelpers {
         errorAlert.showAndWait();
     }
 
+    public static void setButtonSettings(HBox buttonHBox) {
+        buttonHBox.setSpacing(10);
+        buttonHBox.setAlignment(Pos.BASELINE_RIGHT);
+    }
 }

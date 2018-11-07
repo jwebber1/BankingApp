@@ -35,9 +35,9 @@ public class Person {
     public void setState(String state) {this.state = state;}
     public String getZipCode() {return zipCode;}
     public void setZipCode(String zipCode) {this.zipCode = zipCode;}
-    public String getfirstName() {return firstName;}
+    public String getFirstName() {return firstName;}
     public void setfirstName(String firstName) {this.firstName = firstName;}
-    public String getlastName() {return lastName;}
+    public String getLastName() {return lastName;}
     public void setlastName(String lastName) {this.lastName = lastName;}
     public int getUserLevel() {return userLevel;}
     public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
@@ -115,7 +115,7 @@ public class Person {
         for(Person person: people) {
             personWriter.println(person.getId() + "," + person.getStreetAddress() + "," +
                     person.getCity() + "," + person.getState() + "," + person.getZipCode() + "," +
-                    person.getfirstName() + "," + person.getlastName() + ",");
+                    person.getFirstName() + "," + person.getLastName() + ",");
 
             personWriter.flush();
         }

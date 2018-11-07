@@ -3,11 +3,11 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    public static Stage primaryStage;
+    static Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        this.primaryStage = primaryStage;
+        Main.primaryStage = primaryStage;
         UICreationHelpers.navigateToScene(new LoginScene().root);
         primaryStage.setTitle("Banking App");
         primaryStage.show();
