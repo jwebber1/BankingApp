@@ -7,22 +7,26 @@ import java.util.Date;
 
 class CD extends Account {
 
-    protected double currentInterestRate;
-    protected Date dateCDDue;
-    protected boolean beforeDueDate;
+    int cdNumber;
+    double currentInterestRate;
+    Date dateCDDue;
+    boolean beforeDueDate;
+    static ArrayList<CD> cds;
 
     //Get the current date to check if the CD is due
     Date dateNow = new Date();
 
 
-    public CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn) {
+    public CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn, int cdNumber) {
         super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = dateCDDueIn;
         this.beforeDueDate = beforeDueDate;
+        this.cdNumber = cdNumber;
     }
+
     //Create import, export, and search by cusID
     public double getCurrentInterestRate() {
         return currentInterestRate;
@@ -48,6 +52,13 @@ class CD extends Account {
         this.beforeDueDate = beforeDueDate;
     }
 
+    public int getCdNumber() {
+        return cdNumber;
+    }
+
+    public void setCdNumber(int cdNumber) {
+        this.cdNumber = cdNumber;
+    }
 
     public static ArrayList<CD> importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
@@ -82,9 +93,10 @@ class CD extends Account {
                 double currentInterest = Double.parseDouble(splitLine[2]);
                 Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[3]);
                 Date dateCdDue = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
+                int cdNum = Integer.parseInt(splitLine[5]);
 
                 //add the new data to the ArrayList
-                importCD.add(new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue));
+                importCD.add(new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue, cdNum));
 
                 //Debugging
                 //System.out.println("count: " + (lineNum) + "\t" + importCD.get(lineNum-1).toString());
@@ -106,21 +118,23 @@ class CD extends Account {
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 
         //printing the headers of the files
-        cdWriter.println("CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,");
+        cdWriter.println("CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,CDNumber");
 
-        //go through all the checking accounts
-        for (CD cd : cds) {
-            //Check to see if the Balance is 0 and if it is delete it
-            /*if (cd.getAccountBalance() == 0){
-                cds.remove();
-            }*/
+        for (int i = 0; i <= cds.size(); i++) {
 
-            cdWriter.println(cd.getCustomerID() + "," +
-                    cd.getAccountBalance() + "," +
-                    cd.getAccountType() + "," +
-                    cd.getCurrentInterestRate() + "," +
-                    formatter.format(cd.getDateAccountOpened()) + "," +
-                    formatter.format(cd.getDateCDDue()) + ",");
+            //check to see if a CD has a balance of 0 and delete it
+            if (cds.get(i).getAccountBalance() == 0) {
+                cds.remove(i);
+            }
+            //format the line to put back into the file
+            cdWriter.println(cds.get(i).getCustomerID() + "," +
+                    cds.get(i).getAccountBalance() + "," +
+                    cds.get(i).getAccountType() + "," +
+                    cds.get(i).getCurrentInterestRate() + "," +
+                    formatter.format(cds.get(i).getDateAccountOpened()) + "," +
+                    formatter.format(cds.get(i).getDateCDDue()) + "," +
+                    cds.get(i).getCdNumber() + ",");
+
             cdWriter.flush();
         }
 
@@ -130,25 +144,40 @@ class CD extends Account {
 
     }//end of exportFile()
 
-    //find all checking accounts given a customerID
-    public static ArrayList<CD> searchCdAccountsByCustomerID(int custID) {
+    public static ArrayList<CD> search(int custID) {
 
+        //search by cusID, shows all CD
         //initialize searchResults to null
         ArrayList<CD> searchResults = null;
+        for (int i = 0; i < cds.size(); i++) {
+            if (cds.get(i).getCustomerID() == custID) {
+                searchResults.add(cds.get(i));
+            }
+        }
 
-        //loop through all checking accounts in global arraylist
-        // TODO: Fix this
-//        for (CD account : Main.cds) {
-//            if (account.getCustomerID() == custID) {
-//                searchResults.add(account);
-//            }
-//        }
 
         //return found checking accounts OR null
         return searchResults;
     }
 
-    public int withdraw(CD customerCD) {
+    public static ArrayList<CD> search(int custID, int cdID) {
+
+        //search by cusID, shows all CD
+        //initialize searchResults to null
+        ArrayList<CD> searchResults = null;
+        for (int i = 0; i < cds.size(); i++) {
+            if (cds.get(i).getCustomerID() == custID && cds.get(i).getCdNumber() == cdID) {
+                searchResults.add(cds.get(i));
+            }
+        }
+
+
+        //return found checking accounts OR null
+        return searchResults;
+    }
+
+
+    public void withdraw(CD customerCD) {
 
         int errors = 0;
         double charge = 0.0;//Charge if withdrawn before due date
@@ -167,7 +196,6 @@ class CD extends Account {
         // -1 withdrawal before due date
         // 0 default, withdrawal after date
 
-        return errors;
 
     }//end of CD withdraw
 
