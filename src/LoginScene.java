@@ -1,35 +1,37 @@
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import java.io.IOException;
-import java.text.ParseException;
-
-public class LoginScene {
+class LoginScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
 //    private final StringProperty userLevelProperty = new SimpleStringProperty("");
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
 
-    public LoginScene() {
+    LoginScene() {
         try {
             Person.people = Person.importFile();
             CheckingAccount.checkingAccounts = CheckingAccount.importFile();
-//            LoanAccount.importFile();
+            CD.cds = CD.importFile();
+            LoanAccount.importFile();
+            SavingAccount.savingAccounts = SavingAccount.importFile();
 
             for (CheckingAccount account : CheckingAccount.checkingAccounts) {
-                account.mainAccountType = "Checking" + account.accountType;
+                account.mainAccountType = "Checking - " +
+                    account.accountType.substring(0, 1).toUpperCase() +
+                    account.accountType.substring(1);
             }
             for (LoanAccount account : LoanAccount.loans) {
-                account.mainAccountType = "Loan" + account.accountType;
+                account.mainAccountType = "Loan - " + account.accountType;
+            }
+            for (CD account : CD.cds) {
+                account.mainAccountType = "CD - " + account.accountType;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -39,9 +41,6 @@ public class LoginScene {
 
         TextField socialSecurityField = UICreationHelpers.createTextField(socialSecurityProperty);
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("Social Security #:", socialSecurityField));
-
-//        ComboBox userLevelField = UICreationHelpers.createComboBox(UICreationHelpers.userLevels, userLevelProperty);
-//        fieldVBox.getChildren().add(UICreationHelpers.createHBox("User Level:", userLevelField));
 
         // Save Button
         Button loginButton = UICreationHelpers.createButton("Login", fieldVBox, x -> login());
@@ -73,7 +72,6 @@ public class LoginScene {
         if (!errorMessage.isEmpty()) {
             UICreationHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
-//        UICreationHelpers.currentUserLevel = UICreationHelpers.userLevels.indexOf(userLevelProperty.get());
             UICreationHelpers.currentUser = person;
             UICreationHelpers.currentUserLevel = person.userLevel;
             if (person.userLevel == 0) {

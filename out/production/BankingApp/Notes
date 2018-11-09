@@ -1,0 +1,15 @@
+Some loans and cds aren't tied to existing customer ids (possibly other accounts).
+If a class has a method that is supposed to affect a single object of that class, don't make it static, and don't force
+passing in an instance of that class- Class.doSomething() works fine.
+Use foreach if you can- it's more readable, and prevents off-by-one errors
+Some date conversions aren't working ("can't parse this date with this simpledateformat" basically)
+Some methods didn't work, didn't think of everything, or gave bugs- I fixed a few and left TODOs for some more
+An arraylist has to be initialized (new Arraylist<>()) or it will give a null pointer
+We only keep track of single lists of each type of object, so we don't need to pass arraylists into the export methods-
+everything is saved
+Don't remove something from a collection while you're looping through that collection in any way- do it before or later
+
+Not a big deal, but try to make Intellij happy and set method, class, and variable accessibility to what it suggests
+(so its real warnings and errors aren't as drowned out)
+
+Test your code both ways...

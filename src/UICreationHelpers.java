@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 
 class UICreationHelpers {
-    static int currentUserLevel = 0;
+    static int currentUserLevel = -1;
     static Person currentUser;
     private static double fieldWidth = 140;
     private static double fieldHeight = 20;
@@ -33,7 +33,8 @@ class UICreationHelpers {
     static ObservableList<String> accountTypes = FXCollections.observableArrayList(
             "Savings",
             "Checking",
-            "Loan"
+            "Loan",
+            "CD"
     );
     static ObservableList<String> loanTypes = FXCollections.observableArrayList(
             "Long Term",
@@ -88,7 +89,7 @@ class UICreationHelpers {
                 if (s.isEmpty() || "-".equals(s) || ".".equals(s) || "-.".equals(s)) {
                     return 0.0;
                 } else {
-                    return Double.valueOf(s);
+                    return Double.valueOf(s.replace("$", ""));
                 }
             }
 

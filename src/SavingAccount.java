@@ -7,6 +7,7 @@ import java.text.ParseException;
 class  SavingAccount extends Account {
     protected double currentInterestRate;
     protected Date dateCDDue;
+    static ArrayList<SavingAccount> savingAccounts = new ArrayList<>();
 
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn) {
@@ -14,7 +15,6 @@ class  SavingAccount extends Account {
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = null;
     }
-
 
 
     //Getters and setters
@@ -44,7 +44,7 @@ class  SavingAccount extends Account {
             File savingsFileIn = new File("memory/savings.txt");
 
             //creates a bufferedreader to read from a file
-            BufferedReader savingsBR = null;
+            BufferedReader savingsBR;
             savingsBR = new BufferedReader(new InputStreamReader(new FileInputStream(savingsFileIn)));
 
             //buffer string to temporarily hold the line retrieved

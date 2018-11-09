@@ -81,6 +81,10 @@ class AccountCreationScene {
             loanTypeProperty.set(((LoanAccount)editedAccount).accountType);
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(2));
 //            datePaymentDue.set(((LoanAccount)editedAccount).getDatePaymentDue());
+        } else if (editedAccount instanceof SavingAccount) {
+            accountTypeProperty.set(UICreationHelpers.accountTypes.get(0));
+        } else if (editedAccount instanceof CD) {
+            accountTypeProperty.set(UICreationHelpers.accountTypes.get(3));
         }
     }
 
@@ -103,13 +107,7 @@ class AccountCreationScene {
 
         // Cancel Button
         Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(x -> {
-            try {
-                UICreationHelpers.navigateToScene(new NavigationScene().root);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        cancelButton.setOnAction(x -> UICreationHelpers.navigateToScene(new AccountManagementScene().root));
         buttonHBox.getChildren().add(cancelButton);
 
         // Save Button
@@ -149,7 +147,9 @@ class AccountCreationScene {
         if (customerProperty.get().isEmpty()) {
             errorMessage += "Customer must be selected.\n";
         } else {
-            customerId = Person.people.get(customerBox.getSelectionModel().getSelectedIndex()).id;
+            int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
+            Person selectedCustomer = Person.people.get(selectedCustomerId);
+            customerId = selectedCustomer.id;
         }
 
         double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
@@ -168,18 +168,16 @@ class AccountCreationScene {
             }
             switch (UICreationHelpers.accountTypes.indexOf(accountTypeProperty.get())) {
                 case 0:
-//                    ArrayList<SavingAccount> savingAccounts = Main.savingsImportFile();
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
                             accountBalance,
                             0.2,
                             new Date()
                     );
-//                    savingAccounts.add(savingAccount);
-//                    SavingAccount.export(savingAccounts);
+                    SavingAccount.savingAccounts.add(savingAccount);
+                    SavingAccount.exportFile(SavingAccount.savingAccounts);
                     break;
                 case 1:
-                    ArrayList<CheckingAccount> checkingAccounts = CheckingAccount.importFile();
                     CheckingAccount checkingAccount = new CheckingAccount(
                             customerId,
                             accountBalance,
@@ -188,28 +186,34 @@ class AccountCreationScene {
                             0,
                             new Date()
                     );
-                    checkingAccounts.add(checkingAccount);
+                    CheckingAccount.checkingAccounts.add(checkingAccount);
                     CheckingAccount.exportFile();
                     break;
                 case 2:
-//                    ArrayList<LoanAccount> loanAccounts = LoanAccount.loansImportFile();
-//                    LoanAccount loanAccount = new LoanAccount(
-//                            customerId,
-//                            accountBalance,
-//                            0.2,
-//                            new Date(),
-//                            0,
-//                            new Date(),
-//                            new Date(),
-//                            null,
-//                            ""
-//                    );
-//                    loanAccounts.add(loanAccount);
-//                    LoanAccount.(loanAccounts);
+                    String loanType = loanTypeProperty.get();
+                    if (loanType.equals("Long Term")) {
+                        loanType = "LT";
+                    } else if (loanType.equals("Short Term")) {
+                        loanType = "ST";
+                    }
+                    LoanAccount loanAccount = new LoanAccount(
+                            customerId,
+                            accountBalance,
+                            accountBalance,
+                            0.2,
+                            new Date(),
+                            new Date(),
+                            null,
+                            false,
+                            10,
+                            loanType
+                    );
+                    LoanAccount.loans.add(loanAccount);
+                    LoanAccount.exportFile();
                     break;
             }
-            UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
-            UICreationHelpers.navigateToScene(new NavigationScene().root);
+            UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The account has been saved successfully.");
+            UICreationHelpers.navigateToScene(new AccountManagementScene().root);
         }
     }
 

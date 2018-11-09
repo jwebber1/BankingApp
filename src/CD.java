@@ -60,13 +60,12 @@ class CD extends Account {
         this.cdNumber = cdNumber;
     }
 
-    public static ArrayList<CD> importFile() throws IOException, ParseException {
+    static ArrayList<CD> importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
         File cdFileIn = new File("memory/cds.txt");
 
         //creates a bufferedreader to read from a file
-        BufferedReader cdBR = null;
-        cdBR = new BufferedReader(new InputStreamReader(new FileInputStream(cdFileIn)));
+        BufferedReader cdBR = new BufferedReader(new InputStreamReader(new FileInputStream(cdFileIn)));
 
         //buffer string to temporarily hold the line retrieved
         String line;
@@ -112,7 +111,8 @@ class CD extends Account {
 
     }//end of importFile
 
-    public static void exportFile(ArrayList<CD> cds) throws FileNotFoundException {
+    // TODO: The account type was used in this but not the import
+    public static void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter cdWriter = new PrintWriter(new FileOutputStream("memory/cds.txt", false));
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -120,20 +120,19 @@ class CD extends Account {
         //printing the headers of the files
         cdWriter.println("CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,CDNumber");
 
-        for (int i = 0; i <= cds.size(); i++) {
-
+        for (CD cd : cds) {
             //check to see if a CD has a balance of 0 and delete it
-            if (cds.get(i).getAccountBalance() == 0) {
-                cds.remove(i);
-            }
+            // TODO: Can't do this while looping through the cds- like Intellij warns
+//            if (cds.get(i).getAccountBalance() == 0) {
+//                cds.remove(i);
+//            }
             //format the line to put back into the file
-            cdWriter.println(cds.get(i).getCustomerID() + "," +
-                    cds.get(i).getAccountBalance() + "," +
-                    cds.get(i).getAccountType() + "," +
-                    cds.get(i).getCurrentInterestRate() + "," +
-                    formatter.format(cds.get(i).getDateAccountOpened()) + "," +
-                    formatter.format(cds.get(i).getDateCDDue()) + "," +
-                    cds.get(i).getCdNumber() + ",");
+            cdWriter.println(cd.getCustomerID() + "," +
+                    cd.getAccountBalance() + "," +
+                    cd.getCurrentInterestRate() + "," +
+                    formatter.format(cd.getDateAccountOpened()) + "," +
+                    formatter.format(cd.getDateCDDue()) + "," +
+                    cd.getCdNumber() + ",");
 
             cdWriter.flush();
         }
@@ -144,46 +143,38 @@ class CD extends Account {
 
     }//end of exportFile()
 
-    public static ArrayList<CD> search(int custID) {
+    static ArrayList<CD> search(int custID) {
 
         //search by cusID, shows all CD
-        //initialize searchResults to null
-        ArrayList<CD> searchResults = null;
-        for (int i = 0; i < cds.size(); i++) {
-            if (cds.get(i).getCustomerID() == custID) {
-                searchResults.add(cds.get(i));
+        ArrayList<CD> searchResults = new ArrayList<>();
+        for (CD cd : cds) {
+            if (cd.getCustomerID() == custID) {
+                searchResults.add(cd);
             }
         }
-
 
         //return found checking accounts OR null
         return searchResults;
     }
 
     public static ArrayList<CD> search(int custID, int cdID) {
-
         //search by cusID, shows all CD
         //initialize searchResults to null
         ArrayList<CD> searchResults = null;
-        for (int i = 0; i < cds.size(); i++) {
-            if (cds.get(i).getCustomerID() == custID && cds.get(i).getCdNumber() == cdID) {
-                searchResults.add(cds.get(i));
+        for (CD cd : cds) {
+            if (cd.getCustomerID() == custID && cd.getCdNumber() == cdID) {
+                searchResults.add(cd);
             }
         }
-
 
         //return found checking accounts OR null
         return searchResults;
     }
 
-
-    public void withdraw(CD customerCD) {
-
+    void withdraw() {
         int errors = 0;
         double charge = 0.0;//Charge if withdrawn before due date
 
-
-        //begin the if-elses to determine if it is before the CD date
         if (dateCDDue.compareTo(dateNow) >= 0) {
             setAccountBalance(0);
             errors = 0;
@@ -191,13 +182,9 @@ class CD extends Account {
             setAccountBalance(0);
         errors = -1;
 
-
         //return which error was encountered:
         // -1 withdrawal before due date
         // 0 default, withdrawal after date
-
-
     }//end of CD withdraw
-
 
 }//end of CD

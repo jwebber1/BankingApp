@@ -6,7 +6,7 @@ public class Main extends Application {
     static Stage primaryStage;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         Main.primaryStage = primaryStage;
         UICreationHelpers.navigateToScene(new LoginScene().root);
         primaryStage.setTitle("Banking App");

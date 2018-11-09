@@ -42,24 +42,36 @@ class WithdrawOrDepositScene {
                 e.printStackTrace();
             }
         });
-        buttonHBox.getChildren().add(withdrawOrDepositButton);
 
+        // Cancel Button
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(x -> {
+            try {
+                UICreationHelpers.navigateToScene(new AccountManagementScene().root);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        buttonHBox.getChildren().addAll(cancelButton, withdrawOrDepositButton);
         fieldVBox.getChildren().addAll(balanceLabel, amountField, buttonHBox);
     }
 
-    void saveAccount() {
-        if (isWithdraw) {
-            editedAccount.accountBalance -= Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
-        } else {
-            editedAccount.accountBalance += Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
-        }
+    private void saveAccount() {
+//        if (isWithdraw) {
+//            editedAccount.accountBalance -= Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
+//        } else {
+//            editedAccount.accountBalance += Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
+//        }
         try {
             if (editedAccount instanceof CheckingAccount) {
     //            CheckingAccount.checkingAccounts.remove(editedAccount);
-                    CheckingAccount.exportFile();
-            } else if (editedAccount instanceof LoanAccount) {
-    //            LoanAccount.loans.remove(editedAccount);
-                LoanAccount.exportFile();
+                CheckingAccount.exportFile();
+//                if (isWithdraw) ((CheckingAccount) editedAccount).withdraw(editedAccount, editedAccount.accountBalance);
+//            } else if (editedAccount instanceof LoanAccount) {
+//    //            LoanAccount.loans.remove(editedAccount);
+//                LoanAccount.exportFile();
+//                LoanAccount.makeLoanPayment((LoanAccount) editedAccount);
             }
             UICreationHelpers.navigateToScene(new AccountManagementScene().root);
         } catch (FileNotFoundException e) {
