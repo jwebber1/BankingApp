@@ -5,6 +5,7 @@ public class Account {
     protected double accountBalance;
     protected Date dateAccountOpened;
     protected String accountType;
+    protected String mainAccountType; // I need this to display savings/checking/loans for the UI
     //SAVINGS:   Saving = "S"   CD = "CD"
     //CHECKINGS: "regular" or "gold"
     //LOANS:     long term = "LT"  short term = "ST"   credit card = "CC"
@@ -25,6 +26,8 @@ public class Account {
     public void setDateAccountOpened(Date dateAccountOpened) {this.dateAccountOpened = dateAccountOpened;}
     public String getAccountType() {return accountType;}
     public void setAccountType(String accountType) {this.accountType = accountType;}
+    public String getMainAccountType() {return mainAccountType;}
+    public void setMainAccountType(String mainAccountType) {this.mainAccountType = mainAccountType;}
 
     //other methods to be decided
 

@@ -24,6 +24,13 @@ public class LoginScene {
             Person.people = Person.importFile();
             CheckingAccount.checkingAccounts = CheckingAccount.importFile();
 //            LoanAccount.importFile();
+
+            for (CheckingAccount account : CheckingAccount.checkingAccounts) {
+                account.mainAccountType = "Checking" + account.accountType;
+            }
+            for (LoanAccount account : LoanAccount.loans) {
+                account.mainAccountType = "Loan" + account.accountType;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,7 +76,11 @@ public class LoginScene {
 //        UICreationHelpers.currentUserLevel = UICreationHelpers.userLevels.indexOf(userLevelProperty.get());
             UICreationHelpers.currentUser = person;
             UICreationHelpers.currentUserLevel = person.userLevel;
-            UICreationHelpers.navigateToScene(new NavigationScene().root);
+            if (person.userLevel == 0) {
+                UICreationHelpers.navigateToScene(new AccountManagementScene().root);
+            } else {
+                UICreationHelpers.navigateToScene(new NavigationScene().root);
+            }
         }
     }
 }

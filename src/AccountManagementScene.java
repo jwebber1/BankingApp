@@ -21,26 +21,37 @@ public class AccountManagementScene {
 
         setupAccountTable();
 
-        // Edit Button
-        Button addButton = new Button("Add");
-        addButton.setOnAction(x -> UICreationHelpers.navigateToScene(new AccountCreationScene().root));
-        buttonHBox.getChildren().add(addButton);
+        if (UICreationHelpers.currentUserLevel == 0) {
+            // Deposit Button
+            Button depositButton = new Button("Deposit");
+            depositButton.setOnAction(x -> withdrawOrDeposit(false));
 
-        // Edit Button
-        Button editButton = new Button("Edit");
-        editButton.setOnAction(x -> editAccount());
-        buttonHBox.getChildren().add(editButton);
+            // Withdraw Button
+            Button withdrawButton = new Button("Withdraw");
+            withdrawButton.setOnAction(x -> withdrawOrDeposit(true));
 
-        // Cancel Button
-        Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(x -> {
-            try {
-                UICreationHelpers.navigateToScene(new NavigationScene().root);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        buttonHBox.getChildren().add(cancelButton);
+            buttonHBox.getChildren().addAll(depositButton, withdrawButton);
+        } else {
+            // Add Button
+            Button addButton = new Button("Add");
+            addButton.setOnAction(x -> UICreationHelpers.navigateToScene(new AccountCreationScene().root));
+
+            // Edit Button
+            Button editButton = new Button("Edit");
+            editButton.setOnAction(x -> editAccount());
+
+            // Cancel Button
+            Button cancelButton = new Button("Cancel");
+            cancelButton.setOnAction(x -> {
+                try {
+                    UICreationHelpers.navigateToScene(new NavigationScene().root);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            buttonHBox.getChildren().addAll(addButton, editButton, cancelButton);
+        }
 
         fieldVBox.getChildren().addAll(accountTable, buttonHBox);
     }
@@ -49,16 +60,21 @@ public class AccountManagementScene {
         TableColumn<Account, String> type = new TableColumn<>("Type");
         TableColumn<Account, String> dateOpened = new TableColumn<>("Date Opened");
         TableColumn<Account, String> balance = new TableColumn<>("Balance");
-        ObservableList<Account> list = FXCollections.observableArrayList();
-        list.addAll(CheckingAccount.checkingAccounts);
-        list.addAll(LoanAccount.loans);
-//        list.addAll(SavingAccount);
+        ObservableList<Account> accounts = FXCollections.observableArrayList();
+        // TODO: Get other accounts.
+        if (UICreationHelpers.currentUserLevel == 0) {
+            accounts.addAll(CheckingAccount.searchCheckingAccountsByCustomerID(UICreationHelpers.currentUser.id));
+            accounts.addAll(LoanAccount.search(UICreationHelpers.currentUser.id));
+        } else {
+            accounts.addAll(CheckingAccount.checkingAccounts);
+            accounts.addAll(LoanAccount.loans);
+        }
 
-        type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
+        type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
         dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
         balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
         accountTable.getColumns().addAll(type, dateOpened, balance);
-        accountTable.setItems(list);
+        accountTable.setItems(accounts);
     }
 
     public void editAccount() {
@@ -67,5 +83,13 @@ public class AccountManagementScene {
             return;
         }
         UICreationHelpers.navigateToScene(new AccountCreationScene(selectedAccount).root);
+    }
+
+    public void withdrawOrDeposit(boolean isWithdraw) {
+        Account selectedAccount = accountTable.getSelectionModel().getSelectedItem();
+        if (selectedAccount == null) {
+            return;
+        }
+        UICreationHelpers.navigateToScene(new WithdrawOrDepositScene(selectedAccount, isWithdraw).root);
     }
 }

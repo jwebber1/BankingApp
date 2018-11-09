@@ -86,7 +86,7 @@ class CheckingAccount extends Account{
     }//end of checking data import method
 
     //export checking accounts to checkings.txt
-    public static void exportFile(ArrayList<CheckingAccount> checkings) throws FileNotFoundException {
+    public static void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter checkingWriter = new PrintWriter(new FileOutputStream("memory/checkings.txt",false));
 
@@ -94,7 +94,7 @@ class CheckingAccount extends Account{
         checkingWriter.println("CustomerID,CheckingBalance,hasBackup,hasATM,Overdrafts,DateOpened,");
 
         //go through all the checking accounts
-        for (CheckingAccount checking: checkings) {
+        for (CheckingAccount checking: checkingAccounts) {
 
             int overDBit = checking.getHasOverdraftProtection() ? 1 : 0;
             int atmBit = checking.getConnectedToATMCard() ? 1 : 0;
@@ -115,10 +115,10 @@ class CheckingAccount extends Account{
     }//end of exportFile()
 
     //find all checking accounts given a customerID
-    public static ArrayList<CheckingAccount> searchCheckingAccountsByCustomerID(int custID){
+    static ArrayList<CheckingAccount> searchCheckingAccountsByCustomerID(int custID){
 
         //initialize searchResults to null
-        ArrayList<CheckingAccount> searchResults = null;
+        ArrayList<CheckingAccount> searchResults = new ArrayList<>();
 
         //loop through all checking accounts in global arraylist
         for(CheckingAccount account: CheckingAccount.checkingAccounts){

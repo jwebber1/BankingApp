@@ -16,8 +16,6 @@ class NavigationScene {
         if (UICreationHelpers.currentUserLevel > 0) {
             UICreationHelpers.createButton("Person Management", fieldVBox, x -> personManagement());
             UICreationHelpers.createButton("Account Management", fieldVBox, x -> accountManagement());
-        } else {
-
         }
     }
 

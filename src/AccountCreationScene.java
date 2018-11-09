@@ -19,17 +19,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class AccountCreationScene {
-
-    // TODO: Get customers correctly.
-//    private HashMap<Integer, String> customers = new HashMap<>();
-//            FXCollections.observableArrayList(
-//                    "Customer 1",
-//                    "Customer 2",
-//                    "Customer 3"
-//            );
-
-    Account editedAccount;
+class AccountCreationScene {
+    private Account editedAccount;
+    private ComboBox customerBox;
 
     // Fields Needed By All Account Types
     private final StringProperty customerProperty = new SimpleStringProperty("");
@@ -52,7 +44,7 @@ public class AccountCreationScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
-    public AccountCreationScene() {
+    AccountCreationScene() {
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
         UICreationHelpers.setButtonSettings(buttonHBox);
 
@@ -65,7 +57,7 @@ public class AccountCreationScene {
         loanFieldsVBox.setSpacing(8);
     }
 
-    public AccountCreationScene(Account editedAccount) {
+    AccountCreationScene(Account editedAccount) {
         this.editedAccount = editedAccount;
 
         UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
@@ -92,8 +84,6 @@ public class AccountCreationScene {
         }
     }
 
-    ComboBox customerBox;
-
     // Creates base fields that are used by all account types.
     private void createBaseAccountCreationNodes() {
         ObservableList<String> personNames = FXCollections.observableArrayList();
@@ -107,9 +97,9 @@ public class AccountCreationScene {
         accountTypeBox.valueProperty().addListener((observable, oldValue, newValue) -> updateAccountType(newValue.toString()));
         fieldVBox.getChildren().add(UICreationHelpers.createHBox("Account Type:", accountTypeBox));
 
-        HBox hBox = UICreationHelpers.createHBox(
+        HBox balanceField = UICreationHelpers.createHBox(
                 "Account Balance:", UICreationHelpers.createBalanceField(accountBalanceProperty));
-        fieldVBox.getChildren().add(hBox);
+        fieldVBox.getChildren().add(balanceField);
 
         // Cancel Button
         Button cancelButton = new Button("Cancel");
@@ -199,7 +189,7 @@ public class AccountCreationScene {
                             new Date()
                     );
                     checkingAccounts.add(checkingAccount);
-                    CheckingAccount.exportFile(checkingAccounts);
+                    CheckingAccount.exportFile();
                     break;
                 case 2:
 //                    ArrayList<LoanAccount> loanAccounts = LoanAccount.loansImportFile();
