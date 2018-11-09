@@ -35,43 +35,30 @@ class AccountCreationScene {
     private final StringProperty loanTypeProperty = new SimpleStringProperty("");
     private final Property<LocalDate> datePaymentDue = new SimpleObjectProperty<>();
 
+
+    private final Property<LocalDate> dateCDDue = new SimpleObjectProperty<>();
+
     // Boxes to Hold Nodes
     private HBox buttonHBox = new HBox();
     private VBox savingsAccountFieldsVBox = new VBox();
     private VBox checkingAccountFieldsVBox = new VBox();
     private VBox loanFieldsVBox = new VBox();
+    private VBox cdFieldsVBox = new VBox();
 
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
     AccountCreationScene() {
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
-        UICreationHelpers.setButtonSettings(buttonHBox);
-
-        createBaseAccountCreationNodes();
-        createCheckingFields();
-        createLoanFields();
-
-        savingsAccountFieldsVBox.setSpacing(8);
-        checkingAccountFieldsVBox.setSpacing(8);
-        loanFieldsVBox.setSpacing(8);
+        initScene();
     }
 
     AccountCreationScene(Account editedAccount) {
         this.editedAccount = editedAccount;
 
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
-        UICreationHelpers.setButtonSettings(buttonHBox);
+        initScene();
 
-        createBaseAccountCreationNodes();
-        createCheckingFields();
-        createLoanFields();
-
-        savingsAccountFieldsVBox.setSpacing(8);
-        checkingAccountFieldsVBox.setSpacing(8);
-        loanFieldsVBox.setSpacing(8);
-
-        customerProperty.set(String.valueOf(editedAccount.customerID));
+        Person customer = Person.searchPeopleByCustomerID(editedAccount.customerID);
+        customerProperty.set(customer.lastName + ", " + customer.firstName);
         accountBalanceProperty.set(String.valueOf("$" + editedAccount.accountBalance));
 
         if (editedAccount instanceof CheckingAccount) {
@@ -80,12 +67,32 @@ class AccountCreationScene {
         } else if (editedAccount instanceof LoanAccount) {
             loanTypeProperty.set(((LoanAccount)editedAccount).accountType);
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(2));
+            if (editedAccount.accountType.equalsIgnoreCase("LT")) {
+                loanTypeProperty.set("Long Term");
+            } else if (editedAccount.accountType.equalsIgnoreCase("ST")) {
+                loanTypeProperty.set("Short Term");
+            }
+            // TODO
 //            datePaymentDue.set(((LoanAccount)editedAccount).getDatePaymentDue());
         } else if (editedAccount instanceof SavingAccount) {
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(0));
         } else if (editedAccount instanceof CD) {
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(3));
         }
+    }
+
+    public void initScene() {
+        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UICreationHelpers.setButtonSettings(buttonHBox);
+
+        createBaseAccountCreationNodes();
+        createCheckingFields();
+        createLoanFields();
+        createCdFields();
+
+        savingsAccountFieldsVBox.setSpacing(8);
+        checkingAccountFieldsVBox.setSpacing(8);
+        loanFieldsVBox.setSpacing(8);
     }
 
     // Creates base fields that are used by all account types.
@@ -137,6 +144,12 @@ class AccountCreationScene {
 
         DatePicker datePicker = UICreationHelpers.createDatePicker(datePaymentDue);
         loanFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Date Payment Due:", datePicker));
+    }
+
+    // Creates fields used by loans.
+    private void createCdFields() {
+        DatePicker datePicker = UICreationHelpers.createDatePicker(dateCDDue);
+        cdFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Date CD Due:", datePicker));
     }
 
     // Runs when the "Save" button is pressed.
@@ -211,6 +224,18 @@ class AccountCreationScene {
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
+                case 3:
+                    CD cd = new CD(
+                            customerId,
+                            accountBalance,
+                            0.2,
+                            new Date(),
+                            new Date(), // TODO: Dates
+                            CD.cds.get(CD.cds.size() - 1).cdNumber + 1
+                    );
+                    CD.cds.add(cd);
+                    CD.exportFile();
+                    break;
             }
             UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The account has been saved successfully.");
             UICreationHelpers.navigateToScene(new AccountManagementScene().root);
@@ -224,16 +249,25 @@ class AccountCreationScene {
                 fieldVBox.getChildren().add(savingsAccountFieldsVBox);
                 fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
                 fieldVBox.getChildren().remove(loanFieldsVBox);
+                fieldVBox.getChildren().remove(cdFieldsVBox);
                 break;
             case "Checking":
                 fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
                 fieldVBox.getChildren().add(checkingAccountFieldsVBox);
                 fieldVBox.getChildren().remove(loanFieldsVBox);
+                fieldVBox.getChildren().remove(cdFieldsVBox);
                 break;
             case "Loan":
                 fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
                 fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
                 fieldVBox.getChildren().add(loanFieldsVBox);
+                fieldVBox.getChildren().remove(cdFieldsVBox);
+                break;
+            case "CD":
+                fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
+                fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
+                fieldVBox.getChildren().remove(loanFieldsVBox);
+                fieldVBox.getChildren().add(cdFieldsVBox);
                 break;
         }
         fieldVBox.getChildren().remove(buttonHBox);

@@ -1,7 +1,6 @@
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -19,6 +18,9 @@ class CD extends Account {
 
     public CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn, int cdNumber) {
         super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
+
+        mainAccountType = "CD";
+
         this.customerID = cusIDIn;
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
@@ -31,31 +33,24 @@ class CD extends Account {
     public double getCurrentInterestRate() {
         return currentInterestRate;
     }
-
     public void setCurrentInterestRate(double currentInterestRate) {
         this.currentInterestRate = currentInterestRate;
     }
-
     public Date getDateCDDue() {
         return dateCDDue;
     }
-
     public void setDateCDDue(Date dateCDDue) {
         this.dateCDDue = dateCDDue;
     }
-
     public boolean isBeforeDueDate() {
         return beforeDueDate;
     }
-
     public void setBeforeDueDate(boolean beforeDueDate) {
         this.beforeDueDate = beforeDueDate;
     }
-
     public int getCdNumber() {
         return cdNumber;
     }
-
     public void setCdNumber(int cdNumber) {
         this.cdNumber = cdNumber;
     }

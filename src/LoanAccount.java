@@ -54,6 +54,8 @@ class LoanAccount extends Account{
 
         super(cusIDIn, balance, null, loanTypeIn);
 
+        mainAccountType = "Loan - " + accountType;
+
         initialAmount = initial;
         currentInterestRate = currIntRate;
         datePaymentDue = datePayDue;

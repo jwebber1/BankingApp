@@ -22,17 +22,17 @@ class LoginScene {
             LoanAccount.importFile();
             SavingAccount.savingAccounts = SavingAccount.importFile();
 
-            for (CheckingAccount account : CheckingAccount.checkingAccounts) {
-                account.mainAccountType = "Checking - " +
-                    account.accountType.substring(0, 1).toUpperCase() +
-                    account.accountType.substring(1);
-            }
-            for (LoanAccount account : LoanAccount.loans) {
-                account.mainAccountType = "Loan - " + account.accountType;
-            }
-            for (CD account : CD.cds) {
-                account.mainAccountType = "CD - " + account.accountType;
-            }
+//            for (CheckingAccount account : CheckingAccount.checkingAccounts) {
+//                account.mainAccountType = "Checking - " +
+//                    account.accountType.substring(0, 1).toUpperCase() +
+//                    account.accountType.substring(1);
+//            }
+//            for (LoanAccount account : LoanAccount.loans) {
+//                account.mainAccountType = "Loan - " + account.accountType;
+//            }
+//            for (CD account : CD.cds) {
+//                account.mainAccountType = "CD";
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
