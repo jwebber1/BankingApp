@@ -146,7 +146,7 @@ public class PersonCreationScene {
                     Person.people.remove(editedPerson);
                 }
                 Person.people.add(person);
-                Person.exportFile(Person.people);
+                Person.exportFile();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
