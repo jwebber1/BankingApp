@@ -44,7 +44,7 @@ public class Person {
 
 
     //current method to grab data from the persons textfile in "memory"
-    public static ArrayList<Person> importFile() throws IOException, ParseException {
+    public static void importFile() throws IOException, ParseException {
 
         //creates a file referencing the text file in the memory folder
         File personsFileIn = new File("memory/people.txt");
@@ -87,10 +87,10 @@ public class Person {
                 else if (socialSecurityNumber == 000000000){userLevel = 3;}
 
                 //add the new data (in our case checking) to the ArrayList
-                importPerson.add(new Person(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName, userLevel));
+                people.add(new Person(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName, userLevel));
 
                 //debugging importPersons
-                //System.out.println("count: " + (lineNum) + "\t" + importPerson.get(lineNum-1).toString());
+                //System.out.println("count: " + (lineNum) + "\t" + people.get(lineNum-1).toString());
             }
 
             //increment the line number
@@ -99,11 +99,10 @@ public class Person {
 
         //close the bufferfile and return the ArrayList
         personsBR.close();
-        return importPerson;
     }//end of person data import method
 
     //export people to people.txt
-    public static void exportFile(ArrayList<Person> people) throws FileNotFoundException {
+    public static void exportFile() throws FileNotFoundException {
 
         //create a new PrintWriter to write to a file
         PrintWriter personWriter = new PrintWriter(new FileOutputStream("memory/people.txt",false));
@@ -132,7 +131,7 @@ public class Person {
         Person searchResults = null;
 
         //loop through people in global arraylist
-        for (Person person: Person.people) {
+        for (Person person: people) {
             if(person.getId() == custId){
                 searchResults = person;
             }

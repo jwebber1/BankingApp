@@ -9,7 +9,7 @@ class CheckingAccount extends Account{
     protected Boolean connectedToATMCard;        // 1=true   0=false
     protected int overdraftsThisMonth;
     protected int withdrawsToday;
-    static ArrayList<CheckingAccount> checkingAccounts;
+    static ArrayList<CheckingAccount> checkingAccounts = new ArrayList<>();
 
     //constructor for the Checking Account
     public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
@@ -34,7 +34,7 @@ class CheckingAccount extends Account{
     public void setWithdrawsToday(int withdrawsToday) {this.overdraftsThisMonth = withdrawsToday;}
 
     //current method to grab data from the checkings textfile in "memory"
-    public static ArrayList<CheckingAccount> importFile() throws IOException, ParseException {
+    public static void importFile() throws IOException, ParseException {
 
         //creates a file referencing the text file in the memory folder
         File checkingsFileIn = new File("memory/checkings.txt");
@@ -48,7 +48,6 @@ class CheckingAccount extends Account{
 
         //creates the ArrayList of data
         ArrayList<CheckingAccount> importChecking = new ArrayList<>();
-        ArrayList<Check> checks = new ArrayList<>();
 
         //generic counter to know the line currently on
         int lineNum = 0;
@@ -72,10 +71,10 @@ class CheckingAccount extends Account{
                 Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
 
                 //add the new data (in our case checking) to the ArrayList
-                importChecking.add(new CheckingAccount(cusID, balance, hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened));
+                checkingAccounts.add(new CheckingAccount(cusID, balance, hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened));
 
                 //debugging importChecking
-                //System.out.println("count: " + (lineNum) + "\t" + importChecking.get(lineNum-1).toString());
+                //System.out.println("count: " + (lineNum) + "\t" + checkingAccounts.get(lineNum-1).toString());
             }
 
             //increment the line number
@@ -84,8 +83,6 @@ class CheckingAccount extends Account{
 
         //close the bufferfile and return the ArrayList
         checkingsBR.close();
-        return importChecking;
-
     }//end of checking data import method
 
     //export checking accounts to checkings.txt
@@ -98,10 +95,6 @@ class CheckingAccount extends Account{
 
         //go through all the checking accounts
         for (CheckingAccount checking: checkingAccounts) {
-
-            int overDBit = checking.getHasOverdraftProtection() ? 1 : 0;
-            int atmBit = checking.getConnectedToATMCard() ? 1 : 0;
-
             checkingWriter.println(checking.getCustomerID() + "," +
                     checking.getAccountBalance() + "," +
                     checking.getHasOverdraftProtection() + "," +
@@ -217,7 +210,7 @@ class CheckingAccount extends Account{
     public int deposit(double depositAmt){
 
         //charge $0.50 for deposit into checking if not a gold account
-        if(accountType.equals("regualar")) {accountBalance -= 0.5;}
+        if(accountType.equals("regular")) {accountBalance -= 0.5;}
 
         //some data validation
         if(depositAmt < 0.0) {

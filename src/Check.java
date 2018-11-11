@@ -11,18 +11,30 @@ public class Check{
     String payTo;
     Date dateCheck;
     String memo;
-    boolean isHonored;
-    static ArrayList<Check> checks;
+    Date dateHonored;
+    static ArrayList<Check> checks = new ArrayList<>();
 
-    //constructor for the Check class
-    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, boolean isHonored){
+    //constructor for the Check class (without date honored)
+    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn){
         this.customerID = cusIdIn;
         this.checkID = checkIdIn;
         this.checkAmt = checkAmtIn;
         this.payTo = payToIn;
         this.dateCheck = dateCheckIn;
         this.memo = memoIn;
-        this.isHonored = isHonored;
+        this.dateHonored = null;
+
+    }
+
+    //constructor for the Check class (with date honored)
+    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, Date dateHonored){
+        this.customerID = cusIdIn;
+        this.checkID = checkIdIn;
+        this.checkAmt = checkAmtIn;
+        this.payTo = payToIn;
+        this.dateCheck = dateCheckIn;
+        this.memo = memoIn;
+        this.dateHonored = dateHonored;
 
     }
 
@@ -39,11 +51,11 @@ public class Check{
     public void setDateCheck(Date dateCheck) {this.dateCheck = dateCheck;}
     public String getMemo() {return memo;}
     public void setMemo(String memo) {this.memo = memo;}
-    public boolean isHonored() {return isHonored;}
-    public void setHonored(boolean honored) {isHonored = honored;}
+    public Date getDateHonored() {return dateHonored;}
+    public void setDateHonored(Date dateHonored) {this.dateHonored = dateHonored;}
 
     //current method to grab data from the checks textfile in "memory"
-    public static ArrayList<Check> importFile() throws IOException, ParseException {
+    public static void importFile() throws IOException, ParseException {
 
         //creates a file referencing the text file in the memory folder
         File checksFileIn = new File("memory/checks.txt");
@@ -63,28 +75,40 @@ public class Check{
 
         //while loop to go through the file
         while ((line = checksBR.readLine()) != null) {
-
+            System.out.println(line);
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
             if(lineNum > 0) {
 
                 //split the line into an array of strings
-                String[] splitLine = line.split(",");
+                String[] splitLine = line.split(",",-1);
+
 
                 //create temp variable to hold info from the split lines
                 int cusID = Integer.parseInt(splitLine[0]);
+                System.out.println(cusID);
                 int checkID = Integer.parseInt(splitLine[1]);
+                System.out.println(checkID);
                 double checkAmt = Double.parseDouble(splitLine[2]);
+                System.out.println(checkAmt);
                 String payTo = splitLine[3];
+                System.out.println(payTo);
                 Date dateCheck = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
+                System.out.println(dateCheck);
                 String memo = splitLine[5];
-                boolean isHonored = Boolean.parseBoolean(splitLine[6]);
-
-                //add the new data (in our case checking) to the ArrayList
-                importChecks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo, isHonored));
+                System.out.println(memo);
+                System.out.println("*"+splitLine[6]+"*");
+                //create a new check depending on the 6th position of the line
+                if(splitLine[6].equals("")) {
+                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo));
+                }
+                else {
+                    Date dateHonored = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[6]);
+                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo, dateHonored));
+                }
 
                 //debugging importPersons
-                //System.out.println("count: " + (lineNum) + "\t" + importChecks.get(lineNum-1).toString());
+                //System.out.println("count: " + (lineNum) + "\t" + checks.get(lineNum-1).toString());
             }
 
             //increment the line number
@@ -93,16 +117,15 @@ public class Check{
 
         //close the bufferfile and return the ArrayList
         checksBR.close();
-        return importChecks;
     }//end of checks data import method
 
     //export the checks to checks.txt
-    public static void exportFile(ArrayList<Check> checks) throws FileNotFoundException {
+    public static void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter checkWriter = new PrintWriter(new FileOutputStream("memory/checks.txt",false));
 
         //printing the headers of the files
-        checkWriter.println("CustomerID,CheckID,CheckAmt,PayTo,DateCheck,Memo,");
+        checkWriter.println("CustomerID,CheckID,CheckAmt,PayTo,DateCheck,Memo,dateHonored");
 
         //go through all the checks
         for (Check check: checks) {
@@ -111,8 +134,9 @@ public class Check{
                     check.getCheckAmt() + "," +
                     check.getPayTo() + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(check.getDateCheck()) + "," +
-                    new SimpleDateFormat("MM/dd/yyy").format(check.getDateCheck()) + "," +
-                    check.isHonored() + ",");
+                    check.getMemo() + "," +
+                    (check.getDateHonored() == null ? "": new SimpleDateFormat("MM/dd/yyy").format(check.getDateHonored()))
+                     + ",");
             checkWriter.flush();
         }
 
@@ -126,7 +150,7 @@ public class Check{
     public static ArrayList<Check> searchChecksByCustomerID(int custID){
 
         //initialize searchResults to null
-        ArrayList<Check> searchResults = null;
+        ArrayList<Check> searchResults = new ArrayList<>();
 
         //loop through all checks in global arraylist
         for(Check check: Check.checks){
@@ -135,12 +159,12 @@ public class Check{
             }
         }
 
-        //return found checks OR null
+        //return found checks
         return searchResults;
     }
 
     //find one check with a given check ID
-    public static String searchChecksByCheckID(int checkID){
+    public static Check searchChecksByCheckID(int checkID){
 
         //initialize searchResults to null
         Check searchResult = null;
@@ -148,20 +172,39 @@ public class Check{
         //loop through all checks in global arraylist
         for(Check check: Check.checks){
             if(check.getCheckID() == checkID){
-
-                //if the check hasn't been honored yet, stop it
-                if(check.isHonored()){
-                    return "Check has already been honored.";
-                }
-                else{
-                    check.setCheckAmt(0.0);
-                    return "Check has bee stopped.";
-
-                }
+                return check;
             }
         }
 
-        return "Check could not be found";
+        //this could return null
+        return searchResult;
     }
+
+    //method to remove the check from the arraylist
+    public static void stopCheck(int checkID){
+
+        //get the check. If it doesn't exist, it will return null
+        Check foundCheck = searchChecksByCheckID(checkID);
+
+        //if the check was found AND it has not been honored yet...
+        if(foundCheck != null && foundCheck.getDateHonored() == null){
+            int count = 0;
+
+            //go through each check...
+            for(Check check: Check.checks){
+
+                //if it finds the check, break out
+                if(foundCheck.equals(check)){
+                    break;
+                }
+                count++;
+            }
+
+            //remove the check at the found location
+            checks.remove(count);
+        }
+    }//end of stopCheck
+
+
 
 }//end of Check
