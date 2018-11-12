@@ -7,16 +7,17 @@ import java.util.Date;
 class CD extends Account {
 
     int cdNumber;
-    double currentInterestRate;
-    Date dateCDDue;
-    boolean beforeDueDate;
+    private double currentInterestRate;
+    private Date dateCDDue;
+    private boolean beforeDueDate;
     static ArrayList<CD> cds;
+    private String mainAccounttype;
 
     //Get the current date to check if the CD is due
-    Date dateNow = new Date();
+    private Date dateNow = new Date();
 
 
-    public CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn, int cdNumber) {
+    CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn, int cdNumber) {
         super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
 
         mainAccountType = "CD";
@@ -25,18 +26,17 @@ class CD extends Account {
         this.accountBalance = accBalIn;
         this.currentInterestRate = currIntRateIn;
         this.dateCDDue = dateCDDueIn;
-        this.beforeDueDate = beforeDueDate;
         this.cdNumber = cdNumber;
     }
 
     //Create import, export, and search by cusID
-    public double getCurrentInterestRate() {
+    private double getCurrentInterestRate() {
         return currentInterestRate;
     }
     public void setCurrentInterestRate(double currentInterestRate) {
         this.currentInterestRate = currentInterestRate;
     }
-    public Date getDateCDDue() {
+    private Date getDateCDDue() {
         return dateCDDue;
     }
     public void setDateCDDue(Date dateCDDue) {
@@ -45,17 +45,15 @@ class CD extends Account {
     public boolean isBeforeDueDate() {
         return beforeDueDate;
     }
-    public void setBeforeDueDate(boolean beforeDueDate) {
-        this.beforeDueDate = beforeDueDate;
-    }
-    public int getCdNumber() {
+
+    private int getCdNumber() {
         return cdNumber;
     }
     public void setCdNumber(int cdNumber) {
         this.cdNumber = cdNumber;
     }
 
-    static ArrayList<CD> importFile() throws IOException, ParseException {
+     static ArrayList<CD> importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
         File cdFileIn = new File("memory/cds.txt");
 
@@ -93,7 +91,7 @@ class CD extends Account {
                 importCD.add(new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue, cdNum));
 
                 //Debugging
-                //System.out.println("count: " + (lineNum) + "\t" + importCD.get(lineNum-1).toString());
+                System.out.println("count: " + (lineNum) + "\t" + importCD.get(lineNum-1).toString());
             }
 
             //increment the line number
@@ -107,7 +105,7 @@ class CD extends Account {
     }//end of importFile
 
     // TODO: The account type was used in this but not the import
-    public static void exportFile() throws FileNotFoundException {
+     void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter cdWriter = new PrintWriter(new FileOutputStream("memory/cds.txt", false));
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -116,11 +114,7 @@ class CD extends Account {
         cdWriter.println("CustomerID,AccountBalance,CurrInterestRate,DateAccOpened,DateCDDue,CDNumber");
 
         for (CD cd : cds) {
-            //check to see if a CD has a balance of 0 and delete it
-            // TODO: Can't do this while looping through the cds- like Intellij warns
-//            if (cds.get(i).getAccountBalance() == 0) {
-//                cds.remove(i);
-//            }
+
             //format the line to put back into the file
             cdWriter.println(cd.getCustomerID() + "," +
                     cd.getAccountBalance() + "," +
@@ -167,19 +161,18 @@ class CD extends Account {
     }
 
     void withdraw() {
-        int errors = 0;
-        double charge = 0.0;//Charge if withdrawn before due date
+        double amtToReturn = 0.0;//Charge if withdrawn before due date
 
         if (dateCDDue.compareTo(dateNow) >= 0) {
+            //This gives the the original deposit in addition to the interest because it is after the Due Date
+            amtToReturn = getAccountBalance() * (getCurrentInterestRate() * getAccountBalance());
             setAccountBalance(0);
-            errors = 0;
         } else
+            //This only gives the original balance as because it is before the due date
+            amtToReturn = getAccountBalance();
             setAccountBalance(0);
-        errors = -1;
 
-        //return which error was encountered:
-        // -1 withdrawal before due date
-        // 0 default, withdrawal after date
+
     }//end of CD withdraw
 
 }//end of CD
