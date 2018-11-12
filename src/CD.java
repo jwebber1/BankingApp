@@ -42,9 +42,6 @@ class CD extends Account {
     public void setDateCDDue(Date dateCDDue) {
         this.dateCDDue = dateCDDue;
     }
-    public boolean isBeforeDueDate() {
-        return beforeDueDate;
-    }
 
     private int getCdNumber() {
         return cdNumber;
@@ -105,7 +102,7 @@ class CD extends Account {
     }//end of importFile
 
     // TODO: The account type was used in this but not the import
-     void exportFile() throws FileNotFoundException {
+     static void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter cdWriter = new PrintWriter(new FileOutputStream("memory/cds.txt", false));
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -160,19 +157,20 @@ class CD extends Account {
         return searchResults;
     }
 
-    void withdraw() {
+    double withdraw() {
         double amtToReturn = 0.0;//Charge if withdrawn before due date
 
         if (dateCDDue.compareTo(dateNow) >= 0) {
             //This gives the the original deposit in addition to the interest because it is after the Due Date
-            amtToReturn = getAccountBalance() * (getCurrentInterestRate() * getAccountBalance());
+            amtToReturn = getAccountBalance() + (getCurrentInterestRate() * getAccountBalance() / 10);
             setAccountBalance(0);
-        } else
+        } else{
             //This only gives the original balance as because it is before the due date
             amtToReturn = getAccountBalance();
             setAccountBalance(0);
+    }
 
-
+    return amtToReturn;
     }//end of CD withdraw
 
 }//end of CD
