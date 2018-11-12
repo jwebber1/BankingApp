@@ -47,10 +47,11 @@ public class CreditCardPurchase {
                 int ssn = Integer.parseInt(field[0]);
                 String desc = field[1];
                 double price = Double.parseDouble(field[2]);
-                Date dateOfPurchase = (new SimpleDateFormat("mm/dd/yyyy")).parse(field[3]);
+                Date date = new Date();
+                //Date dateOfPurchase = (new SimpleDateFormat("mm/dd/yyyy")).parse(field[3]);
 
                 //create new CreditCardPurchase object
-                CreditCardPurchase purchase = new CreditCardPurchase(ssn, desc, price, dateOfPurchase);
+                CreditCardPurchase purchase = new CreditCardPurchase(ssn, desc, price, date);
 
                 //add purchase to the arraylist
                 purchases.add(purchase);
