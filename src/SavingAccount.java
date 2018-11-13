@@ -135,23 +135,30 @@ class SavingAccount extends Account {
         if (withdrawAmount > currentBal){
             //This will not allow the withdraw because the withdraw is larger than the current balance
         } else{
-           setAccountBalance(currentBal - withdrawAmount);
+            setAccountBalance(currentBal - withdrawAmount);
         }
 
     }//end of withdraw
 
-    public void transferTo(CheckingAccount customerChecking, double amountToTransfer){
+    public void transferTo(double amountToTransfer){
 
-        if(amountToTransfer <= getAccountBalance()) {//make sure we cannot transfer more than the balance
+        //grab the customer checking account
+        CheckingAccount customerChecking = CheckingAccount.search(customerID);
+
+        if(customerChecking != null && amountToTransfer <= getAccountBalance()) {//make sure we cannot transfer more than the balance
             customerChecking.deposit(amountToTransfer);
             withdraw(amountToTransfer);
         }
     }
 
-    public void transferFrom(CheckingAccount customerChecking, double amountToTransfer) {
+    public void transferFrom(double amountToTransfer) {
+
+        //grab the customer checking account
+        CheckingAccount customerChecking = CheckingAccount.search(customerID);
+
         //Make sure that we cannot take more than what is in the Checking account
-        if(customerChecking.getAccountBalance() >= amountToTransfer){
-            customerChecking.withdraw(amountToTransfer); //This will be wrong until Jon overloads his withdraw method
+        if(customerChecking != null && customerChecking.getAccountBalance() >= amountToTransfer){
+            customerChecking.withdraw(amountToTransfer); 
             deposit(amountToTransfer);
         }
     }
