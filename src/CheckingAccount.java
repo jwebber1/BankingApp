@@ -111,31 +111,32 @@ class CheckingAccount extends Account{
     }//end of exportFile()
 
     //find all checking accounts given a customerID
-    static ArrayList<CheckingAccount> searchCheckingAccountsByCustomerID(int custID){
+    static CheckingAccount search(int custID){
 
-        //initialize searchResults to null
-        ArrayList<CheckingAccount> searchResults = new ArrayList<>();
+        //initialize searchResults
+        CheckingAccount searchResults = null;
 
         //loop through all checking accounts in global arraylist
-        for(CheckingAccount account: CheckingAccount.checkingAccounts){
+        for(CheckingAccount account: checkingAccounts){
             if(account.getCustomerID() == custID){
-                searchResults.add(account);
+                searchResults = account;
+                return searchResults;
             }
         }
 
         //return found checking accounts OR null
         return searchResults;
-    }
+    }//end of search
 
     //method for withdraw from checking
-    public void withdraw(SavingAccount customerSaving, double withdrawlAmt){
+    public void withdraw(double withdrawlAmt){
+
+        //set temporary boolean to see if the customer is withdrawing too much
         boolean customerWithdrawTooMuch = ((accountBalance-withdrawlAmt) < 0.0);
-        boolean savingsNotEnough = (((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
         double charge = 0.0;
 
         //todo- on interface, do not allow more than $500 withdrawl   UNLESS they are a part of management
         //todo- on interface, do not allow more than 2 withdraws      UNLESS they are a part of management
-
 
         //charge $0.50 for withdrawl from checking if not a gold account
         if(accountType.equals("regular")) {charge += 0.5;}
@@ -152,19 +153,35 @@ class CheckingAccount extends Account{
         }
         else if(customerWithdrawTooMuch && hasOverdraftProtection) {
 
-            //set the checking balance to $0
-            setAccountBalance(0.0);
+            //get the customer's saving account
+            SavingAccount customersSaving = SavingAccount.search(customerID);
 
-            //subtract the remaining balance not covered by the checking and set the new Savings balance (will be negative)
-            customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
-            //todo- ^^^ will need to modify when Jacob finishes his withdraw method from SavingAcount
+            //set temporary variably to determine if there is enough in the savings account to withdraw from
+            boolean savingsNotEnough = (((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
 
             //return -2 for insufficient funds even with a savings account
             if(savingsNotEnough){
+                //get the new balance for checking after the overdraft
+                double overdraftAmt = ((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
+
+                //drain the Savings account to $0
+                customersSaving.setAccountBalance(0.0);
+
+                //set the checking to the new, overdrafted amount;
+                setAccountBalance(overdraftAmt);
+
                 //increment overdraftsThisMonth and apply $20 overdraft charge
                 overdraftsThisMonth++;
                 charge += 20.0;
             }
+            else{
+                //subtract the remaining balance not covered by the checking and set the new Savings balance (will be negative)
+                customersSaving.setAccountBalance((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
+
+                //set the checking balance to $0
+                setAccountBalance(0.0);
+            }
+
         }
         else{ setAccountBalance(accountBalance - withdrawlAmt); }
 
@@ -178,24 +195,40 @@ class CheckingAccount extends Account{
         withdrawsToday++;
     }//end of checking withdraw
 
+    //method for deposit into checking
+    public void deposit(double depositAmt){
+
+        //charge $0.50 for deposit into checking if not a gold account
+        if(accountType.equals("regular")) {accountBalance -= 0.5;}
+
+        //add the deposited amount to the current account balance
+        accountBalance += depositAmt;
+
+        //change account type if the person has > $1000
+        if(accountType.equals("regular") && accountBalance >= 1000.0){accountType = "gold";}
+
+    }//end of checking deposit
+
     //method for transfer from checking to saving
-    public void transfer(SavingAccount customerSaving, double transferAmt){
+    public void transferTo(double transferAmt){
+
+        //set a temporary variable for charge
         double charge = 0.0;
 
-        //charge $0.50 for withdrawl from checking if not a gold account
-        if(accountType.equals("regular")) {charge += 0.75;}
+        //grab the associated savings account
+        SavingAccount customerSaving = SavingAccount.search(customerID);
 
-        //transfer the money from checking to saving
-        setAccountBalance(accountBalance - transferAmt);
-        customerSaving.setAccountBalance(customerSaving.getAccountBalance() + transferAmt);
-        //todo- consider just doing a deposit method from SavingAccount here.
 
-        //determine if the account is overdrafted
-        if(accountBalance < 0.0){
+        if(customerSaving != null && ((accountBalance - transferAmt) >= 0.0)){
 
-            //increment overdraftsThisMonth and apply $20 overdraft charge
-            overdraftsThisMonth++;
-            charge += 20.0;
+            //charge $0.75 for transfer if not a gold account
+            if(accountType.equals("regular")) {charge += 0.75;}
+
+            //transfer the money from checking to saving
+            customerSaving.deposit(transferAmt);
+
+            //decrement the amount transfered out of checking balance
+            accountBalance =- transferAmt;
         }
 
         //apply any charges accrued to the account
@@ -204,28 +237,37 @@ class CheckingAccount extends Account{
         //change account type if fall below $1000 (just in case)
         if(accountType.equals("gold") && accountBalance < 1000.0){accountType = "regular";}
 
-    }//end of checking transfer
+    }//end of checking transferTo
 
-    //method for deposit into checking
-    public int deposit(double depositAmt){
+    //transfer money from savings to checking
+    public void transferFrom(double transferAmt) {
 
-        //charge $0.50 for deposit into checking if not a gold account
-        if(accountType.equals("regular")) {accountBalance -= 0.5;}
+        //set a temporary variable for charge
+        double charge = 0.0;
 
-        //some data validation
-        if(depositAmt < 0.0) {
-            //return -3 for error; cannot deposit negative money
-            return -3;
+        //get the savings account with this customer
+        SavingAccount customerSavings = SavingAccount.search(customerID);
+
+        if(customerSavings != null && ((customerSavings.getAccountBalance()-transferAmt) >= 0.0)){
+
+            //charge $0.75 for transfer from savings if not a gold account
+            if(accountType.equals("regular")) {charge += 0.75;}
+
+            //transfer the money from checking to saving
+            customerSavings.withdraw(transferAmt);
+
+            //increment the money in checking
+            accountBalance += transferAmt;
         }
 
-        //add the deposited amount to the current account balance
-        accountBalance = accountBalance + depositAmt;
+        //apply any charges accrued to the account
+        accountBalance -= charge;
 
-        //change account type if the person has > $1000
-        if(accountType != "gold" && accountBalance > 1000.0){accountType = "regular";}
+        //change account type if fall below $1000 (just in case)
+        if(accountType.equals("regular") && accountBalance >= 1000.0){accountType = "gold";}
 
-        //return 0 for successful transa ction
-        return 0;
+    }//end of transferFrom
 
-    }//end of checking deposit
+
+
 }//end of CheckingAccount
