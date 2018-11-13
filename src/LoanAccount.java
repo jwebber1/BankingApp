@@ -17,7 +17,8 @@ import java.util.Date;
 //TODO: change loan types in the gui from short hand to full title
 //TODO: add the functionality to remove credit card purchases whenever they are payed off (not of high priority)
 
-class LoanAccount extends Account{
+// Make sure this and any other Account classes and the Person class (and their getters/setters) all stay public.
+public class LoanAccount extends Account{
     private final static DecimalFormat decimalFormat = new DecimalFormat("#,###,###,##0.00");
     private final static SimpleDateFormat dateFormatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     private double calculatedBalance;
@@ -106,7 +107,7 @@ class LoanAccount extends Account{
 
     //calculates the monthly interest for an account
     private double calcInterest(double currentBalance, int months){
-        return ((currentBalance / 2) * (months / 12) * getInterestRate()) / months;
+        return ((currentBalance / 2) * (months / 12.0) * getInterestRate()) / months;
     }//end of calcInterest
 
     //sets initial payments left based on account type
@@ -428,28 +429,28 @@ class LoanAccount extends Account{
     }//end of exportFile
 
     //getters and setters for LoanAccount Class
-    private double getCalculatedBalance() {
+    public double getCalculatedBalance() {
         return calculatedBalance;
     }
-    private void setCalculatedBalance(double initialAmount) {
+    public void setCalculatedBalance(double initialAmount) {
         this.calculatedBalance = initialAmount;
     }
-    private double getInterestRate() {return interestRate;}
-    private void setInterestRate(double interestRate) {this.interestRate = interestRate;}
-    private Date getDatePaymentDue() {return datePaymentDue;}
-    private void setDatePaymentDue(Date datePaymentDue) {this.datePaymentDue = datePaymentDue;}
-    private double getCurrentPaymentDue() {return currentPaymentDue;}
-    private void setCurrentPaymentDue(double currentPaymentDue) {this.currentPaymentDue = currentPaymentDue;}
-    private Date getLastPaymentDate() {return lastPaymentDate;}
-    private void setLastPaymentDate(Date lastPaymentDate) {
+    public double getInterestRate() {return interestRate;}
+    public void setInterestRate(double interestRate) {this.interestRate = interestRate;}
+    public Date getDatePaymentDue() {return datePaymentDue;}
+    public void setDatePaymentDue(Date datePaymentDue) {this.datePaymentDue = datePaymentDue;}
+    public double getCurrentPaymentDue() {return currentPaymentDue;}
+    public void setCurrentPaymentDue(double currentPaymentDue) {this.currentPaymentDue = currentPaymentDue;}
+    public Date getLastPaymentDate() {return lastPaymentDate;}
+    public void setLastPaymentDate(Date lastPaymentDate) {
         this.lastPaymentDate = lastPaymentDate;
     }
-    private boolean getMissedPaymentFlag() {return missedPaymentFlag;}
-    private void setMissedPaymentFlag(boolean missedPaymentFlag) {this.missedPaymentFlag = missedPaymentFlag;}
-    private int getPaymentsLeft() {
+    public boolean getMissedPaymentFlag() {return missedPaymentFlag;}
+    public void setMissedPaymentFlag(boolean missedPaymentFlag) {this.missedPaymentFlag = missedPaymentFlag;}
+    public int getPaymentsLeft() {
         return paymentsLeft;
     }
-    private void setPaymentsLeft(int paymentsLeft) {
+    public void setPaymentsLeft(int paymentsLeft) {
         this.paymentsLeft = paymentsLeft;
     }
 }//end of LoanAccount

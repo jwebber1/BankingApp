@@ -4,7 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-class CD extends Account {
+// Make sure this and any other Account classes and the Person class (and their getters/setters) all stay public.
+public class CD extends Account {
 
     int cdNumber;
     private double currentInterestRate;
@@ -15,7 +16,6 @@ class CD extends Account {
 
     //Get the current date to check if the CD is due
     private Date dateNow = new Date();
-
 
     CD(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn, Date dateCDDueIn, int cdNumber) {
         super(cusIDIn, accBalIn, dateAccOpenedIn, "CD");
@@ -30,28 +30,13 @@ class CD extends Account {
     }
 
     //Create import, export, and search by cusID
-    private double getCurrentInterestRate() {
-        return currentInterestRate;
-    }
-    public void setCurrentInterestRate(double currentInterestRate) {
-        this.currentInterestRate = currentInterestRate;
-    }
-    private Date getDateCDDue() {
-        return dateCDDue;
-    }
-    public void setDateCDDue(Date dateCDDue) {
-        this.dateCDDue = dateCDDue;
-    }
-    public boolean isBeforeDueDate() {
-        return beforeDueDate;
-    }
-
-    private int getCdNumber() {
-        return cdNumber;
-    }
-    public void setCdNumber(int cdNumber) {
-        this.cdNumber = cdNumber;
-    }
+    public double getCurrentInterestRate() { return currentInterestRate; }
+    public void setCurrentInterestRate(double currentInterestRate) { this.currentInterestRate = currentInterestRate; }
+    public Date getDateCDDue() { return dateCDDue; }
+    public void setDateCDDue(Date dateCDDue) { this.dateCDDue = dateCDDue; }
+    public boolean isBeforeDueDate() { return beforeDueDate; }
+    public int getCdNumber() { return cdNumber; }
+    public void setCdNumber(int cdNumber) { this.cdNumber = cdNumber; }
 
      static ArrayList<CD> importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
@@ -105,7 +90,7 @@ class CD extends Account {
     }//end of importFile
 
     // TODO: The account type was used in this but not the import
-     void exportFile() throws FileNotFoundException {
+     static void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter cdWriter = new PrintWriter(new FileOutputStream("memory/cds.txt", false));
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -149,7 +134,7 @@ class CD extends Account {
     public static ArrayList<CD> search(int custID, int cdID) {
         //search by cusID, shows all CD
         //initialize searchResults to null
-        ArrayList<CD> searchResults = null;
+        ArrayList<CD> searchResults = new ArrayList<>();
         for (CD cd : cds) {
             if (cd.getCustomerID() == custID && cd.getCdNumber() == cdID) {
                 searchResults.add(cd);

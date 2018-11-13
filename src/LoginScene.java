@@ -20,6 +20,7 @@ class LoginScene {
             CheckingAccount.importFile();
             CD.cds = CD.importFile();
             LoanAccount.importFile();
+            Check.importFile();
             SavingAccount.savingAccounts = SavingAccount.importFile();
 
 //            for (CheckingAccount account : CheckingAccount.checkingAccounts) {
@@ -75,7 +76,7 @@ class LoginScene {
             UICreationHelpers.currentUser = person;
             UICreationHelpers.currentUserLevel = person.userLevel;
             if (person.userLevel == 0) {
-                UICreationHelpers.navigateToScene(new AccountManagementScene().root);
+                UICreationHelpers.navigateToScene(new AccountTypeSelectionScene().root);
             } else {
                 UICreationHelpers.navigateToScene(new NavigationScene().root);
             }

@@ -15,7 +15,8 @@ class NavigationScene {
         fieldVBox.getChildren().add(nameLabel);
         if (UICreationHelpers.currentUserLevel > 0) {
             UICreationHelpers.createButton("Person Management", fieldVBox, x -> personManagement());
-            UICreationHelpers.createButton("Account Management", fieldVBox, x -> accountManagement());
+            UICreationHelpers.createButton("Account Management", fieldVBox, x ->
+                    UICreationHelpers.navigateToScene(new AccountTypeSelectionScene().root));
         }
     }
 
@@ -23,7 +24,4 @@ class NavigationScene {
         UICreationHelpers.navigateToScene(new PersonManagementScene().root);
     }
 
-    private void accountManagement() {
-        UICreationHelpers.navigateToScene(new AccountManagementScene().root);
-    }
 }

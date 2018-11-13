@@ -4,11 +4,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-class CheckingAccount extends Account{
-    protected Boolean hasOverdraftProtection;    // 1=true   0=false
-    protected Boolean connectedToATMCard;        // 1=true   0=false
-    protected int overdraftsThisMonth;
-    protected int withdrawsToday;
+// Make sure this and any other Account classes and the Person class (and their getters/setters) all stay public.
+public class CheckingAccount extends Account{
+    private Boolean hasOverdraftProtection;    // 1=true   0=false
+    private Boolean connectedToATMCard;        // 1=true   0=false
+    private int overdraftsThisMonth;
+    private int withdrawsToday;
     static ArrayList<CheckingAccount> checkingAccounts = new ArrayList<>();
 
     //constructor for the Checking Account
@@ -112,8 +113,7 @@ class CheckingAccount extends Account{
 
     //find all checking accounts given a customerID
     static ArrayList<CheckingAccount> searchCheckingAccountsByCustomerID(int custID){
-
-        //initialize searchResults to null
+        //initialize searchResults
         ArrayList<CheckingAccount> searchResults = new ArrayList<>();
 
         //loop through all checking accounts in global arraylist
@@ -128,9 +128,15 @@ class CheckingAccount extends Account{
     }
 
     //method for withdraw from checking
-    public void withdraw(SavingAccount customerSaving, double withdrawlAmt){
-        boolean customerWithdrawTooMuch = ((accountBalance-withdrawlAmt) < 0.0);
-        boolean savingsNotEnough = (((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
+    public void withdraw(double withdrawAmt){
+        boolean customerWithdrawTooMuch = ((accountBalance-withdrawAmt) < 0.0);
+        boolean savingsNotEnough = false;
+        // TODO: Re-add when SavingAccount.search() implemented
+//        SavingAccount savingAccount = SavingAccount.search(customerID);
+//        if (savingAccount != null) {
+//            savingsNotEnough = (savingAccount.getAccountBalance() + accountBalance - withdrawAmt) < 0.0;
+//        }
+
         double charge = 0.0;
 
         //todo- on interface, do not allow more than $500 withdrawl   UNLESS they are a part of management
@@ -144,7 +150,7 @@ class CheckingAccount extends Account{
         if(customerWithdrawTooMuch && !hasOverdraftProtection){
 
             //will lead to negative balance
-            setAccountBalance(accountBalance - withdrawlAmt);
+            setAccountBalance(accountBalance - withdrawAmt);
 
             //increment overdraftsThisMonth and apply $20 overdraft charge
             overdraftsThisMonth++;
@@ -156,8 +162,8 @@ class CheckingAccount extends Account{
             setAccountBalance(0.0);
 
             //subtract the remaining balance not covered by the checking and set the new Savings balance (will be negative)
-            customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
-            //todo- ^^^ will need to modify when Jacob finishes his withdraw method from SavingAcount
+//            customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawAmt);
+            //todo- ^^^ will need to modify when Jacob finishes his withdraw method from SavingAccount
 
             //return -2 for insufficient funds even with a savings account
             if(savingsNotEnough){
@@ -166,7 +172,7 @@ class CheckingAccount extends Account{
                 charge += 20.0;
             }
         }
-        else{ setAccountBalance(accountBalance - withdrawlAmt); }
+        else{ setAccountBalance(accountBalance - withdrawAmt); }
 
         //apply any charges accrued to the account
         accountBalance -= charge;

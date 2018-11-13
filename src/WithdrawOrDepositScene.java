@@ -7,6 +7,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 class WithdrawOrDepositScene {
     private boolean isWithdraw;
@@ -47,7 +48,7 @@ class WithdrawOrDepositScene {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(x -> {
             try {
-                UICreationHelpers.navigateToScene(new AccountManagementScene().root);
+                navigateBack();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -58,24 +59,44 @@ class WithdrawOrDepositScene {
     }
 
     private void saveAccount() {
-//        if (isWithdraw) {
-//            editedAccount.accountBalance -= Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
-//        } else {
-//            editedAccount.accountBalance += Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
-//        }
+
         try {
             if (editedAccount instanceof CheckingAccount) {
     //            CheckingAccount.checkingAccounts.remove(editedAccount);
+                ((CheckingAccount)editedAccount).withdraw(editedAccount.accountBalance);
                 CheckingAccount.exportFile();
 //                if (isWithdraw) ((CheckingAccount) editedAccount).withdraw(editedAccount, editedAccount.accountBalance);
-//            } else if (editedAccount instanceof LoanAccount) {
-//    //            LoanAccount.loans.remove(editedAccount);
-//                LoanAccount.exportFile();
-//                LoanAccount.makeLoanPayment((LoanAccount) editedAccount);
+            } else if (editedAccount instanceof LoanAccount) {
+//                LoanAccount.loans.remove(editedAccount);
+                ((LoanAccount)editedAccount).makePayment(Double.parseDouble(accountBalanceProperty.get().replace("$", "")));
+                LoanAccount.exportFile();
+            } else if (editedAccount instanceof SavingAccount) {
+//                LoanAccount.loans.remove(editedAccount);
+                if (isWithdraw) {
+                    editedAccount.accountBalance -= Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
+                } else {
+                    editedAccount.accountBalance += Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
+                }
+//                ((SavingAccount)editedAccount).(Double.parseDouble(accountBalanceProperty.get().replace("$", "")));
+                LoanAccount.exportFile();
             }
-            UICreationHelpers.navigateToScene(new AccountManagementScene().root);
+            navigateBack();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private void navigateBack() {
+        ArrayList<Account> accounts = new ArrayList<>();
+        if (editedAccount instanceof CheckingAccount) {
+            accounts.addAll(CheckingAccount.searchCheckingAccountsByCustomerID(UICreationHelpers.currentUser.id));
+        } else if (editedAccount instanceof LoanAccount) {
+            accounts.addAll(LoanAccount.search(UICreationHelpers.currentUser.id));
+        } else if (editedAccount instanceof CD) {
+            accounts.addAll(CD.search(UICreationHelpers.currentUser.id));
+        } else if (editedAccount instanceof SavingAccount) {
+//            accounts.addAll(SavingAccount.search(UICreationHelpers.currentUser.id));
+        }
+        UICreationHelpers.navigateToScene(new AccountManagementScene(accounts).root);
     }
 }

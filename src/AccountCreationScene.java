@@ -204,22 +204,16 @@ class AccountCreationScene {
                     break;
                 case 2:
                     String loanType = loanTypeProperty.get();
-                    if (loanType.equals("Long Term")) {
-                        loanType = "LT";
-                    } else if (loanType.equals("Short Term")) {
-                        loanType = "ST";
-                    }
+//                    if (loanType.equals("Long Term")) {
+//                        loanType = "LT";
+//                    } else if (loanType.equals("Short Term")) {
+//                        loanType = "ST";
+//                    }
                     LoanAccount loanAccount = new LoanAccount(
                             customerId,
                             accountBalance,
-                            accountBalance,
                             0.2,
-                            new Date(),
-                            new Date(),
-                            null,
-                            false,
-                            10,
-                            loanType
+                            loanType.toLowerCase()
                     );
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
