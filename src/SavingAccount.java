@@ -111,9 +111,48 @@ class SavingAccount extends Account {
 
     }//end of exportFile()
 
-    void deposit(double depositAmount) {
-        double currentBal = super.getAccountBalance();
+    public static SavingAccount search (int cusID){
+        SavingAccount searchResult = null;
+        for(SavingAccount savingAccount : savingAccounts){
+            if (savingAccount.getCustomerID() == cusID){
+                searchResult = savingAccount;
+                return searchResult;//Exit when it finds the account
+
+            }
+        }
+        return searchResult;
+
+    }//end of search
+
+    public void deposit(double depositAmount) {
+        double currentBal = getAccountBalance();
         currentBal = +depositAmount;
-        super.setAccountBalance(currentBal);
+        setAccountBalance(currentBal);
+    }//end of deposit
+
+    public void withdraw(double withdrawAmount) {
+        double currentBal = getAccountBalance();
+        if (withdrawAmount > currentBal){
+            //This will not allow the withdraw because the withdraw is larger than the current balance
+        } else{
+           setAccountBalance(currentBal - withdrawAmount);
+        }
+
+    }//end of withdraw
+
+    public void transferTo(CheckingAccount customerChecking, double amountToTransfer){
+
+        if(amountToTransfer <= getAccountBalance()) {//make sure we cannot transfer more than the balance
+            customerChecking.deposit(amountToTransfer);
+            withdraw(amountToTransfer);
+        }
+    }
+
+    public void transferFrom(CheckingAccount customerChecking, double amountToTransfer) {
+        //Make sure that we cannot take more than what is in the Checking account
+        if(customerChecking.getAccountBalance() >= amountToTransfer){
+            customerChecking.withdraw(amountToTransfer); //This will be wrong until Jon overloads his withdraw method
+            deposit(amountToTransfer);
+        }
     }
 }//end of SavingAccount

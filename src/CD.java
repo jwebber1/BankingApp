@@ -173,7 +173,6 @@ class CD extends Account {
     //Overload the seach method to allow a seach that includes the cdID as well
     public static CD search(int custID, int cdID) {
         //search by cusID, shows all CD
-        //initialize searchResults to null
         CD searchResult = null;
         for (CD cd : cds) {
             if (cd.getCustomerID() == custID && cd.getCdNumber() == cdID) {
