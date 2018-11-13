@@ -12,6 +12,7 @@ class CD extends Account {
     private boolean beforeDueDate;
     static ArrayList<CD> cds = new ArrayList<>();
     private String mainAccounttype;
+    private Date dateAccOpenedIn = new Date();
 
     //Get the current date to check if the CD is due
     private Date dateNow = new Date();
@@ -51,6 +52,14 @@ class CD extends Account {
         return cdNumber;
     }
 
+    public Date getDateAccOpenedIn() {
+        return dateAccOpenedIn;
+    }
+
+    public void setDateAccOpenedIn(Date dateAccOpenedIn) {
+        this.dateAccOpenedIn = dateAccOpenedIn;
+    }
+
     public void setCdNumber(int cdNumber) {
         this.cdNumber = cdNumber;
     }
@@ -72,7 +81,7 @@ class CD extends Account {
                 '}';
     }
 
-    static void  importFile() throws IOException, ParseException {
+    static void importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
         File cdFileIn = new File("memory/cds.txt");
 
@@ -104,8 +113,7 @@ class CD extends Account {
                 int cdNum = Integer.parseInt(splitLine[5]);
 
                 //add the new data to the ArrayList
-                CD tempCD = new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue, cdNum);
-                cds.add(tempCD);
+                cds.add(new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue, cdNum));
 
                 //Debugging
                 //System.out.println("count: " + (lineNum) + "\t" + cds.get(lineNum - 1).toString());
@@ -121,7 +129,7 @@ class CD extends Account {
 
     }//end of importFile
 
-     static void exportFile() throws FileNotFoundException {
+    static void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter cdWriter = new PrintWriter(new FileOutputStream("memory/cds.txt", false));
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -162,6 +170,7 @@ class CD extends Account {
         return searchResults;
     }
 
+    //Overload the seach method to allow a seach that includes the cdID as well
     public static CD search(int custID, int cdID) {
         //search by cusID, shows all CD
         //initialize searchResults to null
