@@ -18,7 +18,7 @@ class LoginScene {
         try {
             Person.importFile();
             CheckingAccount.importFile();
-            CD.cds = CD.importFile();
+            CD.importFile();
             LoanAccount.importFile();
             SavingAccount.savingAccounts = SavingAccount.importFile();
 
