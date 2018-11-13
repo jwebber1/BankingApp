@@ -158,7 +158,7 @@ class SavingAccount extends Account {
 
         //Make sure that we cannot take more than what is in the Checking account
         if(customerChecking != null && customerChecking.getAccountBalance() >= amountToTransfer){
-            customerChecking.withdraw(amountToTransfer); 
+            customerChecking.withdraw(amountToTransfer);
             deposit(amountToTransfer);
         }
     }
