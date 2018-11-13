@@ -44,7 +44,7 @@ class CheckingAccount extends Account{
 
         //buffer string to temporarily hold the line retrieved
         String line;
-        
+
         //generic counter to know the line currently on
         int lineNum = 0;
 
@@ -60,8 +60,8 @@ class CheckingAccount extends Account{
                 //create temp variables to hold info from the split lines
                 int cusID = Integer.parseInt(splitLine[0]);
                 double balance = Double.parseDouble(splitLine[1]);
-                boolean hasOverdraftProtection = Boolean.parseBoolean(splitLine[2]);  
-                boolean connectedToATMCard =  Boolean.parseBoolean(splitLine[3]);  
+                boolean hasOverdraftProtection = Boolean.parseBoolean(splitLine[2]);
+                boolean connectedToATMCard =  Boolean.parseBoolean(splitLine[3]);
                 int overdraftsThisMonth = Integer.parseInt(splitLine[4]);
                 Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
 
@@ -148,9 +148,9 @@ class CheckingAccount extends Account{
 
             //set temporary variably to determine if there is enough in the savings account to withdraw from
             boolean savingsNotEnough = (((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
-            
+
             if(savingsNotEnough){
-                
+
                 //get the new balance for checking after the overdraft
                 double overdraftAmt = ((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
 
@@ -165,8 +165,8 @@ class CheckingAccount extends Account{
                 charge += 20.0;
             }
             else{
-                
-                //set the new Savings balance 
+
+                //set the new Savings balance
                 customersSaving.setAccountBalance((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
 
                 //set the checking balance to $0
@@ -208,7 +208,7 @@ class CheckingAccount extends Account{
 
         //grab the associated savings account
         SavingAccount customerSaving = SavingAccount.search(customerID);
-        
+
         if(customerSaving != null && ((accountBalance - transferAmt) >= 0.0)){
 
             //charge $0.75 for transfer if not a gold account
@@ -257,5 +257,5 @@ class CheckingAccount extends Account{
         if(accountType.equals("regular") && accountBalance >= 1000.0){accountType = "gold";}
 
     }//end of transferFrom
-    
+
 }//end of CheckingAccount
