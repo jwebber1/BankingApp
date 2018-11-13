@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 class CheckingAccount extends Account{
-    protected Boolean hasOverdraftProtection;    // 1=true   0=false
-    protected Boolean connectedToATMCard;        // 1=true   0=false
-    protected int overdraftsThisMonth;
-    protected int withdrawsToday;
+    private Boolean hasOverdraftProtection;
+    private Boolean connectedToATMCard;
+    private int overdraftsThisMonth;
+    private int withdrawsToday;
     static ArrayList<CheckingAccount> checkingAccounts = new ArrayList<>();
 
     //constructor for the Checking Account
@@ -16,7 +16,6 @@ class CheckingAccount extends Account{
         super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >= 1000.0) ? "gold" : "regular"));
 
         mainAccountType = "Checking - " + accountType.substring(0, 1).toUpperCase() + accountType.substring(1);
-
         this.hasOverdraftProtection = OvProIn;
         this.connectedToATMCard = atm;
         this.overdraftsThisMonth = odThisMonth;
@@ -45,43 +44,36 @@ class CheckingAccount extends Account{
 
         //buffer string to temporarily hold the line retrieved
         String line;
-
-        //creates the ArrayList of data
-        ArrayList<CheckingAccount> importChecking = new ArrayList<>();
-
+        
         //generic counter to know the line currently on
         int lineNum = 0;
 
         //while loop to go through the file
         while ((line = checkingsBR.readLine()) != null) {
 
-            //if the file has a header, this if statement is to avoid that
-            //remove "if" if final file has no header
+            //file has a header, this if statement is to avoid that
             if(lineNum > 0) {
 
                 //split the line into an array of strings
                 String[] splitLine = line.split(",");
 
-                //create temp variable to hold info from the split lines
+                //create temp variables to hold info from the split lines
                 int cusID = Integer.parseInt(splitLine[0]);
                 double balance = Double.parseDouble(splitLine[1]);
-                boolean hasOverdraftProtection = Boolean.parseBoolean(splitLine[2]);    // 1=true   0=false
-                boolean connectedToATMCard =  Boolean.parseBoolean(splitLine[3]);  // 1=true   0=false
+                boolean hasOverdraftProtection = Boolean.parseBoolean(splitLine[2]);  
+                boolean connectedToATMCard =  Boolean.parseBoolean(splitLine[3]);  
                 int overdraftsThisMonth = Integer.parseInt(splitLine[4]);
                 Date dateAccountOpened = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[5]);
 
                 //add the new data (in our case checking) to the ArrayList
                 checkingAccounts.add(new CheckingAccount(cusID, balance, hasOverdraftProtection, connectedToATMCard,overdraftsThisMonth, dateAccountOpened));
-
-                //debugging importChecking
-                //System.out.println("count: " + (lineNum) + "\t" + checkingAccounts.get(lineNum-1).toString());
             }
 
             //increment the line number
             lineNum++;
         }
 
-        //close the bufferfile and return the ArrayList
+        //close the bufferfile
         checkingsBR.close();
     }//end of checking data import method
 
@@ -107,7 +99,6 @@ class CheckingAccount extends Account{
         //close the PrintWriter objects
         checkingWriter.flush();
         checkingWriter.close();
-
     }//end of exportFile()
 
     //find all checking accounts given a customerID
@@ -133,10 +124,9 @@ class CheckingAccount extends Account{
 
         //set temporary boolean to see if the customer is withdrawing too much
         boolean customerWithdrawTooMuch = ((accountBalance-withdrawlAmt) < 0.0);
-        double charge = 0.0;
 
-        //todo- on interface, do not allow more than $500 withdrawl   UNLESS they are a part of management
-        //todo- on interface, do not allow more than 2 withdraws      UNLESS they are a part of management
+        //set a temporary variable for charge
+        double charge = 0.0;
 
         //charge $0.50 for withdrawl from checking if not a gold account
         if(accountType.equals("regular")) {charge += 0.5;}
@@ -158,9 +148,9 @@ class CheckingAccount extends Account{
 
             //set temporary variably to determine if there is enough in the savings account to withdraw from
             boolean savingsNotEnough = (((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt) < 0.0);
-
-            //return -2 for insufficient funds even with a savings account
+            
             if(savingsNotEnough){
+                
                 //get the new balance for checking after the overdraft
                 double overdraftAmt = ((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
 
@@ -168,14 +158,15 @@ class CheckingAccount extends Account{
                 customersSaving.setAccountBalance(0.0);
 
                 //set the checking to the new, overdrafted amount;
-                setAccountBalance(overdraftAmt);
+                accountBalance = overdraftAmt;
 
                 //increment overdraftsThisMonth and apply $20 overdraft charge
                 overdraftsThisMonth++;
                 charge += 20.0;
             }
             else{
-                //subtract the remaining balance not covered by the checking and set the new Savings balance (will be negative)
+                
+                //set the new Savings balance 
                 customersSaving.setAccountBalance((customersSaving.getAccountBalance()+accountBalance) - withdrawlAmt);
 
                 //set the checking balance to $0
@@ -217,8 +208,7 @@ class CheckingAccount extends Account{
 
         //grab the associated savings account
         SavingAccount customerSaving = SavingAccount.search(customerID);
-
-
+        
         if(customerSaving != null && ((accountBalance - transferAmt) >= 0.0)){
 
             //charge $0.75 for transfer if not a gold account
@@ -227,7 +217,7 @@ class CheckingAccount extends Account{
             //transfer the money from checking to saving
             customerSaving.deposit(transferAmt);
 
-            //decrement the amount transfered out of checking balance
+            //decrement the amount transferred out of checking balance
             accountBalance =- transferAmt;
         }
 
@@ -267,7 +257,5 @@ class CheckingAccount extends Account{
         if(accountType.equals("regular") && accountBalance >= 1000.0){accountType = "gold";}
 
     }//end of transferFrom
-
-
-
+    
 }//end of CheckingAccount
