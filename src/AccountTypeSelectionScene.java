@@ -4,34 +4,41 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 
+/**
+ * Allows user to select an account type, after which the system will navigate to the AccountManagementScene and
+ * display that account type.
+ *
+ * @author  Hunter Berten
+ */
+
 public class AccountTypeSelectionScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
     AccountTypeSelectionScene() {
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
-        if (UICreationHelpers.currentUserLevel == 0) {
-            int customerId = UICreationHelpers.currentUser.id;
+        if (UIHelpers.currentUserLevel == 0) {
+            int customerId = UIHelpers.currentUser.id;
             if (CheckingAccount.search(customerId) != null) {
-                UICreationHelpers.createButton("Checking", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CHECKING));
+                UIHelpers.createButton("Checking", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.CHECKING));
             }
             if (!new ArrayList<>(LoanAccount.search(customerId)).isEmpty()) {
-                UICreationHelpers.createButton("Loan", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.LOAN));
+                UIHelpers.createButton("Loan", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.LOAN));
             }
             if (SavingAccount.search(customerId) != null) {
-                UICreationHelpers.createButton("Saving", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.SAVING));
+                UIHelpers.createButton("Saving", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.SAVING));
             }
             if (!new ArrayList<>(CD.search(customerId)).isEmpty()) {
-                UICreationHelpers.createButton("CD", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CD));
+                UIHelpers.createButton("CD", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.CD));
             }
         } else {
-            UICreationHelpers.createButton("Checkings", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CHECKING));
-            UICreationHelpers.createButton("Loans", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.LOAN));
-            UICreationHelpers.createButton("Savings", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.SAVING));
-            UICreationHelpers.createButton("CDs", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CD));
+            UIHelpers.createButton("Checkings", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.CHECKING));
+            UIHelpers.createButton("Loans", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.LOAN));
+            UIHelpers.createButton("Savings", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.SAVING));
+            UIHelpers.createButton("CDs", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.CD));
         }
-        UICreationHelpers.createButton("Back", fieldVBox, x ->
-                UICreationHelpers.navigateToScene(new NavigationScene().root));
+        UIHelpers.createButton("Back", fieldVBox, x ->
+                UIHelpers.navigateToScene(new NavigationScene().root));
     }
 }

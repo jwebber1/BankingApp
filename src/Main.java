@@ -1,6 +1,10 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+/**
+ * TODO:
+ */
+
 public class Main extends Application {
 
     static Stage primaryStage;
@@ -8,7 +12,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         Main.primaryStage = primaryStage;
-        UICreationHelpers.navigateToScene(new LoginScene().root);
+        UIHelpers.navigateToScene(new LoginScene().root);
         primaryStage.setTitle("Banking App");
         primaryStage.show();
     }

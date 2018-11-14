@@ -10,10 +10,7 @@ public class CD extends Account {
     int cdNumber;
     private double currentInterestRate;
     private Date dateCDDue;
-    private boolean beforeDueDate;
     static ArrayList<CD> cds = new ArrayList<>();
-    private String mainAccounttype;
-    private Date dateAccOpenedIn = new Date();
 
     //Get the current date to check if the CD is due
     private Date dateNow = new Date();
@@ -36,26 +33,8 @@ public class CD extends Account {
     public void setCurrentInterestRate(double currentInterestRate) { this.currentInterestRate = currentInterestRate; }
     public Date getDateCDDue() { return dateCDDue; }
     public void setDateCDDue(Date dateCDDue) { this.dateCDDue = dateCDDue; }
-    public boolean isBeforeDueDate() { return beforeDueDate; }
     public int getCdNumber() { return cdNumber; }
     public void setCdNumber(int cdNumber) { this.cdNumber = cdNumber; }
-
-    @Override
-    public String toString() {
-        return "CD{" +
-                "cdNumber=" + cdNumber +
-                ", currentInterestRate=" + currentInterestRate +
-                ", dateCDDue=" + dateCDDue +
-                ", beforeDueDate=" + beforeDueDate +
-                ", mainAccounttype='" + mainAccounttype + '\'' +
-                ", dateNow=" + dateNow +
-                ", customerID=" + customerID +
-                ", accountBalance=" + accountBalance +
-                ", dateAccountOpened=" + dateAccountOpened +
-                ", accountType='" + accountType + '\'' +
-                ", mainAccountType='" + mainAccountType + '\'' +
-                '}';
-    }
 
     static void importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
@@ -161,16 +140,14 @@ public class CD extends Account {
     }
 
     double withdraw() {
-        double amtToReturn = 0.0;//Charge if withdrawn before due date
+        double amtToReturn;//Charge if withdrawn before due date
 
-        if (dateCDDue.compareTo(dateNow) >= 0) {
+        if (dateCDDue.compareTo(dateNow) < 0) {
             //This gives the the original deposit in addition to the interest because it is after the Due Date
             amtToReturn = getAccountBalance() + (getCurrentInterestRate() * getAccountBalance() / 10);
-            setAccountBalance(0);
         } else {
             //This only gives the original balance as because it is before the due date
             amtToReturn = getAccountBalance();
-            setAccountBalance(0);
         }
 
         return amtToReturn;

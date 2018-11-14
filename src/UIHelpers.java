@@ -23,23 +23,22 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 /**
- * This Helper class allows static creation of fields anywhere in the application.
+ * Assists in creation, navigation, and management of UI Scenes.
+ *
+ * @author  Hunter Berten
  */
 
-class UICreationHelpers {
+class UIHelpers {
     static int currentUserLevel = -1;
     static Person currentUser;
     private static double fieldWidth = 140;
     private static double fieldHeight = 20;
 
+    static AccountType selectedAccountType;
     static ArrayList<Account> selectedAccounts;
 
-    static ObservableList<String> accountTypes = FXCollections.observableArrayList(
-            "Savings",
-            "Checking",
-            "Loan",
-            "CD"
-    );
+    static ObservableList<String> accountTypes = FXCollections.observableArrayList();
+
     static ObservableList<String> loanTypes = FXCollections.observableArrayList(
             "Long Term",
             "Short Term",
@@ -205,38 +204,56 @@ class UICreationHelpers {
     }
 
     public static void navigateToAccountManagementScene(AccountType type) {
+        selectedAccountType = type;
         switch (type) {
             case CD:
-                if (UICreationHelpers.currentUserLevel == 0) {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>(CD.search(UICreationHelpers.currentUser.id));
+                if (currentUserLevel == 0) {
+                    selectedAccounts = new ArrayList<>(CD.search(currentUser.id));
                 } else {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>(CD.cds);
+                    selectedAccounts = new ArrayList<>(CD.cds);
                 }
                 break;
             case LOAN:
-                if (UICreationHelpers.currentUserLevel == 0) {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>(LoanAccount.search(UICreationHelpers.currentUser.id));
+                if (currentUserLevel == 0) {
+                    selectedAccounts = new ArrayList<>(LoanAccount.search(currentUser.id));
                 } else {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>(LoanAccount.loans);
+                    selectedAccounts = new ArrayList<>(LoanAccount.loans);
                 }
                 break;
             case SAVING:
-                if (UICreationHelpers.currentUserLevel == 0) {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>();
-                    UICreationHelpers.selectedAccounts.add(SavingAccount.search(UICreationHelpers.currentUser.id));
+                if (currentUserLevel == 0) {
+                    selectedAccounts = new ArrayList<>();
+                    selectedAccounts.add(SavingAccount.search(currentUser.id));
                 } else {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>(SavingAccount.savingAccounts);
+                    selectedAccounts = new ArrayList<>(SavingAccount.savingAccounts);
                 }
                 break;
             case CHECKING:
-                if (UICreationHelpers.currentUserLevel == 0) {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>();
-                    UICreationHelpers.selectedAccounts.add(CheckingAccount.search(UICreationHelpers.currentUser.id));
+                if (currentUserLevel == 0) {
+                    selectedAccounts = new ArrayList<>();
+                    selectedAccounts.add(CheckingAccount.search(currentUser.id));
                 } else {
-                    UICreationHelpers.selectedAccounts = new ArrayList<>(CheckingAccount.checkingAccounts);
+                    selectedAccounts = new ArrayList<>(CheckingAccount.checkingAccounts);
                 }
                 break;
         }
-        UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
+        navigateToScene(new AccountManagementScene(selectedAccounts).root);
+    }
+
+    public static void navigateBackToAccountManagement() {
+        switch (UIHelpers.selectedAccountType) {
+            case CHECKING:
+                UIHelpers.navigateToAccountManagementScene(AccountType.CHECKING);
+                break;
+            case SAVING:
+                UIHelpers.navigateToAccountManagementScene(AccountType.SAVING);
+                break;
+            case LOAN:
+                UIHelpers.navigateToAccountManagementScene(AccountType.LOAN);
+                break;
+            case CD:
+                UIHelpers.navigateToAccountManagementScene(AccountType.CD);
+                break;
+        }
     }
 }

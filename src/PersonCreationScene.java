@@ -39,13 +39,13 @@ public class PersonCreationScene {
     );
 
     public PersonCreationScene() {
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
         createBaseCustomerCreationNodes();
     }
 
     public PersonCreationScene(Person editedPerson) {
         this.editedPerson = editedPerson;
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
         createBaseCustomerCreationNodes();
 
         socialSecurityProperty.set(String.valueOf(editedPerson.id));
@@ -55,40 +55,40 @@ public class PersonCreationScene {
         zipCodeProperty.set(editedPerson.zipCode);
         firstNameProperty.set(editedPerson.firstName);
         lastNameProperty.set(editedPerson.lastName);
-        userLevelProperty.set(UICreationHelpers.userLevels.get(editedPerson.userLevel));
+        userLevelProperty.set(UIHelpers.userLevels.get(editedPerson.userLevel));
     }
 
     // Creates base fields that are used by all account types.
     private void createBaseCustomerCreationNodes() {
-        TextField socialSecurityField = UICreationHelpers.createTextField(socialSecurityProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Social Security #:", socialSecurityField));
+        TextField socialSecurityField = UIHelpers.createTextField(socialSecurityProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Social Security #:", socialSecurityField));
 
-        TextField streetAddressField = UICreationHelpers.createTextField(streetAddressProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Street Address:", streetAddressField));
+        TextField streetAddressField = UIHelpers.createTextField(streetAddressProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Street Address:", streetAddressField));
 
-        TextField cityField = UICreationHelpers.createTextField(cityProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("City:", cityField));
+        TextField cityField = UIHelpers.createTextField(cityProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("City:", cityField));
 
-        ComboBox stateField = UICreationHelpers.createComboBox(states, stateProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("State:", stateField));
+        ComboBox stateField = UIHelpers.createComboBox(states, stateProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("State:", stateField));
 
-        TextField zipCodeField = UICreationHelpers.createTextField(zipCodeProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Zip Code:", zipCodeField));
+        TextField zipCodeField = UIHelpers.createTextField(zipCodeProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Zip Code:", zipCodeField));
 
-        TextField firstNameField = UICreationHelpers.createTextField(firstNameProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("First Name:", firstNameField));
+        TextField firstNameField = UIHelpers.createTextField(firstNameProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("First Name:", firstNameField));
 
-        TextField lastNameField = UICreationHelpers.createTextField(lastNameProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Last Name:", lastNameField));
+        TextField lastNameField = UIHelpers.createTextField(lastNameProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Last Name:", lastNameField));
 
-        ComboBox userLevelField = UICreationHelpers.createComboBox(UICreationHelpers.userLevels, userLevelProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("User Level:", userLevelField));
+        ComboBox userLevelField = UIHelpers.createComboBox(UIHelpers.userLevels, userLevelProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("User Level:", userLevelField));
 
         // Cancel Button
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(x -> {
             try {
-                UICreationHelpers.navigateToScene(new PersonManagementScene().root);
+                UIHelpers.navigateToScene(new PersonManagementScene().root);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -109,22 +109,22 @@ public class PersonCreationScene {
     private void savePerson() {
         String errorMessage = "";
 
-        errorMessage += UICreationHelpers.checkNumberField("Social Security #", socialSecurityProperty);
+        errorMessage += UIHelpers.checkNumberField("Social Security #", socialSecurityProperty);
         if (socialSecurityProperty.get().length() != 9) {
             errorMessage += "Social Security # field must contain exactly nine digits.\n";
         }
 
-        errorMessage += UICreationHelpers.checkTextField("Street Address", streetAddressProperty);
-        errorMessage += UICreationHelpers.checkTextField("City", cityProperty);
-        errorMessage += UICreationHelpers.checkTextField("State", stateProperty);
-        errorMessage += UICreationHelpers.checkNumberField("Zip Code", zipCodeProperty);
-        errorMessage += UICreationHelpers.checkTextField("First Name", firstNameProperty);
-        errorMessage += UICreationHelpers.checkTextField("Last Name", lastNameProperty);
-        errorMessage += UICreationHelpers.checkTextField("User Level", userLevelProperty);
-        errorMessage += UICreationHelpers.checkTextField("Street Address", streetAddressProperty);
+        errorMessage += UIHelpers.checkTextField("Street Address", streetAddressProperty);
+        errorMessage += UIHelpers.checkTextField("City", cityProperty);
+        errorMessage += UIHelpers.checkTextField("State", stateProperty);
+        errorMessage += UIHelpers.checkNumberField("Zip Code", zipCodeProperty);
+        errorMessage += UIHelpers.checkTextField("First Name", firstNameProperty);
+        errorMessage += UIHelpers.checkTextField("Last Name", lastNameProperty);
+        errorMessage += UIHelpers.checkTextField("User Level", userLevelProperty);
+        errorMessage += UIHelpers.checkTextField("Street Address", streetAddressProperty);
 
         if (!errorMessage.isEmpty()) {
-            UICreationHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
+            UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
             // TODO: Save to file.
             try {
@@ -140,7 +140,7 @@ public class PersonCreationScene {
                         zipCodeProperty.get(),
                         firstNameProperty.get(),
                         lastNameProperty.get(),
-                        UICreationHelpers.userLevels.indexOf(userLevelProperty.get())
+                        UIHelpers.userLevels.indexOf(userLevelProperty.get())
                 );
                 if (editedPerson != null) {
                     Person.people.remove(editedPerson);
@@ -150,7 +150,7 @@ public class PersonCreationScene {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
         }
     }
 }

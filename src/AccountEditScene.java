@@ -13,13 +13,13 @@ public class AccountEditScene {
     StackPane root = new StackPane(fieldVBox);
 
     public AccountEditScene(Account selectedAccount) {
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
         this.selectedAccount = selectedAccount;
 
-        HBox hBox = UICreationHelpers.createHBox(
-                "Account Balance:", UICreationHelpers.createBalanceField(accountBalanceProperty));
+        HBox hBox = UIHelpers.createHBox(
+                "Account Balance:", UIHelpers.createBalanceField(accountBalanceProperty));
         fieldVBox.getChildren().add(hBox);
-        UICreationHelpers.createBalanceField(accountBalanceProperty);
+        UIHelpers.createBalanceField(accountBalanceProperty);
     }
 }

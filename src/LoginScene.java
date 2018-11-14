@@ -1,3 +1,4 @@
+import Enums.AccountType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
@@ -6,6 +7,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+/**
+ * Initializes application and accepts an SSN and, if valid, logs in as that user.
+ *
+ * @author  Hunter Berten
+ */
 
 class LoginScene {
     private VBox fieldVBox = new VBox();
@@ -16,6 +23,9 @@ class LoginScene {
 
     LoginScene() {
         try {
+            for (AccountType type : AccountType.values()) {
+                UIHelpers.accountTypes.add(type.name);
+            }
             Person.importFile();
             CheckingAccount.importFile();
             CD.importFile();
@@ -38,21 +48,21 @@ class LoginScene {
             e.printStackTrace();
         }
 
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
-        TextField socialSecurityField = UICreationHelpers.createTextField(socialSecurityProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Social Security #:", socialSecurityField));
+        TextField socialSecurityField = UIHelpers.createTextField(socialSecurityProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Social Security #:", socialSecurityField));
 
         // Save Button
-        Button loginButton = UICreationHelpers.createButton("Login", fieldVBox, x -> login());
+        Button loginButton = UIHelpers.createButton("Login", fieldVBox, x -> login());
         loginButton.setAlignment(Pos.BASELINE_RIGHT);
 
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
     }
 
     private void login() {
         String errorMessage = "";
-        errorMessage += UICreationHelpers.checkNumberField("Social Security #", socialSecurityProperty);
+        errorMessage += UIHelpers.checkNumberField("Social Security #", socialSecurityProperty);
         if (socialSecurityProperty.get().length() != 9) {
             errorMessage += "Social Security # field must contain exactly nine digits.\n";
         }
@@ -71,14 +81,14 @@ class LoginScene {
         }
 
         if (!errorMessage.isEmpty()) {
-            UICreationHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
+            UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
-            UICreationHelpers.currentUser = person;
-            UICreationHelpers.currentUserLevel = person.userLevel;
+            UIHelpers.currentUser = person;
+            UIHelpers.currentUserLevel = person.userLevel;
             if (person.userLevel == 0) {
-                UICreationHelpers.navigateToScene(new AccountTypeSelectionScene().root);
+                UIHelpers.navigateToScene(new AccountTypeSelectionScene().root);
             } else {
-                UICreationHelpers.navigateToScene(new NavigationScene().root);
+                UIHelpers.navigateToScene(new NavigationScene().root);
             }
         }
     }

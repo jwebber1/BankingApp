@@ -3,25 +3,31 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Allows navigation to either PersonManagementScene or AccountManagementScene.
+ *
+ * @author  Hunter Berten
+ */
+
 class NavigationScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
     public NavigationScene() {
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
-        Label nameLabel = new Label(UICreationHelpers.currentUser.lastName + ", " + UICreationHelpers.currentUser.firstName);
+        Label nameLabel = new Label(UIHelpers.currentUser.lastName + ", " + UIHelpers.currentUser.firstName);
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(nameLabel);
-        if (UICreationHelpers.currentUserLevel > 0) {
-            UICreationHelpers.createButton("Person Management", fieldVBox, x -> personManagement());
-            UICreationHelpers.createButton("Account Management", fieldVBox, x ->
-                    UICreationHelpers.navigateToScene(new AccountTypeSelectionScene().root));
+        if (UIHelpers.currentUserLevel > 0) {
+            UIHelpers.createButton("Person Management", fieldVBox, x -> personManagement());
+            UIHelpers.createButton("Account Management", fieldVBox, x ->
+                    UIHelpers.navigateToScene(new AccountTypeSelectionScene().root));
         }
     }
 
     private void personManagement() {
-        UICreationHelpers.navigateToScene(new PersonManagementScene().root);
+        UIHelpers.navigateToScene(new PersonManagementScene().root);
     }
 
 }

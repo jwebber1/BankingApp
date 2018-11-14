@@ -14,12 +14,17 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-class AccountCreationScene {
+/**
+ * Allows user to add/edit any account type.
+ *
+ * @author  Hunter Berten
+ */
+
+class AccountAddEditScene {
     private Account editedAccount;
     private ComboBox customerBox;
 
@@ -32,6 +37,7 @@ class AccountCreationScene {
 
     // Checking Account Specific Fields
     private final StringProperty checkingAccountTypeProperty = new SimpleStringProperty("");
+    private final StringProperty overdraftProtectionProperty = new SimpleStringProperty("False");
 
     // Loan Specific Fields
     private final StringProperty loanTypeProperty = new SimpleStringProperty("");
@@ -49,11 +55,11 @@ class AccountCreationScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
-    AccountCreationScene() {
+    AccountAddEditScene() {
         initScene();
     }
 
-    AccountCreationScene(Account editedAccount) {
+    AccountAddEditScene(Account editedAccount) {
         this.editedAccount = editedAccount;
 
         initScene();
@@ -61,13 +67,12 @@ class AccountCreationScene {
         Person customer = Person.searchPeopleByCustomerID(editedAccount.customerID);
         customerProperty.set(customer.lastName + ", " + customer.firstName);
         accountBalanceProperty.set(String.valueOf("$" + editedAccount.accountBalance));
+        accountTypeProperty.set(UIHelpers.selectedAccountType.name);
 
         if (editedAccount instanceof CheckingAccount) {
             checkingAccountTypeProperty.set(((CheckingAccount)editedAccount).accountType);
-            accountTypeProperty.set(UICreationHelpers.accountTypes.get(1));
         } else if (editedAccount instanceof LoanAccount) {
             loanTypeProperty.set(((LoanAccount)editedAccount).accountType);
-            accountTypeProperty.set(UICreationHelpers.accountTypes.get(2));
             if (editedAccount.accountType.equalsIgnoreCase("LT")) {
                 loanTypeProperty.set("Long Term");
             } else if (editedAccount.accountType.equalsIgnoreCase("ST")) {
@@ -77,10 +82,8 @@ class AccountCreationScene {
             LocalDate datePaymentDue = ((LoanAccount)editedAccount).getDatePaymentDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             datePaymentDueProperty.setValue(datePaymentDue);
         } else if (editedAccount instanceof SavingAccount) {
-            accountTypeProperty.set(UICreationHelpers.accountTypes.get(0));
             interestRateProperty.set(Double.toString(((SavingAccount)editedAccount).getCurrentInterestRate()));
         } else if (editedAccount instanceof CD) {
-            accountTypeProperty.set(UICreationHelpers.accountTypes.get(3));
             interestRateProperty.set(Double.toString(((CD)editedAccount).getCurrentInterestRate()));
             LocalDate dateCDDue = ((CD)editedAccount).getDateCDDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             dateCDDueProperty.setValue(dateCDDue);
@@ -88,8 +91,8 @@ class AccountCreationScene {
     }
 
     public void initScene() {
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
-        UICreationHelpers.setButtonSettings(buttonHBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setButtonSettings(buttonHBox);
 
         createBaseAccountCreationNodes();
         createCheckingFields();
@@ -99,6 +102,7 @@ class AccountCreationScene {
         savingsAccountFieldsVBox.setSpacing(8);
         checkingAccountFieldsVBox.setSpacing(8);
         loanFieldsVBox.setSpacing(8);
+        cdFieldsVBox.setSpacing(8);
     }
 
     // Creates base fields that are used by all account types.
@@ -107,27 +111,27 @@ class AccountCreationScene {
         for (Person person : Person.people) {
             personNames.add(person.lastName + ", " + person.firstName);
         }
-        customerBox = UICreationHelpers.createComboBox(personNames, customerProperty);
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Customer:", customerBox));
+        customerBox = UIHelpers.createComboBox(personNames, customerProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
 
-        ComboBox accountTypeBox = UICreationHelpers.createComboBox(UICreationHelpers.accountTypes, accountTypeProperty);
+        ComboBox accountTypeBox = UIHelpers.createComboBox(UIHelpers.accountTypes, accountTypeProperty);
         accountTypeBox.valueProperty().addListener((observable, oldValue, newValue) -> updateAccountType(newValue.toString()));
-        fieldVBox.getChildren().add(UICreationHelpers.createHBox("Account Type:", accountTypeBox));
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Account Type:", accountTypeBox));
 
-        HBox balanceField = UICreationHelpers.createHBox(
-                "Account Balance:", UICreationHelpers.createBalanceField(accountBalanceProperty));
+        HBox balanceField = UIHelpers.createHBox(
+                "Account Balance:", UIHelpers.createBalanceField(accountBalanceProperty));
         fieldVBox.getChildren().add(balanceField);
 
-        HBox interestRateField = UICreationHelpers.createHBox(
-                "Interest Rate:", UICreationHelpers.createTextField(interestRateProperty));
-        cdFieldsVBox.getChildren().add(interestRateField);
-        savingsAccountFieldsVBox.getChildren().add(interestRateField);
-        loanFieldsVBox.getChildren().add(interestRateField);
+        cdFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
+        savingsAccountFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
+        loanFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
 
         // Cancel Button
         Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(x ->
-            UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root));
+        cancelButton.setOnAction(x -> UIHelpers.navigateBackToAccountManagement());
         buttonHBox.getChildren().add(cancelButton);
 
         // Save Button
@@ -146,23 +150,28 @@ class AccountCreationScene {
 
     // Creates fields used by checking accounts.
     private void createCheckingFields() {
-        ComboBox checkingAccountTypeBox = UICreationHelpers.createComboBox(UICreationHelpers.checkingAccountTypes, checkingAccountTypeProperty);
-        checkingAccountFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Checking Account Type:", checkingAccountTypeBox));
+        ComboBox checkingAccountTypeBox = UIHelpers.createComboBox(UIHelpers.checkingAccountTypes, checkingAccountTypeProperty);
+        checkingAccountFieldsVBox.getChildren().add(UIHelpers.createHBox("Checking Account Type:", checkingAccountTypeBox));
+
+        ComboBox overdraftProtectionCombo = UIHelpers.createComboBox(
+                FXCollections.observableArrayList("True", "False"), overdraftProtectionProperty);
+        checkingAccountFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                "Overdraft Protection:", overdraftProtectionCombo));
     }
 
     // Creates fields used by loans.
     private void createLoanFields() {
-        ComboBox loanTypeBox = UICreationHelpers.createComboBox(UICreationHelpers.loanTypes, loanTypeProperty);
-        loanFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Loan Type:", loanTypeBox));
+        ComboBox loanTypeBox = UIHelpers.createComboBox(UIHelpers.loanTypes, loanTypeProperty);
+        loanFieldsVBox.getChildren().add(UIHelpers.createHBox("Loan Type:", loanTypeBox));
 
-        DatePicker datePicker = UICreationHelpers.createDatePicker(datePaymentDueProperty);
-        loanFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Date Payment Due:", datePicker));
+        DatePicker datePicker = UIHelpers.createDatePicker(datePaymentDueProperty);
+        loanFieldsVBox.getChildren().add(UIHelpers.createHBox("Date Payment Due:", datePicker));
     }
 
     // Creates fields used by loans.
     private void createCdFields() {
-        DatePicker datePicker = UICreationHelpers.createDatePicker(dateCDDueProperty);
-        cdFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Date CD Due:", datePicker));
+        DatePicker datePicker = UIHelpers.createDatePicker(dateCDDueProperty);
+        cdFieldsVBox.getChildren().add(UIHelpers.createHBox("Date CD Due:", datePicker));
     }
 
     // Runs when the "Save" button is pressed.
@@ -185,7 +194,7 @@ class AccountCreationScene {
         }
 
         if (!errorMessage.isEmpty()) {
-            UICreationHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
+            UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
             if (editedAccount instanceof CheckingAccount) {
                 CheckingAccount.checkingAccounts.remove(editedAccount);
@@ -196,7 +205,7 @@ class AccountCreationScene {
             } else if (editedAccount instanceof LoanAccount) {
                 LoanAccount.loans.remove(editedAccount);
             }
-            switch (UICreationHelpers.accountTypes.indexOf(accountTypeProperty.get())) {
+            switch (UIHelpers.accountTypes.indexOf(accountTypeProperty.get())) {
                 case 0:
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
@@ -211,9 +220,9 @@ class AccountCreationScene {
                     CheckingAccount checkingAccount = new CheckingAccount(
                             customerId,
                             accountBalance,
-                            null,
-                            null,
-                            0,
+                            overdraftProtectionProperty.get().equals("True"),
+                            false,
+                            editedAccount == null ? 0 : ((CheckingAccount)editedAccount).getOverdraftsThisMonth(),
                             new Date()
                     );
                     CheckingAccount.checkingAccounts.add(checkingAccount);
@@ -245,46 +254,34 @@ class AccountCreationScene {
                     CD.exportFile();
                     break;
             }
-            UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The account has been saved successfully.");
-            if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(0))) {
-                UICreationHelpers.navigateToAccountManagementScene(AccountType.SAVING);
-            } else if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(1))) {
-                UICreationHelpers.navigateToAccountManagementScene(AccountType.CHECKING);
-            } else if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(2))) {
-                UICreationHelpers.navigateToAccountManagementScene(AccountType.LOAN);
-            } else if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(3))) {
-                UICreationHelpers.navigateToAccountManagementScene(AccountType.CD);
-            }
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The account has been saved successfully.");
+
+            UIHelpers.navigateBackToAccountManagement();
         }
     }
 
     // Runs when Account Type is changed to add fields related to account type and remove fields of other account types.
     private void updateAccountType(String newValue) {
-        switch (newValue) {
-            case "Savings":
-                fieldVBox.getChildren().add(savingsAccountFieldsVBox);
-                fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
-                fieldVBox.getChildren().remove(loanFieldsVBox);
-                fieldVBox.getChildren().remove(cdFieldsVBox);
-                break;
-            case "Checking":
-                fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
-                fieldVBox.getChildren().add(checkingAccountFieldsVBox);
-                fieldVBox.getChildren().remove(loanFieldsVBox);
-                fieldVBox.getChildren().remove(cdFieldsVBox);
-                break;
-            case "Loan":
-                fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
-                fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
-                fieldVBox.getChildren().add(loanFieldsVBox);
-                fieldVBox.getChildren().remove(cdFieldsVBox);
-                break;
-            case "CD":
-                fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
-                fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
-                fieldVBox.getChildren().remove(loanFieldsVBox);
-                fieldVBox.getChildren().add(cdFieldsVBox);
-                break;
+        if (newValue.equals(AccountType.SAVING.name)) {
+            fieldVBox.getChildren().add(savingsAccountFieldsVBox);
+            fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
+            fieldVBox.getChildren().remove(loanFieldsVBox);
+            fieldVBox.getChildren().remove(cdFieldsVBox);
+        } else if (newValue.equals(AccountType.CHECKING.name)) {
+            fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
+            fieldVBox.getChildren().add(checkingAccountFieldsVBox);
+            fieldVBox.getChildren().remove(loanFieldsVBox);
+            fieldVBox.getChildren().remove(cdFieldsVBox);
+        } else if (newValue.equals(AccountType.LOAN.name)) {
+            fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
+            fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
+            fieldVBox.getChildren().add(loanFieldsVBox);
+            fieldVBox.getChildren().remove(cdFieldsVBox);
+        } else if (newValue.equals(AccountType.CD.name)) {
+            fieldVBox.getChildren().remove(savingsAccountFieldsVBox);
+            fieldVBox.getChildren().remove(checkingAccountFieldsVBox);
+            fieldVBox.getChildren().remove(loanFieldsVBox);
+            fieldVBox.getChildren().add(cdFieldsVBox);
         }
         fieldVBox.getChildren().remove(buttonHBox);
         fieldVBox.getChildren().add(buttonHBox);

@@ -16,14 +16,14 @@ class PersonManagementScene {
     private HBox buttonHBox = new HBox();
 
     public PersonManagementScene() {
-        UICreationHelpers.setBaseSceneSettings(root, fieldVBox);
-        UICreationHelpers.setButtonSettings(buttonHBox);
+        UIHelpers.setBaseSceneSettings(root, fieldVBox);
+        UIHelpers.setButtonSettings(buttonHBox);
 
         setupPersonTable();
 
         // Edit Button
         Button addButton = new Button("Add");
-        addButton.setOnAction(x -> UICreationHelpers.navigateToScene(new PersonCreationScene().root));
+        addButton.setOnAction(x -> UIHelpers.navigateToScene(new PersonCreationScene().root));
         buttonHBox.getChildren().add(addButton);
 
         // Edit Button
@@ -35,7 +35,7 @@ class PersonManagementScene {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(x -> {
             try {
-                UICreationHelpers.navigateToScene(new NavigationScene().root);
+                UIHelpers.navigateToScene(new NavigationScene().root);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -71,6 +71,6 @@ class PersonManagementScene {
         if (selectedPerson == null) {
             return;
         }
-        UICreationHelpers.navigateToScene(new PersonCreationScene(selectedPerson).root);
+        UIHelpers.navigateToScene(new PersonCreationScene(selectedPerson).root);
     }
 }
