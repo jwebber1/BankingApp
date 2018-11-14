@@ -18,10 +18,10 @@ class LoginScene {
         try {
             Person.importFile();
             CheckingAccount.importFile();
-            CD.cds = CD.importFile();
+            CD.importFile();
             LoanAccount.importFile();
             Check.importFile();
-            SavingAccount.savingAccounts = SavingAccount.importFile();
+            SavingAccount.importFile();
 
 //            for (CheckingAccount account : CheckingAccount.checkingAccounts) {
 //                account.mainAccountType = "Checking - " +

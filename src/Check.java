@@ -205,6 +205,20 @@ public class Check{
         }
     }//end of stopCheck
 
+    //method to honor a check
+    public void honorCheck(){
 
+        //get the checking account of this customer
+        CheckingAccount customerChecking = CheckingAccount.search(customerID);
+
+        if(customerChecking != null) {
+
+            //withdraw the money from the checking account
+            customerChecking.withdraw(checkAmt);
+
+            //set the honoredDate
+            setDateHonored(new Date());
+        }
+    }//end of honorCheck
 
 }//end of Check

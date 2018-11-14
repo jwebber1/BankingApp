@@ -215,7 +215,7 @@ class AccountManagementScene {
                     }
                 } else if (selectedAccount instanceof SavingAccount) {
                     SavingAccount.savingAccounts.remove(selectedAccount);
-                    SavingAccount.exportFile(SavingAccount.savingAccounts);
+                    SavingAccount.exportFile();
                 } else if (selectedAccount instanceof CheckingAccount) {
                     CheckingAccount.checkingAccounts.remove(selectedAccount);
                     CheckingAccount.exportFile();
@@ -231,19 +231,13 @@ class AccountManagementScene {
         setAccountTableItems(FXCollections.observableArrayList());
     }
     private void setAccountTableItems(ObservableList<Account> accounts) {
-        // TODO: Get other accounts.
         if (accounts.isEmpty()) {
             if (UICreationHelpers.currentUserLevel == 0) {
-                accounts.addAll(CheckingAccount.searchCheckingAccountsByCustomerID(UICreationHelpers.currentUser.id));
+                accounts.addAll(CheckingAccount.search(UICreationHelpers.currentUser.id));
                 accounts.addAll(LoanAccount.search(UICreationHelpers.currentUser.id));
                 accounts.addAll(CD.search(UICreationHelpers.currentUser.id));
             }
         }
-//        else {
-//            accounts.addAll(CheckingAccount.checkingAccounts);
-//            accounts.addAll(LoanAccount.loans);
-//            accounts.addAll(CD.cds);
-//        }
         if (!accounts.isEmpty()) {
             if (accounts.get(0) instanceof CheckingAccount) {
                 ObservableList<CheckingAccount> checkingAccounts = FXCollections.observableArrayList();

@@ -13,42 +13,25 @@ public class AccountTypeSelectionScene {
 
         if (UICreationHelpers.currentUserLevel == 0) {
             int customerId = UICreationHelpers.currentUser.id;
-            ArrayList<Account> checkingAccounts = new ArrayList<>(CheckingAccount.searchCheckingAccountsByCustomerID(customerId));
-            if (!checkingAccounts.isEmpty()) {
-                UICreationHelpers.createButton("Checking", fieldVBox, x ->
-                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.CHECKING));
+            if (CheckingAccount.search(customerId) != null) {
+                UICreationHelpers.createButton("Checking", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CHECKING));
             }
-            ArrayList<Account> loanAccounts = new ArrayList<>(LoanAccount.search(customerId));
-            if (!loanAccounts.isEmpty()) {
-                UICreationHelpers.createButton("Loan", fieldVBox, x ->
-                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.LOAN));
+            if (!new ArrayList<>(LoanAccount.search(customerId)).isEmpty()) {
+                UICreationHelpers.createButton("Loan", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.LOAN));
             }
-//            ArrayList<Account> cds = new ArrayList<>(SavingAccount.search(customerId));
-//            if (!cds.isEmpty()) {
-//                UICreationHelpers.createButton("CD", fieldVBox, x ->
-//                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.CD));
-//            }
-            ArrayList<Account> cds = new ArrayList<>(CD.search(customerId));
-            if (!cds.isEmpty()) {
-                UICreationHelpers.createButton("CD", fieldVBox, x ->
-                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.CD));
+            if (SavingAccount.search(customerId) != null) {
+                UICreationHelpers.createButton("Saving", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.SAVING));
+            }
+            if (!new ArrayList<>(CD.search(customerId)).isEmpty()) {
+                UICreationHelpers.createButton("CD", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CD));
             }
         } else {
-            UICreationHelpers.createButton("Checkings", fieldVBox, x ->
-                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.CHECKING));
-            UICreationHelpers.createButton("Loans", fieldVBox, x ->
-                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.LOAN));
-            UICreationHelpers.createButton("Savings", fieldVBox, x ->
-                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.SAVING));
-            UICreationHelpers.createButton("CDs", fieldVBox, x ->
-                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.CD));
+            UICreationHelpers.createButton("Checkings", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CHECKING));
+            UICreationHelpers.createButton("Loans", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.LOAN));
+            UICreationHelpers.createButton("Savings", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.SAVING));
+            UICreationHelpers.createButton("CDs", fieldVBox, x -> UICreationHelpers.navigateToAccountManagementScene(AccountType.CD));
         }
         UICreationHelpers.createButton("Back", fieldVBox, x ->
                 UICreationHelpers.navigateToScene(new NavigationScene().root));
-    }
-
-    private void goToAccountManagementScene(ArrayList<Account> accounts) {
-        UICreationHelpers.selectedAccounts = accounts;
-        UICreationHelpers.navigateToScene(new AccountManagementScene(accounts).root);
     }
 }

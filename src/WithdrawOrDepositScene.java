@@ -89,7 +89,7 @@ class WithdrawOrDepositScene {
     private void navigateBack() {
         ArrayList<Account> accounts = new ArrayList<>();
         if (editedAccount instanceof CheckingAccount) {
-            accounts.addAll(CheckingAccount.searchCheckingAccountsByCustomerID(UICreationHelpers.currentUser.id));
+            accounts.add(CheckingAccount.search(UICreationHelpers.currentUser.id));
         } else if (editedAccount instanceof LoanAccount) {
             accounts.addAll(LoanAccount.search(UICreationHelpers.currentUser.id));
         } else if (editedAccount instanceof CD) {

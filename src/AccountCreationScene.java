@@ -1,3 +1,4 @@
+import Enums.AccountType;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -77,7 +78,7 @@ class AccountCreationScene {
             datePaymentDueProperty.setValue(datePaymentDue);
         } else if (editedAccount instanceof SavingAccount) {
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(0));
-            interestRateProperty.set(Double.toString(((SavingAccount)editedAccount).currentInterestRate));
+            interestRateProperty.set(Double.toString(((SavingAccount)editedAccount).getCurrentInterestRate()));
         } else if (editedAccount instanceof CD) {
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(3));
             interestRateProperty.set(Double.toString(((CD)editedAccount).getCurrentInterestRate()));
@@ -204,7 +205,7 @@ class AccountCreationScene {
                             new Date()
                     );
                     SavingAccount.savingAccounts.add(savingAccount);
-                    SavingAccount.exportFile(SavingAccount.savingAccounts);
+                    SavingAccount.exportFile();
                     break;
                 case 1:
                     CheckingAccount checkingAccount = new CheckingAccount(
@@ -245,14 +246,14 @@ class AccountCreationScene {
                     break;
             }
             UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The account has been saved successfully.");
-            if (editedAccount instanceof CheckingAccount) {
-                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
-            } else if (editedAccount instanceof CD) {
-                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
-            } else if (editedAccount instanceof SavingAccount) {
-                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
-            } else if (editedAccount instanceof LoanAccount) {
-                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
+            if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(0))) {
+                UICreationHelpers.navigateToAccountManagementScene(AccountType.SAVING);
+            } else if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(1))) {
+                UICreationHelpers.navigateToAccountManagementScene(AccountType.CHECKING);
+            } else if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(2))) {
+                UICreationHelpers.navigateToAccountManagementScene(AccountType.LOAN);
+            } else if (accountTypeProperty.get().equals(UICreationHelpers.accountTypes.get(3))) {
+                UICreationHelpers.navigateToAccountManagementScene(AccountType.CD);
             }
         }
     }

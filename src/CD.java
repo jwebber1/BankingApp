@@ -11,8 +11,9 @@ public class CD extends Account {
     private double currentInterestRate;
     private Date dateCDDue;
     private boolean beforeDueDate;
-    static ArrayList<CD> cds;
+    static ArrayList<CD> cds = new ArrayList<>();
     private String mainAccounttype;
+    private Date dateAccOpenedIn = new Date();
 
     //Get the current date to check if the CD is due
     private Date dateNow = new Date();
@@ -29,6 +30,7 @@ public class CD extends Account {
         this.cdNumber = cdNumber;
     }
 
+
     //Create import, export, and search by cusID
     public double getCurrentInterestRate() { return currentInterestRate; }
     public void setCurrentInterestRate(double currentInterestRate) { this.currentInterestRate = currentInterestRate; }
@@ -38,7 +40,24 @@ public class CD extends Account {
     public int getCdNumber() { return cdNumber; }
     public void setCdNumber(int cdNumber) { this.cdNumber = cdNumber; }
 
-     static ArrayList<CD> importFile() throws IOException, ParseException {
+    @Override
+    public String toString() {
+        return "CD{" +
+                "cdNumber=" + cdNumber +
+                ", currentInterestRate=" + currentInterestRate +
+                ", dateCDDue=" + dateCDDue +
+                ", beforeDueDate=" + beforeDueDate +
+                ", mainAccounttype='" + mainAccounttype + '\'' +
+                ", dateNow=" + dateNow +
+                ", customerID=" + customerID +
+                ", accountBalance=" + accountBalance +
+                ", dateAccountOpened=" + dateAccountOpened +
+                ", accountType='" + accountType + '\'' +
+                ", mainAccountType='" + mainAccountType + '\'' +
+                '}';
+    }
+
+    static void importFile() throws IOException, ParseException {
         //creates a file referencing the text file in the memory folder
         File cdFileIn = new File("memory/cds.txt");
 
@@ -47,9 +66,6 @@ public class CD extends Account {
 
         //buffer string to temporarily hold the line retrieved
         String line;
-
-        //creates the ArrayList of data
-        ArrayList<CD> importCD = new ArrayList<>();
 
         //generic counter to know the line currently on
         int lineNum = 0;
@@ -73,10 +89,10 @@ public class CD extends Account {
                 int cdNum = Integer.parseInt(splitLine[5]);
 
                 //add the new data to the ArrayList
-                importCD.add(new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue, cdNum));
+                cds.add(new CD(cusID, balance, currentInterest, dateAccountOpened, dateCdDue, cdNum));
 
                 //Debugging
-                System.out.println("count: " + (lineNum) + "\t" + importCD.get(lineNum-1).toString());
+                //System.out.println("count: " + (lineNum) + "\t" + cds.get(lineNum - 1).toString());
             }
 
             //increment the line number
@@ -85,11 +101,10 @@ public class CD extends Account {
 
         //close the bufferfile and return the ArrayList
         cdBR.close();
-        return importCD;
+
 
     }//end of importFile
 
-    // TODO: The account type was used in this but not the import
      static void exportFile() throws FileNotFoundException {
         //create a new PrintWriter to write to a file
         PrintWriter cdWriter = new PrintWriter(new FileOutputStream("memory/cds.txt", false));
@@ -131,33 +146,34 @@ public class CD extends Account {
         return searchResults;
     }
 
-    public static ArrayList<CD> search(int custID, int cdID) {
-        //search by cusID, shows all CD
-        //initialize searchResults to null
-        ArrayList<CD> searchResults = new ArrayList<>();
+    //Overload the seach method to allow a seach that includes the cdID as well
+    public static CD search(int custID, int cdID) {
+        CD searchResult = null;
         for (CD cd : cds) {
             if (cd.getCustomerID() == custID && cd.getCdNumber() == cdID) {
-                searchResults.add(cd);
+                searchResult = cd;
+                return searchResult;//Exit the search when it finds the account
             }
         }
 
         //return found checking accounts OR null
-        return searchResults;
+        return searchResult;
     }
 
-    void withdraw() {
+    double withdraw() {
         double amtToReturn = 0.0;//Charge if withdrawn before due date
 
         if (dateCDDue.compareTo(dateNow) >= 0) {
             //This gives the the original deposit in addition to the interest because it is after the Due Date
-            amtToReturn = getAccountBalance() * (getCurrentInterestRate() * getAccountBalance());
+            amtToReturn = getAccountBalance() + (getCurrentInterestRate() * getAccountBalance() / 10);
             setAccountBalance(0);
-        } else
+        } else {
             //This only gives the original balance as because it is before the due date
             amtToReturn = getAccountBalance();
             setAccountBalance(0);
+        }
 
-
+        return amtToReturn;
     }//end of CD withdraw
 
 }//end of CD
