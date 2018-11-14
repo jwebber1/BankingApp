@@ -6,14 +6,12 @@ import java.text.ParseException;
 
 class  SavingAccount extends Account {
     protected double currentInterestRate;
-    protected Date dateCDDue;
     static ArrayList<SavingAccount> savingAccounts = new ArrayList<>();
 
     //constructor for the SavingAccount
     public SavingAccount(int cusIDIn, double accBalIn, double currIntRateIn, Date dateAccOpenedIn) {
         super(cusIDIn, accBalIn, dateAccOpenedIn, "Saving");
         this.currentInterestRate = currIntRateIn;
-        this.dateCDDue = null;
     }
 
 
@@ -32,7 +30,6 @@ class  SavingAccount extends Account {
         return "SavingAccount{" +
                 "currentInterestRate=" + currentInterestRate +
                 ", dateAccountOpened=" + dateAccountOpened +
-                ", dateCDDue=" + dateCDDue +
                 ", customerID=" + customerID +
                 ", accountBalance=" + accountBalance +
                 '}';

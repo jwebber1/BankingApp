@@ -58,9 +58,7 @@ public class CheckViewScene {
 
         checkTable.getColumns().addAll(amount, dateCheck, dateHonored, memo, payTo);
 
-        ObservableList checks =
-            FXCollections.observableArrayList(
-                    Check.searchChecksByCustomerID(customerId));
+        ObservableList checks = FXCollections.observableArrayList(Check.searchChecksByCustomerID(customerId));
         checkTable.setItems(checks);
     }
 

@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -16,7 +15,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.ZoneId;
 import java.util.Date;
 
 class AccountCreationScene {
@@ -28,15 +27,16 @@ class AccountCreationScene {
     private final StringProperty accountTypeProperty = new SimpleStringProperty("");
     private final StringProperty accountBalanceProperty = new SimpleStringProperty("$");
 
+    private final StringProperty interestRateProperty = new SimpleStringProperty("0.2");
+
     // Checking Account Specific Fields
     private final StringProperty checkingAccountTypeProperty = new SimpleStringProperty("");
 
     // Loan Specific Fields
     private final StringProperty loanTypeProperty = new SimpleStringProperty("");
-    private final Property<LocalDate> datePaymentDue = new SimpleObjectProperty<>();
+    private final Property<LocalDate> datePaymentDueProperty = new SimpleObjectProperty<>();
 
-
-    private final Property<LocalDate> dateCDDue = new SimpleObjectProperty<>();
+    private final Property<LocalDate> dateCDDueProperty = new SimpleObjectProperty<>();
 
     // Boxes to Hold Nodes
     private HBox buttonHBox = new HBox();
@@ -72,12 +72,17 @@ class AccountCreationScene {
             } else if (editedAccount.accountType.equalsIgnoreCase("ST")) {
                 loanTypeProperty.set("Short Term");
             }
-            // TODO
-//            datePaymentDue.set(((LoanAccount)editedAccount).getDatePaymentDue());
+            interestRateProperty.set(Double.toString(((LoanAccount)editedAccount).getInterestRate()));
+            LocalDate datePaymentDue = ((LoanAccount)editedAccount).getDatePaymentDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            datePaymentDueProperty.setValue(datePaymentDue);
         } else if (editedAccount instanceof SavingAccount) {
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(0));
+            interestRateProperty.set(Double.toString(((SavingAccount)editedAccount).currentInterestRate));
         } else if (editedAccount instanceof CD) {
             accountTypeProperty.set(UICreationHelpers.accountTypes.get(3));
+            interestRateProperty.set(Double.toString(((CD)editedAccount).getCurrentInterestRate()));
+            LocalDate dateCDDue = ((CD)editedAccount).getDateCDDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            dateCDDueProperty.setValue(dateCDDue);
         }
     }
 
@@ -112,9 +117,16 @@ class AccountCreationScene {
                 "Account Balance:", UICreationHelpers.createBalanceField(accountBalanceProperty));
         fieldVBox.getChildren().add(balanceField);
 
+        HBox interestRateField = UICreationHelpers.createHBox(
+                "Interest Rate:", UICreationHelpers.createTextField(interestRateProperty));
+        cdFieldsVBox.getChildren().add(interestRateField);
+        savingsAccountFieldsVBox.getChildren().add(interestRateField);
+        loanFieldsVBox.getChildren().add(interestRateField);
+
         // Cancel Button
         Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(x -> UICreationHelpers.navigateToScene(new AccountManagementScene().root));
+        cancelButton.setOnAction(x ->
+            UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root));
         buttonHBox.getChildren().add(cancelButton);
 
         // Save Button
@@ -142,18 +154,18 @@ class AccountCreationScene {
         ComboBox loanTypeBox = UICreationHelpers.createComboBox(UICreationHelpers.loanTypes, loanTypeProperty);
         loanFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Loan Type:", loanTypeBox));
 
-        DatePicker datePicker = UICreationHelpers.createDatePicker(datePaymentDue);
+        DatePicker datePicker = UICreationHelpers.createDatePicker(datePaymentDueProperty);
         loanFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Date Payment Due:", datePicker));
     }
 
     // Creates fields used by loans.
     private void createCdFields() {
-        DatePicker datePicker = UICreationHelpers.createDatePicker(dateCDDue);
+        DatePicker datePicker = UICreationHelpers.createDatePicker(dateCDDueProperty);
         cdFieldsVBox.getChildren().add(UICreationHelpers.createHBox("Date CD Due:", datePicker));
     }
 
     // Runs when the "Save" button is pressed.
-    private void saveAccount() throws IOException, ParseException {
+    private void saveAccount() throws IOException {
         String errorMessage = "";
 
         int customerId = 0;
@@ -176,6 +188,10 @@ class AccountCreationScene {
         } else {
             if (editedAccount instanceof CheckingAccount) {
                 CheckingAccount.checkingAccounts.remove(editedAccount);
+            } else if (editedAccount instanceof CD) {
+                CD.cds.remove(editedAccount);
+            } else if (editedAccount instanceof SavingAccount) {
+                SavingAccount.savingAccounts.remove(editedAccount);
             } else if (editedAccount instanceof LoanAccount) {
                 LoanAccount.loans.remove(editedAccount);
             }
@@ -184,7 +200,7 @@ class AccountCreationScene {
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
                             accountBalance,
-                            0.2,
+                            Double.parseDouble(interestRateProperty.get()),
                             new Date()
                     );
                     SavingAccount.savingAccounts.add(savingAccount);
@@ -204,17 +220,14 @@ class AccountCreationScene {
                     break;
                 case 2:
                     String loanType = loanTypeProperty.get();
-//                    if (loanType.equals("Long Term")) {
-//                        loanType = "LT";
-//                    } else if (loanType.equals("Short Term")) {
-//                        loanType = "ST";
-//                    }
                     LoanAccount loanAccount = new LoanAccount(
                             customerId,
                             accountBalance,
-                            0.2,
+                            Double.parseDouble(interestRateProperty.get()),
                             loanType.toLowerCase()
                     );
+                    Date datePaymentDue = Date.from(datePaymentDueProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    loanAccount.setDatePaymentDue(datePaymentDue);
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
@@ -222,9 +235,9 @@ class AccountCreationScene {
                     CD cd = new CD(
                             customerId,
                             accountBalance,
-                            0.2,
+                            Double.parseDouble(interestRateProperty.get()),
                             new Date(),
-                            new Date(), // TODO: Dates
+                            Date.from(dateCDDueProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()),
                             CD.cds.get(CD.cds.size() - 1).cdNumber + 1
                     );
                     CD.cds.add(cd);
@@ -232,7 +245,15 @@ class AccountCreationScene {
                     break;
             }
             UICreationHelpers.showAlert(Alert.AlertType.INFORMATION, "The account has been saved successfully.");
-            UICreationHelpers.navigateToScene(new AccountManagementScene().root);
+            if (editedAccount instanceof CheckingAccount) {
+                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
+            } else if (editedAccount instanceof CD) {
+                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
+            } else if (editedAccount instanceof SavingAccount) {
+                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
+            } else if (editedAccount instanceof LoanAccount) {
+                UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
+            }
         }
     }
 

@@ -1,3 +1,4 @@
+import Enums.AccountType;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -15,43 +16,39 @@ public class AccountTypeSelectionScene {
             ArrayList<Account> checkingAccounts = new ArrayList<>(CheckingAccount.searchCheckingAccountsByCustomerID(customerId));
             if (!checkingAccounts.isEmpty()) {
                 UICreationHelpers.createButton("Checking", fieldVBox, x ->
-                        UICreationHelpers.navigateToScene(new AccountManagementScene(checkingAccounts).root));
+                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.CHECKING));
             }
             ArrayList<Account> loanAccounts = new ArrayList<>(LoanAccount.search(customerId));
             if (!loanAccounts.isEmpty()) {
                 UICreationHelpers.createButton("Loan", fieldVBox, x ->
-                        UICreationHelpers.navigateToScene(new AccountManagementScene(loanAccounts).root));
+                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.LOAN));
             }
-            // TODO: Savings Accounts
-//            ArrayList<Account> savingsAccounts = new ArrayList<>(SavingAccount.s(customerId));
-//            if (!loanAccounts.isEmpty()) {
-//                UICreationHelpers.createButton("Account Management", fieldVBox, x ->
-//                        UICreationHelpers.navigateToScene(new AccountManagementScene(loanAccounts).root));
+//            ArrayList<Account> cds = new ArrayList<>(SavingAccount.search(customerId));
+//            if (!cds.isEmpty()) {
+//                UICreationHelpers.createButton("CD", fieldVBox, x ->
+//                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.CD));
 //            }
             ArrayList<Account> cds = new ArrayList<>(CD.search(customerId));
             if (!cds.isEmpty()) {
                 UICreationHelpers.createButton("CD", fieldVBox, x ->
-                    UICreationHelpers.navigateToScene(new AccountManagementScene(cds).root));
+                        UICreationHelpers.navigateToAccountManagmentScene(AccountType.CD));
             }
         } else {
-            UICreationHelpers.createButton("Checkings", fieldVBox, x ->{
-                ArrayList<Account> accounts = new ArrayList<>(CheckingAccount.checkingAccounts);
-                UICreationHelpers.navigateToScene(new AccountManagementScene(accounts).root);
-            });
-            UICreationHelpers.createButton("Loans", fieldVBox, x ->{
-                ArrayList<Account> accounts = new ArrayList<>(LoanAccount.loans);
-                UICreationHelpers.navigateToScene(new AccountManagementScene(accounts).root);
-            });
-            UICreationHelpers.createButton("Savings", fieldVBox, x ->{
-                ArrayList<Account> accounts = new ArrayList<>(SavingAccount.savingAccounts);
-                UICreationHelpers.navigateToScene(new AccountManagementScene(accounts).root);
-            });
-            UICreationHelpers.createButton("CDs", fieldVBox, x ->{
-                ArrayList<Account> accounts = new ArrayList<>(CD.cds);
-                UICreationHelpers.navigateToScene(new AccountManagementScene(accounts).root);
-            });
-            UICreationHelpers.createButton("Back", fieldVBox, x ->
-                    UICreationHelpers.navigateToScene(new NavigationScene().root));
+            UICreationHelpers.createButton("Checkings", fieldVBox, x ->
+                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.CHECKING));
+            UICreationHelpers.createButton("Loans", fieldVBox, x ->
+                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.LOAN));
+            UICreationHelpers.createButton("Savings", fieldVBox, x ->
+                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.SAVING));
+            UICreationHelpers.createButton("CDs", fieldVBox, x ->
+                    UICreationHelpers.navigateToAccountManagmentScene(AccountType.CD));
         }
+        UICreationHelpers.createButton("Back", fieldVBox, x ->
+                UICreationHelpers.navigateToScene(new NavigationScene().root));
+    }
+
+    private void goToAccountManagementScene(ArrayList<Account> accounts) {
+        UICreationHelpers.selectedAccounts = accounts;
+        UICreationHelpers.navigateToScene(new AccountManagementScene(accounts).root);
     }
 }

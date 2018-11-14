@@ -1,3 +1,4 @@
+import Enums.AccountType;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -16,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -29,6 +31,8 @@ class UICreationHelpers {
     static Person currentUser;
     private static double fieldWidth = 140;
     private static double fieldHeight = 20;
+
+    static ArrayList<Account> selectedAccounts;
 
     static ObservableList<String> accountTypes = FXCollections.observableArrayList(
             "Savings",
@@ -198,5 +202,40 @@ class UICreationHelpers {
     public static void setButtonSettings(HBox buttonHBox) {
         buttonHBox.setSpacing(10);
         buttonHBox.setAlignment(Pos.BASELINE_RIGHT);
+    }
+
+    public static void navigateToAccountManagmentScene(AccountType type) {
+        switch (type) {
+            case CD:
+                if (UICreationHelpers.currentUserLevel == 0) {
+                    new ArrayList<>(CD.search(UICreationHelpers.currentUser.id));
+                } else {
+                    UICreationHelpers.selectedAccounts = new ArrayList<>(CD.cds);
+                }
+                break;
+            case LOAN:
+                if (UICreationHelpers.currentUserLevel == 0) {
+                    new ArrayList<>(LoanAccount.search(UICreationHelpers.currentUser.id));
+                } else {
+                    UICreationHelpers.selectedAccounts = new ArrayList<>(LoanAccount.loans);
+                }
+                break;
+            case SAVING:
+                if (UICreationHelpers.currentUserLevel == 0) {
+                    new ArrayList<>(CheckingAccount.searchCheckingAccountsByCustomerID(UICreationHelpers.currentUser.id));
+                } else {
+                    UICreationHelpers.selectedAccounts = new ArrayList<>(SavingAccount.savingAccounts);
+                }
+                break;
+            case CHECKING:
+                if (UICreationHelpers.currentUserLevel == 0) {
+                    new ArrayList<>(CheckingAccount.searchCheckingAccountsByCustomerID(UICreationHelpers.currentUser.id));
+                } else {
+                    UICreationHelpers.selectedAccounts = new ArrayList<>(CheckingAccount.checkingAccounts);
+                }
+                break;
+        }
+        UICreationHelpers.navigateToScene(new AccountManagementScene(UICreationHelpers.selectedAccounts).root);
+
     }
 }
