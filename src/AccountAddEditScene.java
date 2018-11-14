@@ -196,17 +196,27 @@ class AccountAddEditScene {
         if (!errorMessage.isEmpty()) {
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
-            if (editedAccount instanceof CheckingAccount) {
-                CheckingAccount.checkingAccounts.remove(editedAccount);
-            } else if (editedAccount instanceof CD) {
-                CD.cds.remove(editedAccount);
-            } else if (editedAccount instanceof SavingAccount) {
-                SavingAccount.savingAccounts.remove(editedAccount);
-            } else if (editedAccount instanceof LoanAccount) {
-                LoanAccount.loans.remove(editedAccount);
+            switch (UIHelpers.selectedAccountType) {
+                case SAVING:
+                    if (editedAccount != null) CheckingAccount.checkingAccounts.remove(editedAccount);
+                    else if (SavingAccount.search(customerId) != null) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                        "This user already has a Savings account. Are you sure you selected the correct SSN?");
+                        return;
+                    }
+                    break;
+                case CHECKING:
+                    if (editedAccount != null) SavingAccount.savingAccounts.remove(editedAccount);
+                    else if (CheckingAccount.search(customerId) != null) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                                "This user already has a Checking account. Are you sure you selected the correct SSN?");
+                        return;
+                    }
+                    break;
             }
-            switch (UIHelpers.accountTypes.indexOf(accountTypeProperty.get())) {
-                case 0:
+
+            switch (UIHelpers.selectedAccountType) {
+                case SAVING:
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
                             accountBalance,
@@ -216,7 +226,7 @@ class AccountAddEditScene {
                     SavingAccount.savingAccounts.add(savingAccount);
                     SavingAccount.exportFile();
                     break;
-                case 1:
+                case CHECKING:
                     CheckingAccount checkingAccount = new CheckingAccount(
                             customerId,
                             accountBalance,
@@ -228,7 +238,7 @@ class AccountAddEditScene {
                     CheckingAccount.checkingAccounts.add(checkingAccount);
                     CheckingAccount.exportFile();
                     break;
-                case 2:
+                case LOAN:
                     String loanType = loanTypeProperty.get();
                     LoanAccount loanAccount = new LoanAccount(
                             customerId,
@@ -241,7 +251,7 @@ class AccountAddEditScene {
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
-                case 3:
+                case CD:
                     CD cd = new CD(
                             customerId,
                             accountBalance,
