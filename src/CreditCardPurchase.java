@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class CreditCardPurchase {
+    private final static SimpleDateFormat ccDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
     private int SSN;
     private String description;
     private double price;
     private Date dateOfPurchase;
     static ArrayList<CreditCardPurchase> purchases = new ArrayList<>();
 
+    //create a new CreditCardPurchase object instantiated with the given variables
     public CreditCardPurchase(int ssn, String desc, double cost, Date date){
         SSN = ssn;
         description = desc;
@@ -47,8 +49,7 @@ public class CreditCardPurchase {
                 int ssn = Integer.parseInt(field[0]);
                 String desc = field[1];
                 double price = Double.parseDouble(field[2]);
-                Date date = new Date();
-                //Date dateOfPurchase = (new SimpleDateFormat("mm/dd/yyyy")).parse(field[3]);
+                Date date = ccDateFormatter.parse(field[3]);
 
                 //create new CreditCardPurchase object
                 CreditCardPurchase purchase = new CreditCardPurchase(ssn, desc, price, date);
@@ -69,7 +70,7 @@ public class CreditCardPurchase {
         PrintWriter ccWriter = new PrintWriter(new FileOutputStream("memory/ccpurchases.txt"));
 
         //printing the headers of the files
-        ccWriter.println("SSN,description,price,dateOfPurchase,");
+        ccWriter.println("SSN,Description,Price,DateOfPurchase,");
 
         //go through all the checking accounts
         for (CreditCardPurchase purchase : purchases) {
@@ -77,7 +78,7 @@ public class CreditCardPurchase {
                     purchase.getSSN() + "," +
                             purchase.getDescription() + "," +
                             purchase.getPrice() + "," +
-                            purchase.getDateOfPurchase() + ","
+                            ccDateFormatter.format(purchase.getDateOfPurchase()) + ","
             );
             ccWriter.flush();
         }
