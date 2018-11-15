@@ -213,6 +213,12 @@ class AccountAddEditScene {
                         return;
                     }
                     break;
+                case LOAN:
+                    if (editedAccount != null) LoanAccount.loans.remove(editedAccount);
+                    break;
+                case CD:
+                    if (editedAccount != null) CD.cds.remove(editedAccount);
+                    break;
             }
 
             switch (UIHelpers.selectedAccountType) {

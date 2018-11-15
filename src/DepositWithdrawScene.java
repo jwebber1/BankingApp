@@ -80,6 +80,9 @@ class DepositWithdrawScene {
                     } else {
                         return;
                     }
+                } else {
+                    ((LoanAccount)editedAccount).makePayment(amount);
+                    LoanAccount.exportFile();
                 }
             } else if (editedAccount instanceof SavingAccount) {
                 if (isWithdraw) ((SavingAccount) editedAccount).withdraw(amount);

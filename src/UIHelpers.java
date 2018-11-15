@@ -35,7 +35,7 @@ class UIHelpers {
     private static double fieldHeight = 20;
 
     static AccountType selectedAccountType;
-    static ArrayList<Account> selectedAccounts;
+    private static ArrayList<Account> selectedAccounts;
 
     static ObservableList<String> accountTypes = FXCollections.observableArrayList();
 
