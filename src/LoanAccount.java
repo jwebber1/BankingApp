@@ -14,7 +14,10 @@ import java.util.Date;
  *   .
  *   */
 
-//TODO: change loan types in the gui from short hand to full title
+//TODO: please change calculated balance to either Initial Loan Amount/Limit (variable initialAmount) in GUI
+//TODO: please either change Payments Remaining to payments made or populate Payments Remaining with (calcLength(String loanType) - paymentsMade) in GUI
+//TODO: please use the marked constructor for editing, and the smallest possible loan constructor for creating the initial account
+//TODO: I believe that the GUI is over-riding the calcFirstPaymentDate
 //TODO: add the functionality to remove credit card purchases whenever they are payed off (not of high priority)
 
 public class LoanAccount extends Account{
@@ -38,7 +41,7 @@ public class LoanAccount extends Account{
         super(cusID, balance, dateOpened, loanType);
         paymentsMade = payments;
         initialAmount = initial;
-        interestRate = currIntRate;
+        interestRate = changeInterestRate(currIntRate);
         mainAccountType = "Loan - " + accountType;
         currentPaymentDue = currentPayDue;
         interestDue = monthlyInterestDue;
@@ -49,45 +52,65 @@ public class LoanAccount extends Account{
         super.setAccountBalance(calcBalance());
     }//end of Constructor for import method
 
-    //smallest possible loan account constructor
+    //TODO: please use the method for editing an account so that data is not lost
+    public LoanAccount(int cusID, double balance, double payments, double initial,
+                       double currIntRate, Date dateOpened, Date datePayDue,
+                       Date dateLastPayMade, boolean missedPayFlag, String loanType){
+        super(cusID, balance, dateOpened, loanType);
+        mainAccountType = "Loan - " + accountType;
+        initialAmount = initial;
+        paymentsMade = payments;
+        interestRate = changeInterestRate(currIntRate);
+        datePaymentDue = datePayDue;
+        lastPaymentDate = dateLastPayMade;
+        missedPaymentFlag = missedPayFlag;
+    }//end of Constructor for editing an account
+
+    //smallest possible loan account constructor only for the initial creation of an account
     public LoanAccount(int cusID, double initialLoan, double rate, String type){
         super(cusID, initialLoan, new Date(), type);
-        if (type.equalsIgnoreCase("credit card")){
-            super.setAccountBalance(0.0);
-        }
         mainAccountType = "Loan - " + accountType;
-        interestRate = rate;
         initialAmount = initialLoan;
+        interestRate = rate;
         currentPaymentDue = calcCurrentPayment();
+        paymentsMade = 0.0;
         interestDue = calcInterest();
         principalDue = calcPrincipal();
         datePaymentDue = calcFirstPaymentDate(new Date());
         lastPaymentDate = new Date();
         missedPaymentFlag = false;
+        if (type.equalsIgnoreCase("credit card")){
+            super.setAccountBalance(calcBalance());
+            interestDue = 0.0;
+            principalDue = 0.0;
+        }
     }//end of smallest possible loan account constructor
 
-    //TODO: think about how this works with the new understanding of loans
+    //TODO: untested with credit cards
     //changes the interest rate for a specific account and updates related fields
-    private void changeInterestRate(double newRate){
+    private double changeInterestRate(double newRate){
         //if the account is a credit card
         if (getAccountType().equalsIgnoreCase("Credit Card")){
+            //calculate and set the new monthly payment due
+            setCurrentPaymentDue(calcCurrentPayment());
             //calculate and store the delta created from the old balance
-            double delta = calcBalance();
-            delta -= getInitialAmount();
-            //calculate and set the new calculated balance
-            setInitialAmount(calcBalance() - delta);
+            double delta = calcBalance() - getAccountBalance();
+            //set the new interest rate
+            setInterestRate(newRate);
+            //calculate and set the new calculated balance based on the new rate
+            setAccountBalance(calcBalance() - delta);
         }
         //else it is a short or long term loan
         else {
             //set interest rate to new interest rate
             setInterestRate(newRate);
-            //calculate and set the new monthly interest payment due
-            //interestDue = calcInterest(principalDue * getPaymentsLeft(), getPaymentsLeft());
             //calculate and set the new monthly payment due
-            setCurrentPaymentDue(interestDue + principalDue);
-            //calculate and set the new calculated balance
-            setInitialAmount(calcBalance());
+            setCurrentPaymentDue(calcCurrentPayment());
+            //calculate and set the new interestDue and prinicpalDue
+            setInterestDue(calcInterest());
+            setPrincipalDue(calcPrincipal());
         }
+        return newRate;
     }//end of changeInterestRate
 
     //calculates the amount to pay off the loan right now
@@ -119,7 +142,6 @@ public class LoanAccount extends Account{
         return paymentsLeft;
     }//end of calcPaymentsLeft
 
-    //TODO: think about changes due to new understanding of loans
     //calculates the balance of an account including interest
     private double calcBalance(){
         double amount = 0.0;
@@ -181,7 +203,7 @@ public class LoanAccount extends Account{
         return date.after(getDatePaymentDue());
     }//end of checkIfLate
 
-    //TODO: credit card payments and loan payments greater than the currentPaymentDue are untested
+    //TODO: credit card payments are untested
     //Makes a payment on a selected loan account
     void makePayment(double amount){
         Date now = new Date();
