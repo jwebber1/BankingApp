@@ -317,10 +317,10 @@ class AccountManagementScene {
     private void withdrawOrDeposit(boolean isWithdraw) {
         Account selectedAccount = getSelectedAccount();
         if (selectedAccount == null) return;
-        if (selectedAccount instanceof LoanAccount) {
-            if (isWithdraw) {
-                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot withdraw from a loan account.");
-            }
+//        if (selectedAccount instanceof LoanAccount) {
+//            if (isWithdraw) {
+//                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot withdraw from a loan account.");
+//            }
 //                else {
 //                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
 //                            "Would you like to make a payment on this loan?", ButtonType.YES, ButtonType.NO);
@@ -338,8 +338,8 @@ class AccountManagementScene {
 //                        setAccountTableItems();
 //                    }
 //                }
-        } else {
+//        } else {
             UIHelpers.navigateToScene(new DepositWithdrawScene(selectedAccount, isWithdraw).root);
-        }
+//        }
     }
 }

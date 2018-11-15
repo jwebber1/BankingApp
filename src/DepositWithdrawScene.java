@@ -70,8 +70,8 @@ class DepositWithdrawScene {
             } else if (editedAccount instanceof LoanAccount) {
                 if (((LoanAccount)editedAccount).getCurrentPaymentDue() > amount) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                            "This amount does not fully cover this month's payment. Additional fees may be " +
-                                    "added to your loan. Continue?", ButtonType.YES, ButtonType.NO);
+                            "This amount does not fully cover this month's payment ($" +((LoanAccount) editedAccount).getCurrentPaymentDue()
+                                    + "). Additional fees may be added to your loan. Continue?", ButtonType.YES, ButtonType.NO);
                     alert.showAndWait();
 
                     if (alert.getResult() == ButtonType.YES) {
