@@ -5,109 +5,105 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-/*   For CC's calculateBalance is the sum of purchases including interest,
- *   accountBalance is the credit card limit, currentPaymentDue is the sum
- *   of purchases for current payment cycle.
- *   For ST and LT loans the calculatedBalance is the total amount owed including interest,
+/*   For CC's initialAmount is the credit card limit,
+ *   accountBalance is the sum of purchases including interest,
+ *   currentPaymentDue is the sum of purchases for current payment cycle.
+ *   For ST and LT loans the accountBalance is the current initialAmount,
+ *  the initialAmount is the original loan amount,
  *   currentPaymentDue is the calculated monthly payment,
- *   the accountBalance is the initial loan amount.
+ *   .
  *   */
 
-//TODO: have gui use new methods where appropriate
 //TODO: change loan types in the gui from short hand to full title
 //TODO: add the functionality to remove credit card purchases whenever they are payed off (not of high priority)
 
-// Make sure this and any other Account classes and the Person class (and their getters/setters) all stay public.
 public class LoanAccount extends Account{
-    private final static DecimalFormat decimalFormat = new DecimalFormat("#,###,###,##0.00");
-    private final static SimpleDateFormat dateFormatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-    private double calculatedBalance;
+    private final static DecimalFormat loanDecimalFormatter = new DecimalFormat("0.00");
+    private final static SimpleDateFormat loanDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+    private double initialAmount;
     private double interestRate;
     private Date datePaymentDue;
     private double currentPaymentDue;
     private double interestDue;
     private double principalDue;
     private Date lastPaymentDate;
-    private int paymentsLeft;
+    private double paymentsMade;
     private boolean missedPaymentFlag;
     static ArrayList<LoanAccount> loans = new ArrayList<>();
 
-    //TODO: Deprecated, please use constructor with least fields for creating accounts
-    public LoanAccount(int cusIDIn, double calculatedBal, double balance, double currIntRate, Date datePayDue, Date notified,
-                       Date lastPayDateIn, boolean missPayFlagIn, int currentPaymentsLeft, String loanTypeIn){
-
-        super(cusIDIn, balance, notified, loanTypeIn);
-
-        mainAccountType = "Loan - " + accountType;
-
-        paymentsLeft = calcPaymentsLeft();
-        calculatedBalance = calculatedBal;
-        interestRate = currIntRate;
-        datePaymentDue = calcFirstPaymentDate(datePayDue);
-        currentPaymentDue = calcCurrentPayment();
-        lastPaymentDate = new Date();
-        missedPaymentFlag = missPayFlagIn;
-    }//end of LoanAccount Constructor
-
     //Constructor used for import method
-    private LoanAccount(int cusID, double balance, double currentCalcBal, double currentPayDue, int payLeft,
-                        double currIntRate, Date dateOpened, Date datePayDue, Date dateLastPayMade,
-                        boolean missedPayFlag, String loanType){
+    private LoanAccount(int cusID, double balance, double payments, double initial, double currentPayDue, double monthlyInterestDue,
+                        double monthlyPrincipalDue, double currIntRate, Date dateOpened, Date datePayDue,
+                        Date dateLastPayMade, boolean missedPayFlag, String loanType){
         super(cusID, balance, dateOpened, loanType);
-        mainAccountType = "Loan - " + accountType;
-        paymentsLeft = payLeft;
-        currentPaymentDue = currentPayDue;
-        calculatedBalance = currentCalcBal;
+        paymentsMade = payments;
+        initialAmount = initial;
         interestRate = currIntRate;
+        mainAccountType = "Loan - " + accountType;
+        currentPaymentDue = currentPayDue;
+        interestDue = monthlyInterestDue;
+        principalDue = monthlyPrincipalDue;
         datePaymentDue = datePayDue;
         lastPaymentDate = dateLastPayMade;
         missedPaymentFlag = missedPayFlag;
+        super.setAccountBalance(calcBalance());
     }//end of Constructor for import method
 
     //smallest possible loan account constructor
     public LoanAccount(int cusID, double initialLoan, double rate, String type){
         super(cusID, initialLoan, new Date(), type);
+        if (type.equalsIgnoreCase("credit card")){
+            super.setAccountBalance(0.0);
+        }
         mainAccountType = "Loan - " + accountType;
-        paymentsLeft = calcPaymentsLeft();
-        currentPaymentDue = calcCurrentPayment();
-        calculatedBalance = calcBalance();
         interestRate = rate;
+        initialAmount = initialLoan;
+        currentPaymentDue = calcCurrentPayment();
+        interestDue = calcInterest();
+        principalDue = calcPrincipal();
         datePaymentDue = calcFirstPaymentDate(new Date());
         lastPaymentDate = new Date();
         missedPaymentFlag = false;
     }//end of smallest possible loan account constructor
 
+    //TODO: think about how this works with the new understanding of loans
     //changes the interest rate for a specific account and updates related fields
     private void changeInterestRate(double newRate){
         //if the account is a credit card
         if (getAccountType().equalsIgnoreCase("Credit Card")){
             //calculate and store the delta created from the old balance
             double delta = calcBalance();
-            delta -= getCalculatedBalance();
+            delta -= getInitialAmount();
             //calculate and set the new calculated balance
-            setCalculatedBalance(calcBalance() - delta);
+            setInitialAmount(calcBalance() - delta);
         }
         //else it is a short or long term loan
         else {
             //set interest rate to new interest rate
             setInterestRate(newRate);
             //calculate and set the new monthly interest payment due
-            interestDue = calcInterest(principalDue * getPaymentsLeft(), getPaymentsLeft());
+            //interestDue = calcInterest(principalDue * getPaymentsLeft(), getPaymentsLeft());
             //calculate and set the new monthly payment due
             setCurrentPaymentDue(interestDue + principalDue);
             //calculate and set the new calculated balance
-            setCalculatedBalance(calcBalance());
+            setInitialAmount(calcBalance());
         }
     }//end of changeInterestRate
 
-    //calculates the monthly principal for an account
-    private double calcPrincipal(double currentBalance, int months){
-        return currentBalance / months;
+    //calculates the amount to pay off the loan right now
+    private double calcPayOff(){
+        double calculation = calcLength(getAccountType()) - getPaymentsMade() * getCurrentPaymentDue();
+        return Double.parseDouble(loanDecimalFormatter.format(calculation));
+    }//end of calcPayOff
+
+    //calculates the monthly initialAmount for an account
+    private double calcPrincipal(){
+        return Double.parseDouble(loanDecimalFormatter.format(getCurrentPaymentDue() - getInterestDue()));
     }//end of calcPrincipal
 
     //calculates the monthly interest for an account
-    private double calcInterest(double currentBalance, int months){
-        return ((currentBalance / 2) * (months / 12.0) * getInterestRate()) / months;
+    private double calcInterest(){
+        return Double.parseDouble(loanDecimalFormatter.format(getAccountBalance() * (getInterestRate() / 12)));
     }//end of calcInterest
 
     //sets initial payments left based on account type
@@ -123,12 +119,12 @@ public class LoanAccount extends Account{
         return paymentsLeft;
     }//end of calcPaymentsLeft
 
+    //TODO: think about changes due to new understanding of loans
     //calculates the balance of an account including interest
     private double calcBalance(){
         double amount = 0.0;
         //if it is a credit card
-        if (getAccountType().equalsIgnoreCase("Credit Card")
-                || getAccountType().equalsIgnoreCase("cc")){
+        if (getAccountType().equalsIgnoreCase("Credit Card")){
             double sum = 0.0;
             int count = 0;
             for(CreditCardPurchase purchase: CreditCardPurchase.purchases){
@@ -143,10 +139,23 @@ public class LoanAccount extends Account{
         }
         //else it is a short or long term loan
         else {
-            amount = getCurrentPaymentDue() * getPaymentsLeft();
+            amount = getInitialAmount();
         }
-        return amount;
+        return Double.parseDouble(loanDecimalFormatter.format(amount));
     }//end of calcBalance
+
+    public static int calcLength(String type){
+        int payments = 0;
+        switch (type.toLowerCase()){
+            case "short term":
+                payments = 60;
+                break;
+            case "long term":
+                payments = 180;
+                break;
+        }//end of switch
+        return payments;
+    }//end of calcLength
 
     //creates a CreditCardPurchase tied to a specific account
     private void makeCCPurchase(double cost, String desc, Date date){
@@ -158,13 +167,13 @@ public class LoanAccount extends Account{
             CreditCardPurchase purchase = new CreditCardPurchase(getCustomerID(), desc, cost, date);
             CreditCardPurchase.purchases.add(purchase);
             //update calculated balance for new purchase
-            setCalculatedBalance(calcBalance());
+            setInitialAmount(calcBalance());
         }
     }//end of makeCCPurchase
 
     //returns true if new CC purchase would put account over limit and false if it would not
     private boolean ccPurchaseIsTooMuch(double newAmount){
-        return (getCurrentPaymentDue() + newAmount) < getAccountBalance();
+        return (getCurrentPaymentDue() + newAmount) < getInitialAmount();
     }//end of isCCPurchaseTooMuch
 
     //checks to see if payment is late
@@ -172,33 +181,7 @@ public class LoanAccount extends Account{
         return date.after(getDatePaymentDue());
     }//end of checkIfLate
 
-    //TODO: Deprecated, please use method "makePayment" for all loan account payments
-    void makeLoanPayment(){
-        Date date = new Date();
-//        for (LoanAccount loan : loans) {
-        //if the account matches
-//            if (loan.getCustomerID() == getCustomerID() && loan.getAccountType().equalsIgnoreCase(getAccountType())) {
-        if (paymentIsLate(date)) { //find out if the payment is late
-            setMissedPaymentFlag(true);
-            setLastPaymentDate(date);
-            // TODO: I just put this in because nothing was paid otherwise if it was late - Hunter
-            double tempBalance = getAccountBalance();
-            double tempPaymentDue = getCurrentPaymentDue();
-            setAccountBalance(tempBalance - tempPaymentDue);
-        }
-        else {
-            //else the payment is not late
-            setMissedPaymentFlag(false);
-            double tempBalance = getAccountBalance();
-            double tempPaymentDue = getCurrentPaymentDue();
-            setAccountBalance(tempBalance - tempPaymentDue);
-            setLastPaymentDate(date);
-        }
-        paymentsLeft--;
-//            }
-//        }
-    }//end of makeCCPayment
-
+    //TODO: credit card payments and loan payments greater than the currentPaymentDue are untested
     //Makes a payment on a selected loan account
     void makePayment(double amount){
         Date now = new Date();
@@ -209,6 +192,12 @@ public class LoanAccount extends Account{
                 setAccountBalance(0.0);
                 setCurrentPaymentDue(0.0);
                 setMissedPaymentFlag(paymentIsLate(now));
+                //get all purchases for this account
+                ArrayList<CreditCardPurchase> purchases = CreditCardPurchase.search(getCustomerID());
+                //remove these purchases
+                for (CreditCardPurchase purchase: purchases){
+                    CreditCardPurchase.purchases.remove(purchase);
+                }
             }
             //if the payment is less than the current amount due
             if (amount < getAccountBalance()){
@@ -218,55 +207,33 @@ public class LoanAccount extends Account{
         }
         //else the account is a short or long term loan
         else {
+            //set the missed payment flag based on whether the payment is late
             setMissedPaymentFlag(paymentIsLate(now));
-            double monthlyInterest = interestDue;
-            double monthlyPrincipal = principalDue;
-            //if the amount payed is equal to the current amount due
-            if (amount == getCurrentPaymentDue()){
-                //set the missed payment flag based on date of payment
-                setMissedPaymentFlag(paymentIsLate(now));
-                //reduce calculated balance appropriately
-                double tempBalance = getCalculatedBalance();
-                setCalculatedBalance(tempBalance - getCurrentPaymentDue());
-                //reset currentPayment due
-                setCurrentPaymentDue(monthlyInterest + monthlyPrincipal);
-                //decrement payments left
-                paymentsLeft--;
+            //calculate and set the payments made by the ratio of the amount payed to the current monthly payment
+            double paymentsMade = amount / getCurrentPaymentDue();
+            setPaymentsMade(Double.parseDouble(loanDecimalFormatter.format(getPaymentsMade() + paymentsMade)));
+            double fee = 0.0;
+            //if the payment is late set the fee
+            if (paymentIsLate(now)){
+                fee = 75.00;
             }
-            //else if the amount payed is less than the current amount due
-            else if (amount < getCurrentPaymentDue()){
-                //reduce calculated balance and current payment due to correct amount
-                setCalculatedBalance(getCalculatedBalance() - amount);
-                setCurrentPaymentDue(getCurrentPaymentDue() - amount);
+            //if the the payment is less than the interest due
+            if (amount < getInterestDue()){
+                setMissedPaymentFlag(true);
             }
-            //else the amount payed is greater than the current amount due
-            else {
-                //if amount is equal to the calculated balance
-                if (amount == getCalculatedBalance()){
-                    //set the missed payment flag based on date of payment
-                    setMissedPaymentFlag(paymentIsLate(now));
-                    //set calculated balance, current payment due, and payments left to 0
-                    setCalculatedBalance(0.0);
-                    setCurrentPaymentDue(0.0);
-                    setPaymentsLeft(0);
-                }
-                //else it is less than calculated balance and greater than current payment due
-                else {
-                    //set missed payment flag based on date of payment
-                    setMissedPaymentFlag(paymentIsLate(now));
-                    //calculate the number of whole payments the amount payed represents
-                    int payments = (int)(amount / getCurrentPaymentDue());
-                    //set date payment is due based on calculated payments made
-                    setDatePaymentDue(incrementDate(getDatePaymentDue(), payments));
-                    //reduce calculated balance by amount payed
-                    setCalculatedBalance(getCalculatedBalance() - amount);
-                    //reduce the current payment due by the amount that is left over from the amount payed
-                    double excess = amount - (getCurrentPaymentDue() * payments);
-                    setCurrentPaymentDue(getCurrentPaymentDue() - excess);
-                    //decrement payments left by payments made
-                    setPaymentsLeft(getPaymentsLeft() - payments);
-                }//end of else amount is less than calculated balance and greater than current payment due
-            }//end of else the amount payed is greater than the current amount due
+            //if the payments made is less than 1 then force the advancement of the date payment is due
+            if (paymentsMade < 1){
+                paymentsMade = 1;
+            }
+            //calculate and set the new date payment is required
+            setDatePaymentDue(incrementDate(getDatePaymentDue(), (int)Math.round(paymentsMade)));
+            //calculate the delta for amount payed and interest due
+            double delta = amount - getInterestDue();
+            //calculate and set the new balance including the delta and any fees
+            setAccountBalance(Double.parseDouble(loanDecimalFormatter.format(getAccountBalance() - delta + fee)));
+            //calculate and set the new interestDue and principalDue
+            setInterestDue(calcInterest());
+            setPrincipalDue(calcPrincipal());
         }//end of else the account is a short or long term loan
     }//end of makePayment
 
@@ -311,7 +278,6 @@ public class LoanAccount extends Account{
                 loan.setLastPaymentDate(date);
                 loan.setCurrentPaymentDue(0.0);
                 loan.setAccountBalance(0.0);
-                loan.setPaymentsLeft(0);
             }//end of if the account matches
         }//end of for loop
     }//end of payOffLoan
@@ -320,8 +286,9 @@ public class LoanAccount extends Account{
     private double calcCurrentPayment(){
         double amount;
         double sum = 0.0;
+
         //if the account is a credit card
-        if (this.getAccountType().equalsIgnoreCase("Credit Card")){
+        if (this.getAccountType().equalsIgnoreCase("credit card")){
             //for all credit card purchases sum the purchases where the account matches ssn and the date of purchase
             for (CreditCardPurchase ccPurchase : CreditCardPurchase.purchases) {
                 if (ccPurchase.getSSN() == this.getCustomerID()) {
@@ -333,16 +300,28 @@ public class LoanAccount extends Account{
         }
         //else the account is a short or long term loan
         else {
-            //stop gap till this is fleshed out
-            interestDue = calcInterest(getAccountBalance(), paymentsLeft);
-            principalDue = calcPrincipal(getAccountBalance(), paymentsLeft);
-            amount = interestDue + principalDue;
-            if (amount == Double.NaN){
-                amount = 0.0;
+            //calculate monthly interest rate
+            double monthlyRate = getInterestRate() / 12;
+            //calculate the two parts of the equation
+            double part1 = monthlyRate * Math.pow((1 + monthlyRate), calcLength(getAccountType()));
+            double part2 = Math.pow((1 + monthlyRate), calcLength(getAccountType())) - 1;
+            //combine the two parts and set amount to calculated monthly payment
+            amount = getInitialAmount() * (part1 / part2);
+        }
+        return Double.parseDouble(loanDecimalFormatter.format(amount));
+    }//end of calcCurrentPayment
+
+    //returns all loan accounts that match the given ssn and account type
+    static ArrayList<LoanAccount> search(int ssn, String type){
+        ArrayList<LoanAccount> accounts = new ArrayList<>();
+        for (LoanAccount loan : loans) {
+            //if it is a match
+            if (loan.getCustomerID() == ssn && loan.getAccountType().equalsIgnoreCase(type)) {
+                accounts.add(loan);
             }
         }
-        return amount;
-    }//end of calcCurrentPayment
+        return accounts;
+    }//end of search
 
     //returns all loan accounts that match the given ssn
     static ArrayList<LoanAccount> search(int ssn){
@@ -372,19 +351,22 @@ public class LoanAccount extends Account{
                 //parse those parts
                 int ssn = Integer.parseInt(field[0]);
                 double balance = Double.parseDouble(field[1]);
-                double calculatedBalance = Double.parseDouble(field[2]);
-                double currentPaymentDue = Double.parseDouble(field[3]);
-                int paymentsLeft = Integer.parseInt(field[4]);
-                double interest = Double.parseDouble(field[5]);
-                Date dateOpened = dateFormatter.parse(field[6]);
-                Date dateDue = dateFormatter.parse(field[7]);
-                Date dateOfLastPayment = dateFormatter.parse(field[8]);
-                boolean missedPaymentFlag = Boolean.parseBoolean(field[9]);
-                String accountType = field[10];
+                double payments = Double.parseDouble(field[2]);
+                double initialAmount = Double.parseDouble(field[3]);
+                double currentPaymentDue = Double.parseDouble(field[4]);
+                double interestDue = Double.parseDouble(field[5]);
+                double principalDue = Double.parseDouble(field[6]);
+                double interest = Double.parseDouble(field[7]);
+                Date dateOpened = loanDateFormatter.parse(field[8]);
+                Date dateDue = loanDateFormatter.parse(field[9]);
+                Date dateOfLastPayment = loanDateFormatter.parse(field[10]);
+                boolean missedPaymentFlag = Boolean.parseBoolean(field[11]);
+                String accountType = field[12];
 
                 //create new loan account object
-                LoanAccount account = new LoanAccount(ssn, balance, calculatedBalance, currentPaymentDue, paymentsLeft, interest, dateDue, dateOpened,
-                        dateOfLastPayment, missedPaymentFlag, accountType);
+                LoanAccount account = new LoanAccount(ssn, balance, payments, initialAmount, currentPaymentDue, interestDue,
+                        principalDue, interest, dateOpened, dateDue, dateOfLastPayment, missedPaymentFlag,
+                        accountType);
 
                 //add account to the arraylist
                 loans.add(account);
@@ -401,7 +383,7 @@ public class LoanAccount extends Account{
         PrintWriter loanWriter = new PrintWriter(new FileOutputStream("memory/loans.txt"));
 
         //printing the headers of the files
-        loanWriter.println("CustomerID,CurrentBalance,CalculatedBalance,CurrentPaymentDue,PaymentsLeft," +
+        loanWriter.println("CustomerID,CurrentBalance,PaymentsMade,Limit/InitialAmount,CurrentPaymentDue,InterestDue,PrincipalDue," +
                 "CurrentInterestRate,DateAccountOpened,DatePaymentDue,DateLastPaymentMade," +
                 "MissedPaymentFlag,AccountType,");
 
@@ -410,17 +392,18 @@ public class LoanAccount extends Account{
             loanWriter.println(
                     account.getCustomerID() + "," +
                             account.getAccountBalance() + "," +
-                            account.getCalculatedBalance() + "," +
+                            account.getPaymentsMade() + "," +
+                            account.getInitialAmount() + "," +
                             account.getCurrentPaymentDue() + "," +
-                            account.getPaymentsLeft() + "," +
+                            account.getInterestDue() + "," +
+                            account.getPrincipalDue() + "," +
                             account.getInterestRate() + "," +
-                            account.getDateAccountOpened() + "," +
-                            account.getDatePaymentDue() + "," +
-                            account.getLastPaymentDate() + "," +
+                            loanDateFormatter.format(account.getDateAccountOpened()) + "," +
+                            loanDateFormatter.format(account.getDatePaymentDue()) + "," +
+                            loanDateFormatter.format(account.getLastPaymentDate()) + "," +
                             account.getMissedPaymentFlag() + "," +
                             account.getAccountType() + ","
             );
-
             loanWriter.flush();
         }
         //close the PrintWriter objects
@@ -429,11 +412,30 @@ public class LoanAccount extends Account{
     }//end of exportFile
 
     //getters and setters for LoanAccount Class
-    public double getCalculatedBalance() {
-        return calculatedBalance;
+
+    public double getPaymentsMade() {
+        return paymentsMade;
     }
-    public void setCalculatedBalance(double initialAmount) {
-        this.calculatedBalance = initialAmount;
+    public void setPaymentsMade(double paymentsMade) {
+        this.paymentsMade = paymentsMade;
+    }
+    public double getInterestDue() {
+        return interestDue;
+    }
+    public void setInterestDue(double interestDue) {
+        this.interestDue = interestDue;
+    }
+    public double getPrincipalDue() {
+        return principalDue;
+    }
+    public void setPrincipalDue(double principalDue) {
+        this.principalDue = principalDue;
+    }
+    public double getInitialAmount() {
+        return initialAmount;
+    }
+    public void setInitialAmount(double initialAmount) {
+        this.initialAmount = initialAmount;
     }
     public double getInterestRate() {return interestRate;}
     public void setInterestRate(double interestRate) {this.interestRate = interestRate;}
@@ -447,10 +449,4 @@ public class LoanAccount extends Account{
     }
     public boolean getMissedPaymentFlag() {return missedPaymentFlag;}
     public void setMissedPaymentFlag(boolean missedPaymentFlag) {this.missedPaymentFlag = missedPaymentFlag;}
-    public int getPaymentsLeft() {
-        return paymentsLeft;
-    }
-    public void setPaymentsLeft(int paymentsLeft) {
-        this.paymentsLeft = paymentsLeft;
-    }
 }//end of LoanAccount
