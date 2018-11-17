@@ -40,7 +40,7 @@ public class LoanAccount extends Account{
                         Date dateLastPayMade, boolean missedPayFlag, String loanType){
         super(cusID, balance, dateOpened, loanType);
         paymentsMade = payments;
-        initialAmount = initial;
+        initialAmount = Double.valueOf(loanDecimalFormatter.format(initial));
         interestRate = changeInterestRate(currIntRate);
         mainAccountType = "Loan - " + accountType;
         currentPaymentDue = currentPayDue;
@@ -49,7 +49,6 @@ public class LoanAccount extends Account{
         datePaymentDue = datePayDue;
         lastPaymentDate = dateLastPayMade;
         missedPaymentFlag = missedPayFlag;
-        super.setAccountBalance(calcBalance());
     }//end of Constructor for import method
 
     //TODO: please use the method for editing an account so that data is not lost
@@ -68,9 +67,9 @@ public class LoanAccount extends Account{
 
     //smallest possible loan account constructor only for the initial creation of an account
     public LoanAccount(int cusID, double initialLoan, double rate, String type){
-        super(cusID, initialLoan, new Date(), type);
+        super(cusID, Double.valueOf(loanDecimalFormatter.format(initialLoan)), new Date(), type);
         mainAccountType = "Loan - " + accountType;
-        initialAmount = initialLoan;
+        initialAmount = Double.valueOf(loanDecimalFormatter.format(initialLoan));
         interestRate = rate;
         currentPaymentDue = calcCurrentPayment();
         paymentsMade = 0.0;
