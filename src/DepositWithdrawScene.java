@@ -35,6 +35,12 @@ class DepositWithdrawScene {
 
         Label balanceLabel = new Label("Balance: $" + editedAccount.accountBalance);
         HBox amountField = UIHelpers.createHBox("Amount:", UIHelpers.createBalanceField(accountBalanceProperty));
+        fieldVBox.getChildren().add(balanceLabel);
+
+        if (editedAccount instanceof LoanAccount) {
+            Label paymentDueLabel = new Label("Payment Due: $" + ((LoanAccount) editedAccount).getCurrentPaymentDue());
+            fieldVBox.getChildren().add(paymentDueLabel);
+        }
 
         // Save Button
         Button withdrawOrDepositButton;
@@ -56,7 +62,7 @@ class DepositWithdrawScene {
         cancelButton.setOnAction(x -> UIHelpers.navigateBackToAccountManagement());
 
         buttonHBox.getChildren().addAll(cancelButton, withdrawOrDepositButton);
-        fieldVBox.getChildren().addAll(balanceLabel, amountField, buttonHBox);
+        fieldVBox.getChildren().addAll(amountField, buttonHBox);
     }
 
     private void saveAccount() {
@@ -65,7 +71,6 @@ class DepositWithdrawScene {
             if (editedAccount instanceof CheckingAccount) {
                 if (isWithdraw) ((CheckingAccount)editedAccount).withdraw(amount);
                 else ((CheckingAccount)editedAccount).deposit(amount);
-                ((CheckingAccount)editedAccount).withdraw(amount);
                 CheckingAccount.exportFile();
             } else if (editedAccount instanceof LoanAccount) {
                 if (((LoanAccount)editedAccount).getCurrentPaymentDue() > amount) {

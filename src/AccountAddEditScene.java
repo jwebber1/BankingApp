@@ -41,7 +41,7 @@ class AccountAddEditScene {
 
     // Loan Specific Fields
     private final StringProperty loanTypeProperty = new SimpleStringProperty("");
-    private final Property<LocalDate> datePaymentDueProperty = new SimpleObjectProperty<>();
+//    private final Property<LocalDate> datePaymentDueProperty = new SimpleObjectProperty<>();
 
     private final Property<LocalDate> dateCDDueProperty = new SimpleObjectProperty<>();
 
@@ -79,8 +79,8 @@ class AccountAddEditScene {
                 loanTypeProperty.set("Short Term");
             }
             interestRateProperty.set(Double.toString(((LoanAccount)editedAccount).getInterestRate()));
-            LocalDate datePaymentDue = ((LoanAccount)editedAccount).getDatePaymentDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            datePaymentDueProperty.setValue(datePaymentDue);
+//            LocalDate datePaymentDue = ((LoanAccount)editedAccount).getDatePaymentDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//            datePaymentDueProperty.setValue(datePaymentDue);
         } else if (editedAccount instanceof SavingAccount) {
             interestRateProperty.set(Double.toString(((SavingAccount)editedAccount).getCurrentInterestRate()));
         } else if (editedAccount instanceof CD) {
@@ -164,8 +164,8 @@ class AccountAddEditScene {
         ComboBox loanTypeBox = UIHelpers.createComboBox(UIHelpers.loanTypes, loanTypeProperty);
         loanFieldsVBox.getChildren().add(UIHelpers.createHBox("Loan Type:", loanTypeBox));
 
-        DatePicker datePicker = UIHelpers.createDatePicker(datePaymentDueProperty);
-        loanFieldsVBox.getChildren().add(UIHelpers.createHBox("Date Payment Due:", datePicker));
+//        DatePicker datePicker = UIHelpers.createDatePicker(datePaymentDueProperty);
+//        loanFieldsVBox.getChildren().add(UIHelpers.createHBox("Date Payment Due:", datePicker));
     }
 
     // Creates fields used by loans.
@@ -215,6 +215,11 @@ class AccountAddEditScene {
                     break;
                 case LOAN:
                     if (editedAccount != null) LoanAccount.loans.remove(editedAccount);
+                    else if (LoanAccount.search(customerId, loanTypeProperty.get()) != null) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                                "This user already has a Loan of this type. Are you sure you selected the correct SSN?");
+                        return;
+                    }
                     break;
                 case CD:
                     if (editedAccount != null) CD.cds.remove(editedAccount);
@@ -252,8 +257,8 @@ class AccountAddEditScene {
                             Double.parseDouble(interestRateProperty.get()),
                             loanType.toLowerCase()
                     );
-                    Date datePaymentDue = Date.from(datePaymentDueProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-                    loanAccount.setDatePaymentDue(datePaymentDue);
+//                    Date datePaymentDue = Date.from(datePaymentDueProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+//                    loanAccount.setDatePaymentDue(datePaymentDue);
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
@@ -271,7 +276,6 @@ class AccountAddEditScene {
                     break;
             }
             UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The account has been saved successfully.");
-
             UIHelpers.navigateBackToAccountManagement();
         }
     }

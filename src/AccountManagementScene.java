@@ -145,12 +145,16 @@ class AccountManagementScene {
                 TableColumn<LoanAccount, String> type = new TableColumn<>("Type");
                 TableColumn<LoanAccount, String> dateOpened = new TableColumn<>("Date Opened");
                 TableColumn<LoanAccount, String> balance = new TableColumn<>("Balance");
-                TableColumn<LoanAccount, String> calculatedBalance = new TableColumn<>("Calculated Balance");
+                TableColumn<LoanAccount, String> calculatedBalance = new TableColumn<>("Initial Amount");
+                TableColumn<LoanAccount, String> currentPayment = new TableColumn<>("Current Payment");
+                TableColumn<LoanAccount, String> interestDue = new TableColumn<>("Interest Due");
 
                 type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
                 dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
                 balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-                calculatedBalance.setCellValueFactory(new PropertyValueFactory<>("calculatedBalance"));
+                calculatedBalance.setCellValueFactory(new PropertyValueFactory<>("initialAmount"));
+                currentPayment.setCellValueFactory(new PropertyValueFactory<>("currentPaymentDue"));
+                interestDue.setCellValueFactory(new PropertyValueFactory<>("interestDue"));
 
                 TableColumn<LoanAccount, String> interestRate = new TableColumn<>("Interest Rate");
                 interestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
@@ -161,7 +165,7 @@ class AccountManagementScene {
                 TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Remaining");
                 paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsLeft"));
 
-                loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, datePaymentDue, paymentsLeft);
+                loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, interestDue, datePaymentDue, currentPayment, paymentsLeft);
                 fieldVBox.getChildren().addAll(loanTable, buttonHBox);
             } else if (accounts.get(0) instanceof CD) {
                 if (UIHelpers.currentUserLevel != 0) {

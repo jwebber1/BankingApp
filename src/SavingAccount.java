@@ -120,7 +120,7 @@ public class SavingAccount extends Account {
 
     public void deposit(double depositAmount) {
         double currentBal = getAccountBalance();
-        currentBal = +depositAmount;
+        currentBal += depositAmount;
         setAccountBalance(currentBal);
     }//end of deposit
 
