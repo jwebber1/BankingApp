@@ -32,6 +32,7 @@ class LoginScene {
             LoanAccount.importFile();
             Check.importFile();
             SavingAccount.importFile();
+            CreditCardPurchase.importFile();
 
 //            for (CheckingAccount account : CheckingAccount.checkingAccounts) {
 //                account.mainAccountType = "Checking - " +

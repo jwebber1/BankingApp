@@ -1,3 +1,6 @@
+import Enums.AccountType;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -26,6 +29,10 @@ class AccountManagementScene {
     private TableView<CheckingAccount> checkingTable = new TableView<>();
     private TableView<CD> cdTable = new TableView<>();
 
+    private ComboBox customerBox;
+
+    private final StringProperty customerProperty = new SimpleStringProperty("");
+
     private HBox buttonHBox = new HBox();
 
     ObservableList<Account> accounts;
@@ -36,15 +43,27 @@ class AccountManagementScene {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
-        setupAccountTable();
+        ObservableList<String> personNames = FXCollections.observableArrayList();
+        for (Person person : Person.people) {
+            personNames.add(person.lastName + ", " + person.firstName);
+        }
+        customerBox = UIHelpers.createComboBox(personNames, customerProperty);
+        fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
+        customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> changeSelectedCustomer());
 
-        if (accounts.get(0) instanceof LoanAccount) {
+        initializeButtonBox();
+        setupAccountTable();
+    }
+
+    private void initializeButtonBox() {
+        buttonHBox.getChildren().clear();
+        if (UIHelpers.selectedAccountType == AccountType.LOAN) {
             // Make Payment Button
             Button makePaymentButton = new Button("Make Payment");
             makePaymentButton.setOnAction(x -> withdrawOrDeposit(false));
 
             buttonHBox.getChildren().addAll(makePaymentButton);
-        } else if (!(accounts.get(0) instanceof CD)) {
+        } else if (!(UIHelpers.selectedAccountType == AccountType.CD)) {
             // If not viewing CDs (since CDs can just be closed- which withdraws their money).
 
             // Deposit Button
@@ -70,127 +89,184 @@ class AccountManagementScene {
             Button closeButton = new Button("Close");
             closeButton.setOnAction(x -> closeAccount());
 
-            // Back Button
-            Button backButton = new Button("Back");
-            backButton.setOnAction(x -> {
-                try {
-                    UIHelpers.navigateToScene(new AccountTypeSelectionScene().root);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-
-            buttonHBox.getChildren().addAll(addButton, editButton, closeButton, backButton);
+            buttonHBox.getChildren().addAll(addButton, editButton, closeButton);
         }
     }
 
+    private void changeSelectedCustomer() {
+        int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
+        Person selectedCustomer = Person.people.get(selectedCustomerId);
+        int customerId = selectedCustomer.id;
+        setupAccountTable(customerId);
+    }
+
     private void setupAccountTable() {
-        if (!accounts.isEmpty()) {
-            if (accounts.get(0) instanceof CheckingAccount) {
-                if (UIHelpers.currentUserLevel != 0) {
-                    TableColumn<CheckingAccount, String> ssn = new TableColumn<>("SSN");
-                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                    checkingTable.getColumns().add(ssn);
-                }
+        setupAccountTable(0);
+    }
 
-                TableColumn<CheckingAccount, String> type = new TableColumn<>("Type");
-                TableColumn<CheckingAccount, String> dateOpened = new TableColumn<>("Date Opened");
-                TableColumn<CheckingAccount, String> balance = new TableColumn<>("Balance");
-
-                type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
-                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-
-                checkingTable.getColumns().addAll(type, dateOpened, balance);
-                fieldVBox.getChildren().addAll(checkingTable, buttonHBox);
-
-                Button viewChecksButton = new Button("View Checks");
-                viewChecksButton.setOnAction(x -> {
-                    int customerId = UIHelpers.currentUser.id;
-                    if (customerId <= 1) {
-                        CheckingAccount account = checkingTable.getSelectionModel().getSelectedItem();
-                        if (account == null) {
-                            return;
-                        }
-                        customerId = account.customerID;
-                    }
-                    UIHelpers.navigateToScene(new CheckViewScene(customerId).root);
-                });
-
-                buttonHBox.getChildren().add(viewChecksButton);
-            } else if (accounts.get(0) instanceof SavingAccount) {
-                if (UIHelpers.currentUserLevel != 0) {
-                    TableColumn<SavingAccount, String> ssn = new TableColumn<>("SSN");
-                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                    savingsTable.getColumns().add(ssn);
-                }
-
-                TableColumn<SavingAccount, String> type = new TableColumn<>("Type");
-                TableColumn<SavingAccount, String> dateOpened = new TableColumn<>("Date Opened");
-                TableColumn<SavingAccount, String> balance = new TableColumn<>("Balance");
-
-                type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
-                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-
-                savingsTable.getColumns().addAll(type, dateOpened, balance);
-                fieldVBox.getChildren().addAll(savingsTable, buttonHBox);
-            } else if (accounts.get(0) instanceof LoanAccount) {
-                if (UIHelpers.currentUserLevel != 0) {
-                    TableColumn<LoanAccount, String> ssn = new TableColumn<>("SSN");
-                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                    loanTable.getColumns().add(ssn);
-                }
-
-                TableColumn<LoanAccount, String> type = new TableColumn<>("Type");
-                TableColumn<LoanAccount, String> dateOpened = new TableColumn<>("Date Opened");
-                TableColumn<LoanAccount, String> balance = new TableColumn<>("Balance");
-                TableColumn<LoanAccount, String> calculatedBalance = new TableColumn<>("Initial Amount");
-                TableColumn<LoanAccount, String> currentPayment = new TableColumn<>("Current Payment");
-                TableColumn<LoanAccount, String> interestDue = new TableColumn<>("Interest Due");
-
-                type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
-                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-                calculatedBalance.setCellValueFactory(new PropertyValueFactory<>("initialAmount"));
-                currentPayment.setCellValueFactory(new PropertyValueFactory<>("currentPaymentDue"));
-                interestDue.setCellValueFactory(new PropertyValueFactory<>("interestDue"));
-
-                TableColumn<LoanAccount, String> interestRate = new TableColumn<>("Interest Rate");
-                interestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
-
-                TableColumn<LoanAccount, String> datePaymentDue = new TableColumn<>("Date Payment Due");
-                datePaymentDue.setCellValueFactory(new PropertyValueFactory<>("datePaymentDue"));
-
-                TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Remaining");
-                paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsLeft"));
-
-                loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, interestDue, datePaymentDue, currentPayment, paymentsLeft);
-                fieldVBox.getChildren().addAll(loanTable, buttonHBox);
-            } else if (accounts.get(0) instanceof CD) {
-                if (UIHelpers.currentUserLevel != 0) {
-                    TableColumn<CD, String> ssn = new TableColumn<>("SSN");
-                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                    cdTable.getColumns().add(ssn);
-                }
-
-                TableColumn<CD, String> type = new TableColumn<>("Type");
-                TableColumn<CD, String> dateOpened = new TableColumn<>("Date Opened");
-                TableColumn<CD, String> balance = new TableColumn<>("Balance");
-
-                type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
-                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-
-                TableColumn<CD, String> dateCDDue = new TableColumn<>("Date Due");
-                dateCDDue.setCellValueFactory(new PropertyValueFactory<>("dateCDDue"));
-
-                cdTable.getColumns().addAll(type, dateOpened, balance, dateCDDue);
-                fieldVBox.getChildren().addAll(cdTable, buttonHBox);
+    private void setupAccountTable(int searchId) {
+        initializeButtonBox();
+        fieldVBox.getChildren().removeAll(savingsTable, checkingTable, cdTable, loanTable, buttonHBox);
+        if (searchId != 0) {
+            switch (UIHelpers.selectedAccountType) {
+                case CHECKING:
+                    accounts = FXCollections.observableArrayList(CheckingAccount.search(searchId));
+                    break;
+                case LOAN:
+                    accounts = FXCollections.observableArrayList(LoanAccount.search(searchId));
+                    break;
+                case SAVING:
+                    accounts = FXCollections.observableArrayList(SavingAccount.search(searchId));
+                    break;
+                case CD:
+                    accounts = FXCollections.observableArrayList(CD.search(searchId));
+                    break;
             }
+        } else if (UIHelpers.currentUserLevel != 0) {
+            switch (UIHelpers.selectedAccountType) {
+                case CHECKING:
+                    accounts = FXCollections.observableArrayList(CheckingAccount.checkingAccounts);
+                    break;
+                case LOAN:
+                    accounts = FXCollections.observableArrayList(LoanAccount.loans);
+                    break;
+                case SAVING:
+                    accounts = FXCollections.observableArrayList(SavingAccount.savingAccounts);
+                    break;
+                case CD:
+                    accounts = FXCollections.observableArrayList(CD.cds);
+                    break;
+            }
+        }
+        if (!accounts.isEmpty() && accounts.get(0) != null) {
+            switch (UIHelpers.selectedAccountType) {
+                case CHECKING: {
+                    if (UIHelpers.currentUserLevel != 0) {
+                        TableColumn<CheckingAccount, String> ssn = new TableColumn<>("SSN");
+                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                        checkingTable.getColumns().add(ssn);
+                    }
+
+                    TableColumn<CheckingAccount, String> type = new TableColumn<>("Type");
+                    TableColumn<CheckingAccount, String> dateOpened = new TableColumn<>("Date Opened");
+                    TableColumn<CheckingAccount, String> balance = new TableColumn<>("Balance");
+
+                    type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
+                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+
+                    checkingTable.getColumns().addAll(type, dateOpened, balance);
+                    fieldVBox.getChildren().addAll(checkingTable, buttonHBox);
+
+                    Button viewChecksButton = new Button("View Checks");
+                    viewChecksButton.setOnAction(x -> {
+                        int customerId = UIHelpers.currentUser.id;
+                        if (customerId <= 1) {
+                            CheckingAccount account = checkingTable.getSelectionModel().getSelectedItem();
+                            if (account == null) {
+                                return;
+                            }
+                            customerId = account.customerID;
+                        }
+                        UIHelpers.navigateToScene(new CheckViewScene(customerId).root);
+                    });
+
+                    buttonHBox.getChildren().add(viewChecksButton);
+                    break;
+                }
+                case SAVING: {
+                    if (UIHelpers.currentUserLevel != 0) {
+                        TableColumn<SavingAccount, String> ssn = new TableColumn<>("SSN");
+                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                        savingsTable.getColumns().add(ssn);
+                    }
+
+                    TableColumn<SavingAccount, String> dateOpened = new TableColumn<>("Date Opened");
+                    TableColumn<SavingAccount, String> balance = new TableColumn<>("Balance");
+                    TableColumn<SavingAccount, String> currentInterestRate = new TableColumn<>("Interest");
+
+                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+                    currentInterestRate.setCellValueFactory(new PropertyValueFactory<>("currentInterestRate"));
+
+                    savingsTable.getColumns().addAll(dateOpened, balance, currentInterestRate);
+                    fieldVBox.getChildren().addAll(savingsTable, buttonHBox);
+                    break;
+                }
+                case LOAN: {
+                    if (UIHelpers.currentUserLevel != 0) {
+                        TableColumn<LoanAccount, String> ssn = new TableColumn<>("SSN");
+                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                        loanTable.getColumns().add(ssn);
+                    }
+
+                    TableColumn<LoanAccount, String> type = new TableColumn<>("Type");
+                    TableColumn<LoanAccount, String> dateOpened = new TableColumn<>("Date Opened");
+                    TableColumn<LoanAccount, String> balance = new TableColumn<>("Balance");
+                    TableColumn<LoanAccount, String> calculatedBalance = new TableColumn<>("Initial Amount");
+                    TableColumn<LoanAccount, String> currentPayment = new TableColumn<>("Current Payment");
+                    TableColumn<LoanAccount, String> interestDue = new TableColumn<>("Interest Due");
+
+                    type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
+                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+                    calculatedBalance.setCellValueFactory(new PropertyValueFactory<>("initialAmount"));
+                    currentPayment.setCellValueFactory(new PropertyValueFactory<>("currentPaymentDue"));
+                    interestDue.setCellValueFactory(new PropertyValueFactory<>("interestDue"));
+
+                    TableColumn<LoanAccount, String> interestRate = new TableColumn<>("Interest Rate");
+                    interestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
+
+                    TableColumn<LoanAccount, String> datePaymentDue = new TableColumn<>("Date Payment Due");
+                    datePaymentDue.setCellValueFactory(new PropertyValueFactory<>("datePaymentDue"));
+
+                    TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Remaining");
+                    paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsLeft"));
+
+                    loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, interestDue, datePaymentDue, currentPayment, paymentsLeft);
+                    fieldVBox.getChildren().addAll(loanTable, buttonHBox);
+                    break;
+                }
+                case CD: {
+                    if (UIHelpers.currentUserLevel != 0) {
+                        TableColumn<CD, String> ssn = new TableColumn<>("SSN");
+                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                        cdTable.getColumns().add(ssn);
+                    }
+
+                    TableColumn<CD, String> type = new TableColumn<>("Type");
+                    TableColumn<CD, String> dateOpened = new TableColumn<>("Date Opened");
+                    TableColumn<CD, String> balance = new TableColumn<>("Balance");
+
+                    type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
+                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+
+                    TableColumn<CD, String> dateCDDue = new TableColumn<>("Date Due");
+                    dateCDDue.setCellValueFactory(new PropertyValueFactory<>("dateCDDue"));
+
+                    cdTable.getColumns().addAll(type, dateOpened, balance, dateCDDue);
+                    fieldVBox.getChildren().addAll(cdTable, buttonHBox);
+                    break;
+                }
+            }
+        } else {
+            fieldVBox.getChildren().add(buttonHBox);
         }
 
         setAccountTableItems(FXCollections.observableArrayList(accounts));
+
+        // Back Button
+        Button backButton = new Button("Back");
+        backButton.setOnAction(x -> {
+            try {
+                UIHelpers.navigateToScene(new AccountTypeSelectionScene().root);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        buttonHBox.getChildren().add(backButton);
     }
 
     private Account getSelectedAccount() {
@@ -212,6 +288,8 @@ class AccountManagementScene {
     private void editAccount() {
         Account selectedAccount = getSelectedAccount();
         if (selectedAccount == null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "You must select an account to edit.");
             return;
         }
         UIHelpers.navigateToScene(new AccountAddEditScene(selectedAccount).root);
@@ -220,6 +298,8 @@ class AccountManagementScene {
     private void closeAccount() {
         Account selectedAccount = getSelectedAccount();
         if (selectedAccount == null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "You must select an account to close.");
             return;
         }
         if (selectedAccount instanceof CD) {
@@ -322,30 +402,11 @@ class AccountManagementScene {
 
     private void withdrawOrDeposit(boolean isWithdraw) {
         Account selectedAccount = getSelectedAccount();
-        if (selectedAccount == null) return;
-//        if (selectedAccount instanceof LoanAccount) {
-//            if (isWithdraw) {
-//                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot withdraw from a loan account.");
-//            }
-//                else {
-//                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-//                            "Would you like to make a payment on this loan?", ButtonType.YES, ButtonType.NO);
-//                    alert.showAndWait();
-//
-//                    if (alert.getResult() == ButtonType.YES) {
-//                        ((LoanAccount) selectedAccount).makeLoanPayment();
-//
-//                        if (selectedAccount.accountBalance <= 0) {
-//                            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
-//                                    "The loan has been paid off in full, and will now be closed.");
-//                            LoanAccount.loans.remove(selectedAccount);
-//                        }
-//                        LoanAccount.exportFile();
-//                        setAccountTableItems();
-//                    }
-//                }
-//        } else {
-            UIHelpers.navigateToScene(new DepositWithdrawScene(selectedAccount, isWithdraw).root);
-//        }
+        if (selectedAccount == null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "You must select an account to " + (isWithdraw ? "withdraw from." : "deposit into."));
+            return;
+        }
+        UIHelpers.navigateToScene(new DepositWithdrawScene(selectedAccount, isWithdraw).root);
     }
 }

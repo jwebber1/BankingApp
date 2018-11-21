@@ -75,7 +75,7 @@ public class Check{
 
         //while loop to go through the file
         while ((line = checksBR.readLine()) != null) {
-            System.out.println(line);
+//            System.out.println(line);
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
             if(lineNum > 0) {
@@ -86,18 +86,18 @@ public class Check{
 
                 //create temp variable to hold info from the split lines
                 int cusID = Integer.parseInt(splitLine[0]);
-                System.out.println(cusID);
+//                System.out.println(cusID);
                 int checkID = Integer.parseInt(splitLine[1]);
-                System.out.println(checkID);
+//                System.out.println(checkID);
                 double checkAmt = Double.parseDouble(splitLine[2]);
-                System.out.println(checkAmt);
+//                System.out.println(checkAmt);
                 String payTo = splitLine[3];
-                System.out.println(payTo);
+//                System.out.println(payTo);
                 Date dateCheck = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
-                System.out.println(dateCheck);
+//                System.out.println(dateCheck);
                 String memo = splitLine[5];
-                System.out.println(memo);
-                System.out.println("*"+splitLine[6]+"*");
+//                System.out.println(memo);
+//                System.out.println("*"+splitLine[6]+"*");
                 //create a new check depending on the 6th position of the line
                 if(splitLine[6].equals("")) {
                     checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo));

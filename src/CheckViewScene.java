@@ -10,6 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.FileNotFoundException;
+import java.util.Date;
 
 /**
  * Allows viewing and stopping of checks for an account.
@@ -35,15 +36,23 @@ public class CheckViewScene {
 
         setupCheckTable();
 
-        // Stop Check Button
-        Button stopCheckButton = new Button("Stop Check");
-        stopCheckButton.setOnAction(x -> stopCheck());
+        if (UIHelpers.currentUserLevel != 0) {
+            // Honor Check Button
+            Button honorCheckButton = new Button("Honor Check");
+            honorCheckButton.setOnAction(x -> honorCheck());
+
+            // Stop Check Button
+            Button stopCheckButton = new Button("Stop Check");
+            stopCheckButton.setOnAction(x -> stopCheck());
+
+            buttonHBox.getChildren().addAll(honorCheckButton, stopCheckButton);
+        }
 
         // Back Button
         Button backButton = new Button("Back");
         backButton.setOnAction(x -> UIHelpers.navigateBackToAccountManagement());
 
-        buttonHBox.getChildren().addAll(stopCheckButton, backButton);
+        buttonHBox.getChildren().add(backButton);
         fieldVBox.getChildren().addAll(checkTable, buttonHBox);
     }
 
@@ -64,6 +73,30 @@ public class CheckViewScene {
 
         ObservableList checks = FXCollections.observableArrayList(Check.searchChecksByCustomerID(customerId));
         checkTable.setItems(checks);
+    }
+
+    private void honorCheck() {
+        Check check = checkTable.getSelectionModel().getSelectedItem();
+        if (check == null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "You must select a check to honor.");
+            return;
+        }
+        if (check.dateHonored != null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "This check has already been honored.");
+            return;
+        }
+        check.dateHonored = new Date();
+        try {
+            Check.exportFile();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        checkTable.setItems(FXCollections.observableArrayList());
+        ObservableList checks = FXCollections.observableArrayList(Check.searchChecksByCustomerID(customerId));
+        checkTable.setItems(checks);
+        checkTable.refresh();
     }
 
     private void stopCheck() {
