@@ -67,9 +67,6 @@ public class Check{
         //buffer string to temporarily hold the line retrieved
         String line;
 
-        //creates the ArrayList of data
-        ArrayList<Check> importChecks = new ArrayList<>();
-
         //generic counter to know the line currently on
         int lineNum = 0;
 
@@ -83,21 +80,14 @@ public class Check{
                 //split the line into an array of strings
                 String[] splitLine = line.split(",",-1);
 
-
                 //create temp variable to hold info from the split lines
                 int cusID = Integer.parseInt(splitLine[0]);
-                System.out.println(cusID);
                 int checkID = Integer.parseInt(splitLine[1]);
-                System.out.println(checkID);
                 double checkAmt = Double.parseDouble(splitLine[2]);
-                System.out.println(checkAmt);
                 String payTo = splitLine[3];
-                System.out.println(payTo);
                 Date dateCheck = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
-                System.out.println(dateCheck);
                 String memo = splitLine[5];
-                System.out.println(memo);
-                System.out.println("*"+splitLine[6]+"*");
+
                 //create a new check depending on the 6th position of the line
                 if(splitLine[6].equals("")) {
                     checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo));
@@ -172,7 +162,7 @@ public class Check{
         //loop through all checks in global arraylist
         for(Check check: Check.checks){
             if(check.getCheckID() == checkID){
-                return check;
+                searchResult = check;
             }
         }
 
