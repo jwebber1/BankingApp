@@ -13,12 +13,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -33,6 +35,7 @@ class UIHelpers {
     static Person currentUser;
     private static double fieldWidth = 140;
     private static double fieldHeight = 20;
+    private static StackPane mainPane = new StackPane();
 
     static AccountType selectedAccountType;
     private static ArrayList<Account> selectedAccounts;
@@ -182,9 +185,7 @@ class UIHelpers {
     }
 
     public static void navigateToScene(Parent root) {
-        Scene scene = new Scene(root, 640, 480);
-        scene.getStylesheets().add("stylesheet.css");
-        Main.primaryStage.setScene(scene);
+        Main.primaryStage.getScene().setRoot(root);
     }
 
     public static void showAlert(Alert.AlertType alertType, String message) {

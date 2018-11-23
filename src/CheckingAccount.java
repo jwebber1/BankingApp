@@ -15,7 +15,6 @@ public class CheckingAccount extends Account{
     public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
         super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >= 1000.0) ? "gold" : "regular"));
 
-        mainAccountType = "Checking - " + accountType.substring(0, 1).toUpperCase() + accountType.substring(1);
         this.hasOverdraftProtection = OvProIn;
         this.connectedToATMCard = atm;
         this.overdraftsThisMonth = odThisMonth;

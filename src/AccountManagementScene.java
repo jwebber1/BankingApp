@@ -151,7 +151,7 @@ class AccountManagementScene {
                     TableColumn<CheckingAccount, String> dateOpened = new TableColumn<>("Date Opened");
                     TableColumn<CheckingAccount, String> balance = new TableColumn<>("Balance");
 
-                    type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
+                    type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
                     dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
                     balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
 
@@ -207,7 +207,7 @@ class AccountManagementScene {
                     TableColumn<LoanAccount, String> currentPayment = new TableColumn<>("Current Payment");
                     TableColumn<LoanAccount, String> interestDue = new TableColumn<>("Interest Due");
 
-                    type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
+                    type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
                     dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
                     balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
                     calculatedBalance.setCellValueFactory(new PropertyValueFactory<>("initialAmount"));

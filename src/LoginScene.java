@@ -2,6 +2,7 @@ import Enums.AccountType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -26,6 +27,9 @@ class LoginScene {
             for (AccountType type : AccountType.values()) {
                 UIHelpers.accountTypes.add(type.name);
             }
+            Scene scene = new Scene(new StackPane(), 640, 480);
+            scene.getStylesheets().add("stylesheet.css");
+            Main.primaryStage.setScene(scene);
             Person.importFile();
             CheckingAccount.importFile();
             CD.importFile();

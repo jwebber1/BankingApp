@@ -56,7 +56,6 @@ public class LoanAccount extends Account{
                        double currIntRate, Date dateOpened, Date datePayDue,
                        Date dateLastPayMade, boolean missedPayFlag, String loanType){
         super(cusID, balance, dateOpened, loanType);
-        mainAccountType = "Loan - " + accountType;
         initialAmount = initial;
         paymentsMade = payments;
         interestRate = changeInterestRate(currIntRate);
@@ -68,7 +67,6 @@ public class LoanAccount extends Account{
     //smallest possible loan account constructor only for the initial creation of an account
     public LoanAccount(int cusID, double initialLoan, double rate, String type){
         super(cusID, Double.valueOf(loanDecimalFormatter.format(initialLoan)), new Date(), type);
-        mainAccountType = "Loan - " + accountType;
         initialAmount = Double.valueOf(loanDecimalFormatter.format(initialLoan));
         interestRate = rate;
         currentPaymentDue = calcCurrentPayment();
