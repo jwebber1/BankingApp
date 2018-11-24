@@ -8,10 +8,8 @@ import java.util.Date;
 /*   For CC's initialAmount is the credit card limit,
  *   accountBalance is the sum of purchases including interest,
  *   currentPaymentDue is the sum of purchases for current payment cycle.
- *   For ST and LT loans the accountBalance is the current initialAmount,
- *  the initialAmount is the original loan amount,
- *   currentPaymentDue is the calculated monthly payment,
- *   .
+ *   For ST and LT loans the accountBalance is the current principal left to pay,
+ *   the initialAmount is the original loan amount, currentPaymentDue is the calculated monthly payment.
  *   */
 
 //TODO: please change calculated balance to either Initial Loan Amount/Limit (variable initialAmount) in GUI
@@ -38,7 +36,7 @@ public class LoanAccount extends Account{
     private LoanAccount(int cusID, double balance, double payments, double initial, double currentPayDue, double monthlyInterestDue,
                         double monthlyPrincipalDue, double currIntRate, Date dateOpened, Date datePayDue,
                         Date dateLastPayMade, boolean missedPayFlag, String loanType){
-        super(cusID, balance, dateOpened, loanType);
+        super(cusID, Double.valueOf(loanDecimalFormatter.format(balance)), dateOpened, loanType);
         paymentsMade = payments;
         initialAmount = Double.valueOf(loanDecimalFormatter.format(initial));
         interestRate = changeInterestRate(currIntRate);
@@ -51,11 +49,11 @@ public class LoanAccount extends Account{
         missedPaymentFlag = missedPayFlag;
     }//end of Constructor for import method
 
-    //TODO: please use the method for editing an account so that data is not lost
+    //TODO: please use this method for editing an account so that data is not lost
     public LoanAccount(int cusID, double balance, double payments, double initial,
                        double currIntRate, Date dateOpened, Date datePayDue,
                        Date dateLastPayMade, boolean missedPayFlag, String loanType){
-        super(cusID, balance, dateOpened, loanType);
+        super(cusID, Double.valueOf(loanDecimalFormatter.format(balance)), dateOpened, loanType);
         initialAmount = initial;
         paymentsMade = payments;
         interestRate = changeInterestRate(currIntRate);
@@ -356,7 +354,6 @@ public class LoanAccount extends Account{
 
     //imports the loans.txt file to the arraylist loans
     static void importFile() throws IOException, ParseException {
-        CreditCardPurchase.importFile();
         //open a buffered reader
         BufferedReader br = new BufferedReader(new FileReader("memory/loans.txt"));
         String line;
@@ -397,7 +394,6 @@ public class LoanAccount extends Account{
 
     //exports the loans arraylist to the file loans.txt
     public static void exportFile() throws FileNotFoundException{
-        CreditCardPurchase.exportFile();
         //create a new PrintWriter to write to a file
         PrintWriter loanWriter = new PrintWriter(new FileOutputStream("memory/loans.txt"));
 

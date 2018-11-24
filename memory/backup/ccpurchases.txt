@@ -1,6 +1,4 @@
 SSN,Description,Price,DateOfPurchase,
-423453245,Walmart,100.0,11/14/2018,
-423453245,Luigis Resturaunt,27.99,11/14/2018,
 345879912,Couch,600.09,11/14/2018,
 285482889,Menards,140.83,11/14/2018,
 851593249,Tires N More,78.03,11/14/2018,

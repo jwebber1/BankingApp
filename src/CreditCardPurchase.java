@@ -1,4 +1,5 @@
 import java.io.*;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -6,6 +7,7 @@ import java.util.Date;
 
 public class CreditCardPurchase {
     private final static SimpleDateFormat ccDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+    private final static DecimalFormat ccDecimalFormatter = new DecimalFormat("0.00");
     private int SSN;
     private String description;
     private double price;
@@ -16,7 +18,7 @@ public class CreditCardPurchase {
     public CreditCardPurchase(int ssn, String desc, double cost, Date date){
         SSN = ssn;
         description = desc;
-        price = cost;
+        price = Double.valueOf(ccDecimalFormatter.format(cost));
         dateOfPurchase = date;
     }//end of CreditCardPurchase Constructor
 
