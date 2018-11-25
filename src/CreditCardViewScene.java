@@ -1,9 +1,8 @@
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -28,11 +27,34 @@ public class CreditCardViewScene {
 
     private HBox buttonHBox = new HBox();
 
+    private ComboBox customerBox; // The customer selection box (which allows searching by customer).
+    // Stores the "customerBox"'s selected customer.
+    private final StringProperty customerProperty = new SimpleStringProperty("");
+
     public CreditCardViewScene(int customerId) {
         this.customerId = customerId;
 
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
+
+        if (customerId == 0) {
+            ObservableList<String> personNames = FXCollections.observableArrayList();
+            for (Person person : Person.people) {
+                personNames.add(person.lastName + ", " + person.firstName);
+            }
+            customerBox = UIHelpers.createComboBox(personNames, customerProperty);
+            fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
+            customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> {
+                int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
+                Person selectedCustomer = Person.people.get(selectedCustomerId);
+                int id = selectedCustomer.id;
+                ObservableList purchases = FXCollections.observableArrayList(
+                        CreditCardPurchase.search(id)
+                );
+                creditCardPurchaseTable.setItems(purchases);
+                creditCardPurchaseTable.refresh();
+            });
+        }
 
         setupCreditCardPurchaseTable();
 
@@ -55,7 +77,9 @@ public class CreditCardViewScene {
 
         creditCardPurchaseTable.getColumns().addAll(description, price, dateOfPurchase);
 
-        ObservableList purchases = FXCollections.observableArrayList(CreditCardPurchase.search(customerId));
-        creditCardPurchaseTable.setItems(purchases);
+        if (customerId != 0) {
+            ObservableList purchases = FXCollections.observableArrayList(CreditCardPurchase.search(customerId));
+            creditCardPurchaseTable.setItems(purchases);
+        }
     }
 }

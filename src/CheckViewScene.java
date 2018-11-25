@@ -1,16 +1,14 @@
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.FileNotFoundException;
-import java.util.Date;
 
 /**
  * Allows viewing and stopping of checks for an account.
@@ -28,6 +26,11 @@ public class CheckViewScene {
     private TableView<Check> checkTable = new TableView<>(); // The table of checks being viewed.
     private HBox buttonHBox = new HBox(); // Contains the buttons at the bottom of the scene.
 
+    private ComboBox customerBox; // The customer selection box (which allows searching by customer).
+
+    // Stores the "customerBox"'s selected customer.
+    private final StringProperty customerProperty = new SimpleStringProperty("");
+
     // Constructor
     public CheckViewScene(int customerId) {
         this.customerId = customerId;
@@ -35,6 +38,25 @@ public class CheckViewScene {
         // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
+
+        if (customerId == 0) {
+            ObservableList<String> personNames = FXCollections.observableArrayList();
+            for (Person person : Person.people) {
+                personNames.add(person.lastName + ", " + person.firstName);
+            }
+            customerBox = UIHelpers.createComboBox(personNames, customerProperty);
+            fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
+            customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> {
+                int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
+                Person selectedCustomer = Person.people.get(selectedCustomerId);
+                int id = selectedCustomer.id;
+                ObservableList checks = FXCollections.observableArrayList(
+                        Check.searchChecksByCustomerID(id)
+                );
+                checkTable.setItems(checks);
+                checkTable.refresh();
+            });
+        }
 
         setupCheckTable();
 
@@ -74,8 +96,10 @@ public class CheckViewScene {
 
         checkTable.getColumns().addAll(amount, dateCheck, dateHonored, memo, payTo);
 
-        ObservableList checks = FXCollections.observableArrayList(Check.searchChecksByCustomerID(customerId));
-        checkTable.setItems(checks);
+        if (customerId != 0) {
+            ObservableList checks = FXCollections.observableArrayList(Check.searchChecksByCustomerID(customerId));
+            checkTable.setItems(checks);
+        }
     }
 
     // The "Honor Check" button's click event. Honors the check and does any necessary error checking.

@@ -68,6 +68,11 @@ class AccountManagementScene {
             Button makePaymentButton = new Button("Make Payment");
             makePaymentButton.setOnAction(x -> withdrawOrDeposit(false));
             buttonHBox.getChildren().addAll(makePaymentButton);
+
+            // C.C. Purchases Button
+            Button ccPurchasesButton = new Button("C.C. Purchases");
+            ccPurchasesButton.setOnAction(x -> ccPurchases());
+            buttonHBox.getChildren().addAll(ccPurchasesButton);
         } else if (!(UIHelpers.selectedAccountType == AccountType.CD)) {
             // If not viewing CDs (since CDs can just be closed- which withdraws their money).
 
@@ -427,5 +432,16 @@ class AccountManagementScene {
             return;
         }
         UIHelpers.navigateToScene(new DepositWithdrawScene(selectedAccount, isWithdraw).root);
+    }
+
+    // The "C.C. Purchases" button's click event. Navigates to the CreditCardViewScene if a credit card loan selected.
+    private void ccPurchases() {
+        Account selectedAccount = getSelectedAccount();
+        if (selectedAccount == null || !selectedAccount.accountType.equalsIgnoreCase("credit card")) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "You must select a credit card loan to view its purchases.");
+            return;
+        }
+        UIHelpers.navigateToScene(new CreditCardViewScene(selectedAccount.customerID).root);
     }
 }
