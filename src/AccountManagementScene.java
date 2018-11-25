@@ -21,25 +21,30 @@ import java.util.Date;
  */
 
 class AccountManagementScene {
+    // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "root" contains all UI of the scene (this is transferred on navigation to another page).
+    // "buttonHBox" holds the buttons at the bottom of the scene.
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
-
-    private TableView<SavingAccount> savingsTable = new TableView<>();
-    private TableView<LoanAccount> loanTable = new TableView<>();
-    private TableView<CheckingAccount> checkingTable = new TableView<>();
-    private TableView<CD> cdTable = new TableView<>();
-
-    private ComboBox customerBox;
-
-    private final StringProperty customerProperty = new SimpleStringProperty("");
-
     private HBox buttonHBox = new HBox();
 
-    ObservableList<Account> accounts;
+    private TableView<SavingAccount> savingsTable = new TableView<>(); // The table that holds savings accounts.
+    private TableView<LoanAccount> loanTable = new TableView<>(); // The table that holds loans.
+    private TableView<CheckingAccount> checkingTable = new TableView<>(); // The table that holds checking accounts.
+    private TableView<CD> cdTable = new TableView<>(); // The table that holds cds.
 
+    private ComboBox customerBox; // The customer selection box (which allows searching by customer).
+
+    // Stores the "customerBox"'s selected customer.
+    private final StringProperty customerProperty = new SimpleStringProperty("");
+
+    ObservableList<Account> accounts; // The displayed accounts.
+
+    // Constructor
     AccountManagementScene(ArrayList<Account> accounts) {
         this.accounts = FXCollections.observableArrayList(accounts);
 
+        // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
@@ -55,13 +60,13 @@ class AccountManagementScene {
         setupAccountTable();
     }
 
+    // Injects the correct buttons into the buttonBox based on the account type.
     private void initializeButtonBox() {
         buttonHBox.getChildren().clear();
         if (UIHelpers.selectedAccountType == AccountType.LOAN) {
             // Make Payment Button
             Button makePaymentButton = new Button("Make Payment");
             makePaymentButton.setOnAction(x -> withdrawOrDeposit(false));
-
             buttonHBox.getChildren().addAll(makePaymentButton);
         } else if (!(UIHelpers.selectedAccountType == AccountType.CD)) {
             // If not viewing CDs (since CDs can just be closed- which withdraws their money).
@@ -93,6 +98,7 @@ class AccountManagementScene {
         }
     }
 
+    // Filters the account box by the selected customer.
     private void changeSelectedCustomer() {
         int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
         Person selectedCustomer = Person.people.get(selectedCustomerId);
@@ -100,13 +106,18 @@ class AccountManagementScene {
         setupAccountTable(customerId);
     }
 
+    // Initializes the account table for the current account type.
     private void setupAccountTable() {
         setupAccountTable(0);
     }
-
     private void setupAccountTable(int searchId) {
-        initializeButtonBox();
+        initializeButtonBox(); // Initializes the button box with the correct buttons.
+
+        // Removes all previous tables and buttons.
         fieldVBox.getChildren().removeAll(savingsTable, checkingTable, cdTable, loanTable, buttonHBox);
+
+        // Ensures the correct accounts are displayed (the selected type and only the current user's if they are only a
+        // customer level user).
         if (searchId != 0) {
             switch (UIHelpers.selectedAccountType) {
                 case CHECKING:
@@ -138,6 +149,8 @@ class AccountManagementScene {
                     break;
             }
         }
+
+        // Adds the correct fields to the table for the selected account type.
         if (!accounts.isEmpty() && accounts.get(0) != null) {
             switch (UIHelpers.selectedAccountType) {
                 case CHECKING: {
@@ -269,6 +282,7 @@ class AccountManagementScene {
         buttonHBox.getChildren().add(backButton);
     }
 
+    // Selects an account when it is clicked on in its table.
     private Account getSelectedAccount() {
         Account selectedAccount = null;
         if (!accounts.isEmpty()) {
@@ -285,6 +299,8 @@ class AccountManagementScene {
         return selectedAccount;
     }
 
+    // The "Edit" button click event. Navigates to AccountAddEditScreen with the selected account (if an account is
+    // selected- otherwise, displays an error message).
     private void editAccount() {
         Account selectedAccount = getSelectedAccount();
         if (selectedAccount == null) {
@@ -295,6 +311,7 @@ class AccountManagementScene {
         UIHelpers.navigateToScene(new AccountAddEditScene(selectedAccount).root);
     }
 
+    // The "Close" button click event. Closes the selected account (displays error if no account selected).
     private void closeAccount() {
         Account selectedAccount = getSelectedAccount();
         if (selectedAccount == null) {
@@ -355,10 +372,10 @@ class AccountManagementScene {
         }
     }
 
+    // Refreshes an account table when changes are made.
     private void setAccountTableItems() {
         setAccountTableItems(FXCollections.observableArrayList());
     }
-
     private void setAccountTableItems(ObservableList<Account> accounts) {
         if (accounts.isEmpty()) {
             if (UIHelpers.currentUserLevel == 0) {
@@ -400,6 +417,8 @@ class AccountManagementScene {
         }
     }
 
+    // Both the "Deposit" and "Withdraw" button click events. Navigates to the DepositWithdrawScene in deposit or
+    // withdraw mode respectively (or displays an error if no account is selected).
     private void withdrawOrDeposit(boolean isWithdraw) {
         Account selectedAccount = getSelectedAccount();
         if (selectedAccount == null) {

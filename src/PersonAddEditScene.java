@@ -11,9 +11,23 @@ import javafx.scene.layout.VBox;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-public class PersonCreationScene {
-    Person editedPerson;
+/**
+ * Allows the adding and editing of a person and all their fields.
+ *
+ * @author  Hunter Berten
+ */
 
+public class PersonAddEditScene {
+    // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "root" contains all UI of the scene (this is transferred on navigation to another page).
+    // "buttonHBox" holds the buttons at the bottom of the scene.
+    private VBox fieldVBox = new VBox();
+    private HBox buttonHBox = new HBox();
+    StackPane root = new StackPane(fieldVBox, buttonHBox);
+
+    Person editedPerson; // The person being edited (or null, if no person is being edited).
+
+    // Field properties (stores values of the fields).
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
     private final StringProperty streetAddressProperty = new SimpleStringProperty("");
     private final StringProperty cityProperty = new SimpleStringProperty("");
@@ -23,11 +37,7 @@ public class PersonCreationScene {
     private final StringProperty lastNameProperty = new SimpleStringProperty("");
     private final StringProperty userLevelProperty = new SimpleStringProperty("");
 
-    private VBox fieldVBox = new VBox();
-    private HBox buttonHBox = new HBox();
-
-    StackPane root = new StackPane(fieldVBox, buttonHBox);
-
+    // The states selectable in the state box.
     private ObservableList<String> states = FXCollections.observableArrayList(
             "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
             "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
@@ -38,16 +48,19 @@ public class PersonCreationScene {
             "West Virginia", "Wisconsin", "Wyoming"
     );
 
-    public PersonCreationScene() {
+    // Constructors
+    public PersonAddEditScene() {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         createBaseCustomerCreationNodes();
     }
-
-    public PersonCreationScene(Person editedPerson) {
+    public PersonAddEditScene(Person editedPerson) {
         this.editedPerson = editedPerson;
+
+        // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         createBaseCustomerCreationNodes();
 
+        // Sets the fields to the passed person's values.
         socialSecurityProperty.set(String.valueOf(editedPerson.id));
         streetAddressProperty.set(editedPerson.streetAddress);
         cityProperty.set(editedPerson.city);
@@ -126,7 +139,6 @@ public class PersonCreationScene {
         if (!errorMessage.isEmpty()) {
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
-            // TODO: Save to file.
             try {
                 ArrayList<ArrayList> accounts = new ArrayList<>();
                 accounts.add(new ArrayList());

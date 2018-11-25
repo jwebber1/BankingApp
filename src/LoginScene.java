@@ -10,16 +10,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
- * Initializes application and accepts an SSN and, if valid, logs in as that user.
+ * The initial screen of the application. Initializes the app and accepts an SSN and, if valid, logs in as that
+ * user.
  *
  * @author  Hunter Berten
  */
 
 class LoginScene {
+    // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "root" contains all UI of the scene (this is transferred on navigation to another page).
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
-//    private final StringProperty userLevelProperty = new SimpleStringProperty("");
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
 
     LoginScene() {
@@ -38,23 +40,14 @@ class LoginScene {
             SavingAccount.importFile();
             CreditCardPurchase.importFile();
 
-//            for (CheckingAccount account : CheckingAccount.checkingAccounts) {
-//                account.mainAccountType = "Checking - " +
-//                    account.accountType.substring(0, 1).toUpperCase() +
-//                    account.accountType.substring(1);
-//            }
-//            for (LoanAccount account : LoanAccount.loans) {
-//                account.mainAccountType = "Loan - " + account.accountType;
-//            }
-//            for (CD account : CD.cds) {
-//                account.mainAccountType = "CD";
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
+        // SSN Field
         TextField socialSecurityField = UIHelpers.createTextField(socialSecurityProperty);
         fieldVBox.getChildren().add(UIHelpers.createHBox("Social Security #:", socialSecurityField));
 
@@ -65,6 +58,7 @@ class LoginScene {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
     }
 
+    // The "Login" button click event. Logs in as the user with the entered SSN (ensuring that the SSN is valid).
     private void login() {
         String errorMessage = "";
         errorMessage += UIHelpers.checkNumberField("Social Security #", socialSecurityProperty);

@@ -19,18 +19,20 @@ import java.util.Date;
  */
 
 public class CheckViewScene {
+    // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "root" contains all UI of the scene (this is transferred on navigation to another page).
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
-    private int customerId;
+    private int customerId; // The id of the customer whose checks are being viewed.
+    private TableView<Check> checkTable = new TableView<>(); // The table of checks being viewed.
+    private HBox buttonHBox = new HBox(); // Contains the buttons at the bottom of the scene.
 
-    private TableView<Check> checkTable = new TableView<>();
-
-    private HBox buttonHBox = new HBox();
-
+    // Constructor
     public CheckViewScene(int customerId) {
         this.customerId = customerId;
 
+        // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
@@ -56,6 +58,7 @@ public class CheckViewScene {
         fieldVBox.getChildren().addAll(checkTable, buttonHBox);
     }
 
+    // Injects the correct fields into the check table and binds the data to it.
     private void setupCheckTable() {
         TableColumn<Check, String> amount = new TableColumn<>("Amount");
         TableColumn<Check, String> dateCheck = new TableColumn<>("Date");
@@ -75,6 +78,7 @@ public class CheckViewScene {
         checkTable.setItems(checks);
     }
 
+    // The "Honor Check" button's click event. Honors the check and does any necessary error checking.
     private void honorCheck() {
         Check check = checkTable.getSelectionModel().getSelectedItem();
         if (check == null) {
@@ -87,7 +91,7 @@ public class CheckViewScene {
                     "This check has already been honored.");
             return;
         }
-        check.dateHonored = new Date();
+        check.honorCheck();
         try {
             Check.exportFile();
         } catch (FileNotFoundException e) {
@@ -99,6 +103,7 @@ public class CheckViewScene {
         checkTable.refresh();
     }
 
+    // The "Stop Check" button's click event. Stops the check and does any necessary error checking.
     private void stopCheck() {
         Check check = checkTable.getSelectionModel().getSelectedItem();
         if (check == null) {

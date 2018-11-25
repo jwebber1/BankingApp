@@ -1,5 +1,6 @@
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -8,14 +9,25 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Allows the viewing, creation, and editing of users.
+ *
+ * @author  Hunter Berten
+ */
+
 class PersonManagementScene {
+    // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "root" contains all UI of the scene (this is transferred on navigation to another page).
+    // "buttonHBox" holds the buttons at the bottom of the scene.
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
-    TableView<Person> personTable = new TableView<>();
-
     private HBox buttonHBox = new HBox();
 
+    TableView<Person> personTable = new TableView<>(); // The table that displays the Persons.
+
+    // Constructor
     public PersonManagementScene() {
+        // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
@@ -23,7 +35,7 @@ class PersonManagementScene {
 
         // Edit Button
         Button addButton = new Button("Add");
-        addButton.setOnAction(x -> UIHelpers.navigateToScene(new PersonCreationScene().root));
+        addButton.setOnAction(x -> UIHelpers.navigateToScene(new PersonAddEditScene().root));
         buttonHBox.getChildren().add(addButton);
 
         // Edit Button
@@ -45,6 +57,7 @@ class PersonManagementScene {
         fieldVBox.getChildren().addAll(personTable, buttonHBox);
     }
 
+    // Injects fields into person table and binds the data to it.
     public void setupPersonTable() {
         TableColumn<Person, String> id = new TableColumn<>("SSN");
         TableColumn<Person, String> fName = new TableColumn<>("First Name");
@@ -66,11 +79,13 @@ class PersonManagementScene {
         personTable.setItems(list);
     }
 
+    // The "Edit" button's click event. Navigates to PersonAddEditScene (or displays an error if no person is selected).
     public void editPerson() {
         Person selectedPerson = personTable.getSelectionModel().getSelectedItem();
         if (selectedPerson == null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You must select an person to edit.");
             return;
         }
-        UIHelpers.navigateToScene(new PersonCreationScene(selectedPerson).root);
+        UIHelpers.navigateToScene(new PersonAddEditScene(selectedPerson).root);
     }
 }

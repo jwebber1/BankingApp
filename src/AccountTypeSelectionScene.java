@@ -12,9 +12,12 @@ import java.util.ArrayList;
  */
 
 public class AccountTypeSelectionScene {
+    // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "root" contains all UI of the scene (this is transferred on navigation to another page).
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
+    // Constructor
     AccountTypeSelectionScene() {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
 

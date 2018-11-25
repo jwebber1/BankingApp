@@ -31,13 +31,13 @@ import java.util.regex.Pattern;
  */
 
 class UIHelpers {
+    // The user level of the Person that is currently logged in. (0 = Customer, 1 = Teller, 2 = Manager)
     static int currentUserLevel = -1;
-    static Person currentUser;
-    private static double fieldWidth = 140;
-    private static double fieldHeight = 20;
-    private static StackPane mainPane = new StackPane();
+    static Person currentUser; // The Person that is currently logged in.
+    private static double fieldWidth = 140; // The default field width.
+    private static double fieldHeight = 20; // The default field height.
 
-    static AccountType selectedAccountType;
+    static AccountType selectedAccountType; // The account type selected at the AccountTypeSelectionScene.
     private static ArrayList<Account> selectedAccounts;
 
     static ObservableList<String> accountTypes = FXCollections.observableArrayList();
@@ -113,18 +113,6 @@ class UIHelpers {
 
     // Creates a combobox with Label having text "labelText" and containing the options passed in "options." The text
     // in the field is bound bidirectionally to the StringProperty "property."
-    static ComboBox createComboBox(HashMap<Integer, String> options, StringProperty property) {
-        ObservableList<String> values = FXCollections.observableArrayList();
-        values.addAll(options.values());
-
-        ComboBox<String> comboBox = new ComboBox<>(values);
-        comboBox.valueProperty().bindBidirectional(property);
-        comboBox.setPrefSize(fieldWidth, fieldHeight);
-        return comboBox;
-    }
-
-    // Creates a combobox with Label having text "labelText" and containing the options passed in "options." The text
-    // in the field is bound bidirectionally to the StringProperty "property."
     static ComboBox createComboBox(ObservableList<String> options, StringProperty property) {
         ComboBox<String> comboBox = new ComboBox<>(options);
         comboBox.valueProperty().bindBidirectional(property);
@@ -132,6 +120,7 @@ class UIHelpers {
         return comboBox;
     }
 
+    // Creates and returns a date picker field with "date" selected.
     static DatePicker createDatePicker(Property<LocalDate> date) {
         DatePicker datePicker = new DatePicker();
         datePicker.setPrefSize(fieldWidth, fieldHeight);
@@ -148,20 +137,8 @@ class UIHelpers {
         return textField;
     }
 
-    static String checkNumberField(String fieldName, StringProperty property) {
-        String errorMessage = "";
-
-        // Contains ONLY Numbers
-//        if (property.get().matches("[0-9]+")) {
-//            errorMessage += fieldName + " field must contain only numbers.\n";
-//        }
-
-        return errorMessage;
-    }
-
     // Checks basic text fields to ensure that they contain text and only valid text (for instance, no numbers).
     static String checkTextField(String fieldName, StringProperty property) {
-        // TODO: Implement any further checks- like checking for special characters.
         String errorMessage = "";
 
         // Field Length
@@ -170,13 +147,14 @@ class UIHelpers {
         }
 
         // Contains Numbers
-        if (property.get().matches(".*\\d+.*")) {
-            errorMessage += fieldName + " field cannot contain numbers.\n";
+        if (property.get().matches("^[a-zA-Z]$")) {
+            errorMessage += fieldName + " field cannot contain numbers or special characters.\n";
         }
 
         return errorMessage;
     }
 
+    // Creates a button with the given "buttonText", places it in the "fieldVBox", and gives it the click event "lambda."
     public static Button createButton(String buttonText, VBox fieldVBox, EventHandler<ActionEvent> lambda) {
         Button button = new Button(buttonText);
         button.setOnAction(lambda);
@@ -184,10 +162,12 @@ class UIHelpers {
         return button;
     }
 
+    // Navigates to the passed scene (in the form of the scene's root node, which holds all its nodes).
     public static void navigateToScene(Parent root) {
         Main.primaryStage.getScene().setRoot(root);
     }
 
+    // Shows an alert of the given type with the given message.
     public static void showAlert(Alert.AlertType alertType, String message) {
         Alert errorAlert = new Alert(alertType);
         if (alertType == Alert.AlertType.ERROR) {
@@ -199,11 +179,13 @@ class UIHelpers {
         errorAlert.showAndWait();
     }
 
+    // Sets the base settings for all buttons in the application.
     public static void setButtonSettings(HBox buttonHBox) {
         buttonHBox.setSpacing(10);
         buttonHBox.setAlignment(Pos.BASELINE_RIGHT);
     }
 
+    // Performs the extra step of ensuring the AccountManagementScene receives the correct accounts.
     public static void navigateToAccountManagementScene(AccountType type) {
         selectedAccountType = type;
         switch (type) {
@@ -241,6 +223,19 @@ class UIHelpers {
         navigateToScene(new AccountManagementScene(selectedAccounts).root);
     }
 
+    // Checks number field input.
+    static String checkNumberField(String fieldName, StringProperty property) {
+        String errorMessage = "";
+
+        // Contains ONLY Numbers
+        if (property.get().matches("^[0-9]$")) {
+            errorMessage += fieldName + " field must contain only numbers.\n";
+        }
+
+        return errorMessage;
+    }
+
+    // Returns to the previous AccountManagementScene with the accounts for the selected account type.
     public static void navigateBackToAccountManagement() {
         switch (UIHelpers.selectedAccountType) {
             case CHECKING:
