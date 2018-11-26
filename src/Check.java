@@ -72,7 +72,7 @@ public class Check{
 
         //while loop to go through the file
         while ((line = checksBR.readLine()) != null) {
-//            System.out.println(line);
+
             //if the file has a header, this if statement is to avoid that
             //remove "if" if final file has no header
             if(lineNum > 0) {
