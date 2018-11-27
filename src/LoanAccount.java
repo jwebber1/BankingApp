@@ -47,7 +47,7 @@ public class LoanAccount extends Account{
     //Constructor used only for editing an existing account
     public LoanAccount(int cusID, double balance, double payments, double initial, double currentPayDue,
                        double currIntRate, Date dateOpened, Date datePayDue,
-                       Date dateLastPayMade, boolean missedPayFlag, String loanType){
+                       Date dateLastPayMade, boolean missedPayFlag, String loanType) {
         super(cusID, Double.valueOf(loanDecimalFormatter.format(balance)), dateOpened, loanType);
         initialAmount = initial;
         currentPaymentDue = currentPayDue;
@@ -149,7 +149,7 @@ public class LoanAccount extends Account{
 
     //TODO: implement into the GUI and test
     //creates a CreditCardPurchase tied to a specific account's ssn
-    private void makeCCPurchase(double cost, String desc, Date date){
+    void makeCCPurchase(double cost, String desc, Date date){
         //if the purchase would not put account over the limit
         if (!ccPurchaseIsTooMuch(cost)){
             //create and add the new purchase to the purchases arrayList
@@ -165,7 +165,7 @@ public class LoanAccount extends Account{
     }//end of makeCCPurchase
 
     //returns true if new CC purchase would put account over limit and false if it would not
-    private boolean ccPurchaseIsTooMuch(double newAmount){
+    boolean ccPurchaseIsTooMuch(double newAmount){
         return (getCurrentPaymentDue() + newAmount) < getInitialAmount();
     }//end of isCCPurchaseTooMuch
 
@@ -301,15 +301,14 @@ public class LoanAccount extends Account{
     }//end of calcCurrentPayment
 
     //returns all loan accounts that match the given ssn and account type
-    static ArrayList<LoanAccount> search(int ssn, String type){
-        ArrayList<LoanAccount> accounts = new ArrayList<>();
+    static LoanAccount search(int ssn, String type){
         for (LoanAccount loan : loans) {
             //if it is a match
             if (loan.getCustomerID() == ssn && loan.getAccountType().equalsIgnoreCase(type)) {
-                accounts.add(loan);
+                return null;
             }
         }
-        return accounts;
+        return null;
     }//end of search
 
     //returns all loan accounts that match the given ssn

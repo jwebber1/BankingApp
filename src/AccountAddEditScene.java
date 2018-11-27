@@ -293,6 +293,7 @@ class AccountAddEditScene {
                                 accountBalance,
                                 ((LoanAccount)editedAccount).getPaymentsMade(),
                                 ((LoanAccount)editedAccount).getInitialAmount(),
+                                ((LoanAccount)editedAccount).getCurrentPaymentDue(),
                                 loanInterestRate,
                                 editedAccount.getDateAccountOpened(),
                                 ((LoanAccount)editedAccount).getDatePaymentDue(),
