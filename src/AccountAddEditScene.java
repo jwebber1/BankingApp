@@ -286,12 +286,28 @@ class AccountAddEditScene {
                         return;
                     }
                     String loanType = loanTypeProperty.get();
-                    LoanAccount loanAccount = new LoanAccount(
-                            customerId,
-                            accountBalance,
-                            loanInterestRate,
-                            loanType.toLowerCase()
-                    );
+                    LoanAccount loanAccount;
+                    if (editedAccount != null) {
+                        loanAccount = new LoanAccount(
+                                customerId,
+                                accountBalance,
+                                ((LoanAccount)editedAccount).getPaymentsMade(),
+                                ((LoanAccount)editedAccount).getInitialAmount(),
+                                loanInterestRate,
+                                editedAccount.getDateAccountOpened(),
+                                ((LoanAccount)editedAccount).getDatePaymentDue(),
+                                ((LoanAccount)editedAccount).getLastPaymentDate(),
+                                ((LoanAccount)editedAccount).getMissedPaymentFlag(),
+                                loanType.toLowerCase()
+                        );
+                    } else {
+                        loanAccount = new LoanAccount(
+                                customerId,
+                                accountBalance,
+                                loanInterestRate,
+                                loanType.toLowerCase()
+                        );
+                    }
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
