@@ -160,7 +160,7 @@ public class LoanAccount extends Account{
     }//end of calcLength
 
     //creates a CreditCardPurchase tied to a specific account
-    private void makeCCPurchase(double cost, String desc, Date date){
+    void makeCCPurchase(double cost, String desc, Date date){
         //if the purchase would not put account over the limit
         if (!ccPurchaseIsTooMuch(cost)){
             //update current payment due
@@ -174,7 +174,7 @@ public class LoanAccount extends Account{
     }//end of makeCCPurchase
 
     //returns true if new CC purchase would put account over limit and false if it would not
-    private boolean ccPurchaseIsTooMuch(double newAmount){
+    boolean ccPurchaseIsTooMuch(double newAmount){
         return (getCurrentPaymentDue() + newAmount) < getInitialAmount();
     }//end of isCCPurchaseTooMuch
 

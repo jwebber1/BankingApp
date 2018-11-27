@@ -74,7 +74,13 @@ public class CheckViewScene {
 
         // Back Button
         Button backButton = new Button("Back");
-        backButton.setOnAction(x -> UIHelpers.navigateBackToAccountManagement());
+        backButton.setOnAction(x -> {
+            if (UIHelpers.selectedAccountType != null) {
+                UIHelpers.navigateBackToAccountManagement();
+            } else {
+                UIHelpers.navigateToScene(new NavigationScene().root);
+            }
+        });
 
         buttonHBox.getChildren().add(backButton);
         fieldVBox.getChildren().addAll(checkTable, buttonHBox);

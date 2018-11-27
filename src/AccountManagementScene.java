@@ -159,6 +159,7 @@ class AccountManagementScene {
         if (!accounts.isEmpty() && accounts.get(0) != null) {
             switch (UIHelpers.selectedAccountType) {
                 case CHECKING: {
+                    checkingTable.getColumns().clear();
                     if (UIHelpers.currentUserLevel != 0) {
                         TableColumn<CheckingAccount, String> ssn = new TableColumn<>("SSN");
                         ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
@@ -193,6 +194,7 @@ class AccountManagementScene {
                     break;
                 }
                 case SAVING: {
+                    savingsTable.getColumns().clear();
                     if (UIHelpers.currentUserLevel != 0) {
                         TableColumn<SavingAccount, String> ssn = new TableColumn<>("SSN");
                         ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
@@ -212,6 +214,7 @@ class AccountManagementScene {
                     break;
                 }
                 case LOAN: {
+                    loanTable.getColumns().clear();
                     if (UIHelpers.currentUserLevel != 0) {
                         TableColumn<LoanAccount, String> ssn = new TableColumn<>("SSN");
                         ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
@@ -246,6 +249,7 @@ class AccountManagementScene {
                     break;
                 }
                 case CD: {
+                    cdTable.getColumns().clear();
                     if (UIHelpers.currentUserLevel != 0) {
                         TableColumn<CD, String> ssn = new TableColumn<>("SSN");
                         ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
@@ -277,6 +281,7 @@ class AccountManagementScene {
         // Back Button
         Button backButton = new Button("Back");
         backButton.setOnAction(x -> {
+            UIHelpers.selectedAccountType = null;
             try {
                 UIHelpers.navigateToScene(new AccountTypeSelectionScene().root);
             } catch (Exception e) {

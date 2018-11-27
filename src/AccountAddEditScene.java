@@ -21,7 +21,7 @@ import java.util.Date;
 /**
  * Allows user to add/edit any account type.
  *
- * @author  Hunter Berten
+ * @author Hunter Berten
  */
 
 class AccountAddEditScene {
@@ -67,25 +67,24 @@ class AccountAddEditScene {
         Person customer = Person.searchPeopleByCustomerID(editedAccount.customerID);
         customerProperty.set(customer.lastName + ", " + customer.firstName);
         accountBalanceProperty.set(String.valueOf("$" + editedAccount.accountBalance));
-        accountTypeProperty.set(UIHelpers.selectedAccountType.name);
 
         if (editedAccount instanceof CheckingAccount) {
-            checkingAccountTypeProperty.set(((CheckingAccount)editedAccount).accountType);
+            checkingAccountTypeProperty.set(((CheckingAccount) editedAccount).accountType);
         } else if (editedAccount instanceof LoanAccount) {
-            loanTypeProperty.set(((LoanAccount)editedAccount).accountType);
+            loanTypeProperty.set(((LoanAccount) editedAccount).accountType);
             if (editedAccount.accountType.equalsIgnoreCase("LT")) {
                 loanTypeProperty.set("Long Term");
             } else if (editedAccount.accountType.equalsIgnoreCase("ST")) {
                 loanTypeProperty.set("Short Term");
             }
-            interestRateProperty.set(Double.toString(((LoanAccount)editedAccount).getInterestRate()));
+            interestRateProperty.set(Double.toString(((LoanAccount) editedAccount).getInterestRate()));
 //            LocalDate datePaymentDue = ((LoanAccount)editedAccount).getDatePaymentDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 //            datePaymentDueProperty.setValue(datePaymentDue);
         } else if (editedAccount instanceof SavingAccount) {
-            interestRateProperty.set(Double.toString(((SavingAccount)editedAccount).getCurrentInterestRate()));
+            interestRateProperty.set(Double.toString(((SavingAccount) editedAccount).getCurrentInterestRate()));
         } else if (editedAccount instanceof CD) {
-            interestRateProperty.set(Double.toString(((CD)editedAccount).getCurrentInterestRate()));
-            LocalDate dateCDDue = ((CD)editedAccount).getDateCDDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            interestRateProperty.set(Double.toString(((CD) editedAccount).getCurrentInterestRate()));
+            LocalDate dateCDDue = ((CD) editedAccount).getDateCDDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             dateCDDueProperty.setValue(dateCDDue);
         }
     }
@@ -94,10 +93,14 @@ class AccountAddEditScene {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
+
         createBaseAccountCreationNodes();
         createCheckingFields();
         createLoanFields();
         createCdFields();
+
+        accountTypeProperty.set(UIHelpers.selectedAccountType.name);
+        updateAccountType(UIHelpers.selectedAccountType.name);
 
         savingsAccountFieldsVBox.setSpacing(8);
         checkingAccountFieldsVBox.setSpacing(8);
@@ -114,9 +117,10 @@ class AccountAddEditScene {
         customerBox = UIHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
 
-        ComboBox accountTypeBox = UIHelpers.createComboBox(UIHelpers.accountTypes, accountTypeProperty);
-        accountTypeBox.valueProperty().addListener((observable, oldValue, newValue) -> updateAccountType(newValue.toString()));
-        fieldVBox.getChildren().add(UIHelpers.createHBox("Account Type:", accountTypeBox));
+//        ComboBox accountTypeBox = UIHelpers.createComboBox(UIHelpers.accountTypes, accountTypeProperty);
+//        accountTypeBox.valueProperty().addListener((observable, oldValue, newValue) -> updateAccountType(newValue.toString()));
+//        accountTypeBox.getEditor().setEditable(false);
+//        fieldVBox.getChildren().add(UIHelpers.createHBox("Account Type:", accountTypeBox));
 
         HBox balanceField = UIHelpers.createHBox(
                 "Account Balance:", UIHelpers.createBalanceField(accountBalanceProperty));
@@ -188,10 +192,14 @@ class AccountAddEditScene {
         }
 
         double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
+        if (accountBalance <= 0) {
+            errorMessage += "Account balance must be a greater than 0.\n";
+        }
 
         if (accountTypeProperty.get().isEmpty()) {
             errorMessage += "Account Type must be selected.\n";
         }
+
 
         if (!errorMessage.isEmpty()) {
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
@@ -201,7 +209,7 @@ class AccountAddEditScene {
                     if (editedAccount != null) CheckingAccount.checkingAccounts.remove(editedAccount);
                     else if (SavingAccount.search(customerId) != null) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION,
-                        "This user already has a Savings account. Are you sure you selected the correct SSN?");
+                                "This user already has a Savings account. Are you sure you selected the correct SSN?");
                         return;
                     }
                     break;
@@ -228,43 +236,78 @@ class AccountAddEditScene {
 
             switch (UIHelpers.selectedAccountType) {
                 case SAVING:
+                    if (overdraftProtectionProperty.get().equals("True") && SavingAccount.search(customerId) == null) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "This account cannot have overdraft" +
+                                "protection because this customer does not have a savings account.");
+                    }
+
+                    double interestRate;
+                    try {
+                        interestRate = Double.parseDouble(interestRateProperty.get());
+                    } catch (NumberFormatException | NullPointerException e) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
+                                "number (such as \"0.2\" for 20%).");
+                        return;
+                    }
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
                             accountBalance,
-                            Double.parseDouble(interestRateProperty.get()),
+                            interestRate,
                             new Date()
                     );
                     SavingAccount.savingAccounts.add(savingAccount);
                     SavingAccount.exportFile();
+
+
                     break;
                 case CHECKING:
+                    if (overdraftProtectionProperty.get().equals("True") && SavingAccount.search(customerId) == null) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "This account cannot have overdraft" +
+                                "protection because this customer does not have a savings account.");
+                    }
                     CheckingAccount checkingAccount = new CheckingAccount(
                             customerId,
                             accountBalance,
                             overdraftProtectionProperty.get().equals("True"),
                             false,
-                            editedAccount == null ? 0 : ((CheckingAccount)editedAccount).getOverdraftsThisMonth(),
-                            new Date()
+                            editedAccount == null ? 0 : ((CheckingAccount) editedAccount).getOverdraftsThisMonth(),
+                            editedAccount == null ? new Date() : editedAccount.getDateAccountOpened()
                     );
                     CheckingAccount.checkingAccounts.add(checkingAccount);
                     CheckingAccount.exportFile();
                     break;
                 case LOAN:
+                    double loanInterestRate;
+                    try {
+                        loanInterestRate = Double.parseDouble(interestRateProperty.get());
+                    } catch (NumberFormatException | NullPointerException e) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
+                                "number (such as \"0.2\" for 20%).");
+                        return;
+                    }
                     String loanType = loanTypeProperty.get();
                     LoanAccount loanAccount = new LoanAccount(
                             customerId,
                             accountBalance,
-                            Double.parseDouble(interestRateProperty.get()),
+                            loanInterestRate,
                             loanType.toLowerCase()
                     );
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
                 case CD:
+                    double cdInterestRate;
+                    try {
+                        cdInterestRate = Double.parseDouble(interestRateProperty.get());
+                    } catch (NumberFormatException | NullPointerException e) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
+                                "number (such as \"0.2\" for 20%).");
+                        return;
+                    }
                     CD cd = new CD(
                             customerId,
                             accountBalance,
-                            Double.parseDouble(interestRateProperty.get()),
+                            cdInterestRate,
                             new Date(),
                             Date.from(dateCDDueProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()),
                             CD.cds.get(CD.cds.size() - 1).cdNumber + 1
