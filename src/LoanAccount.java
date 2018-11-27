@@ -12,9 +12,6 @@ import java.util.Date;
  *   the initialAmount is the original loan amount, currentPaymentDue is the calculated monthly payment.
  *   */
 
-//TODO: add the functionality to remove credit card purchases whenever they are payed off (not of high priority)
-//TODO: please use marked constructor for editing an already created loan account
-
 public class LoanAccount extends Account{
     private final static DecimalFormat loanDecimalFormatter = new DecimalFormat("0.00");
     private final static SimpleDateFormat loanDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -30,9 +27,9 @@ public class LoanAccount extends Account{
     static ArrayList<LoanAccount> loans = new ArrayList<>();
 
     //Constructor used for import method
-    private LoanAccount(int cusID, double balance, double payments, double initial, double currentPayDue, double monthlyInterestDue,
-                        double monthlyPrincipalDue, double currIntRate, Date dateOpened, Date datePayDue,
-                        Date dateLastPayMade, boolean missedPayFlag, String loanType){
+    private LoanAccount(int cusID, double balance, double payments, double initial, double currentPayDue,
+                        double monthlyInterestDue, double monthlyPrincipalDue, double currIntRate,
+                        Date dateOpened, Date datePayDue, Date dateLastPayMade, boolean missedPayFlag, String loanType){
         super(cusID, Double.valueOf(loanDecimalFormatter.format(balance)), dateOpened, loanType);
         paymentsMade = payments;
         initialAmount = Double.valueOf(loanDecimalFormatter.format(initial));
@@ -46,12 +43,14 @@ public class LoanAccount extends Account{
         missedPaymentFlag = missedPayFlag;
     }//end of Constructor for import method
 
-    //Constructor used for editing an account
-    public LoanAccount(int cusID, double balance, double payments, double initial,
+    //TODO: use this Constructor for editing an account
+    //Constructor used only for editing an existing account
+    public LoanAccount(int cusID, double balance, double payments, double initial, double currentPayDue,
                        double currIntRate, Date dateOpened, Date datePayDue,
                        Date dateLastPayMade, boolean missedPayFlag, String loanType){
         super(cusID, Double.valueOf(loanDecimalFormatter.format(balance)), dateOpened, loanType);
         initialAmount = initial;
+        currentPaymentDue = currentPayDue;
         paymentsMade = payments;
         interestRate = changeInterestRate(currIntRate);
         datePaymentDue = datePayDue;
@@ -73,24 +72,20 @@ public class LoanAccount extends Account{
         missedPaymentFlag = false;
         if (type.equalsIgnoreCase("credit card")){
             super.setAccountBalance(calcBalance());
-            interestDue = 0.0;
-            principalDue = 0.0;
         }
     }//end of smallest possible loan account constructor
 
-    //TODO: untested with credit cards
+    //TODO: test with credit cards
     //changes the interest rate for a specific account and updates related fields
     private double changeInterestRate(double newRate){
         //if the account is a credit card
         if (getAccountType().equalsIgnoreCase("Credit Card")){
-            //calculate and set the new monthly payment due
-            setCurrentPaymentDue(calcCurrentPayment());
-            //calculate and store the delta created from the old balance
-            double delta = calcBalance() - getAccountBalance();
             //set the new interest rate
             setInterestRate(newRate);
-            //calculate and set the new calculated balance based on the new rate
-            setAccountBalance(calcBalance() - delta);
+            //calculate and set the new balance, principal, and interest
+            setPrincipalDue(getCurrentPaymentDue());
+            setInterestDue(getPrincipalDue() * getInterestRate());
+            setAccountBalance(getPrincipalDue() + getInterestDue());
         }
         //else it is a short or long term loan
         else {
@@ -105,6 +100,7 @@ public class LoanAccount extends Account{
         return newRate;
     }//end of changeInterestRate
 
+    //TODO: Use this when to show how much is needed to pay off a short or long term loan
     //calculates the amount to pay off the loan right now
     private double calcPayOff(){
         double calculation = calcLength() - getPaymentsMade() * getCurrentPaymentDue();
@@ -123,20 +119,12 @@ public class LoanAccount extends Account{
 
     //calculates the balance of an account including interest
     private double calcBalance(){
-        double amount = 0.0;
+        double amount;
         //if it is a credit card
         if (getAccountType().equalsIgnoreCase("Credit Card")){
-            double sum = 0.0;
-            int count = 0;
-            for(CreditCardPurchase purchase: CreditCardPurchase.purchases){
-                if (getCustomerID() == purchase.getSSN()){
-                    sum += purchase.getPrice();
-                    count++;
-                }
-            }
-            if (count != 0) {
-                amount = sum + ((sum / count) * getInterestRate());
-            }
+            setPrincipalDue(getCurrentPaymentDue());
+            setInterestDue(getPrincipalDue() * getInterestRate());
+            amount = getPrincipalDue() + getInterestDue();
         }
         //else it is a short or long term loan
         else {
@@ -159,22 +147,25 @@ public class LoanAccount extends Account{
         return payments;
     }//end of calcLength
 
-    //creates a CreditCardPurchase tied to a specific account
-    void makeCCPurchase(double cost, String desc, Date date){
+    //TODO: implement into the GUI and test
+    //creates a CreditCardPurchase tied to a specific account's ssn
+    private void makeCCPurchase(double cost, String desc, Date date){
         //if the purchase would not put account over the limit
         if (!ccPurchaseIsTooMuch(cost)){
-            //update current payment due
-            setCurrentPaymentDue(getCurrentPaymentDue() + cost);
             //create and add the new purchase to the purchases arrayList
             CreditCardPurchase purchase = new CreditCardPurchase(getCustomerID(), desc, cost, date);
             CreditCardPurchase.purchases.add(purchase);
-            //update calculated balance for new purchase
-            setInitialAmount(calcBalance());
+            //calculate and set current payment, principal, and interest due
+            setCurrentPaymentDue(getCurrentPaymentDue() + cost);
+            setPrincipalDue(getCurrentPaymentDue());
+            setInterestDue(getPrincipalDue() * getInterestRate());
+            //calculate and set new account balance
+            setAccountBalance(getPrincipalDue() + getInterestDue());
         }
     }//end of makeCCPurchase
 
     //returns true if new CC purchase would put account over limit and false if it would not
-    boolean ccPurchaseIsTooMuch(double newAmount){
+    private boolean ccPurchaseIsTooMuch(double newAmount){
         return (getCurrentPaymentDue() + newAmount) < getInitialAmount();
     }//end of isCCPurchaseTooMuch
 
@@ -183,7 +174,7 @@ public class LoanAccount extends Account{
         return date.after(getDatePaymentDue());
     }//end of checkIfLate
 
-    //TODO: credit card payments are untested
+    //TODO: test credit card payments
     //Makes a payment on a selected loan account
     void makePayment(double amount){
         Date now = new Date();
@@ -200,8 +191,6 @@ public class LoanAccount extends Account{
             if (amount == getAccountBalance()){
                 //clear the balance and payment due
                 setAccountBalance(fee);
-                setCurrentPaymentDue(0.0);
-
             }
             //if the payment is less than the current amount due
             if (amount < getAccountBalance()){
@@ -216,6 +205,10 @@ public class LoanAccount extends Account{
             for (CreditCardPurchase purchase: purchases){
                 CreditCardPurchase.purchases.remove(purchase);
             }
+            //update current payment, principal, and interest due
+            setCurrentPaymentDue(getAccountBalance());
+            setPrincipalDue(getCurrentPaymentDue());
+            setInterestDue(getPrincipalDue() * getInterestRate());
             //increment date payment due by one month
             setDatePaymentDue(incrementDate(getDatePaymentDue(), 1));
         }
@@ -276,36 +269,23 @@ public class LoanAccount extends Account{
         return date;
     }//end of calcFirstPaymentDate
 
+    //TODO: deprecate this method, and use a combination of calcPayOff and a message
     //completely pays off loan account balance
     void payOffLoan() {
-        Date date = new Date();
-        for (LoanAccount loan : loans) {
-            //if the account matches
-            if (loan.getCustomerID() == getCustomerID()
-                    && loan.getAccountType().equalsIgnoreCase(getAccountType())) {
-                //update account info
-                loan.setLastPaymentDate(date);
-                loan.setCurrentPaymentDue(0.0);
-                loan.setAccountBalance(0.0);
-            }//end of if the account matches
-        }//end of for loop
+        return;
     }//end of payOffLoan
 
     //calculate the current payment due based on account type
     private double calcCurrentPayment(){
-        double amount;
-        double sum = 0.0;
-
+        double amount = 0.0;
         //if the account is a credit card
         if (this.getAccountType().equalsIgnoreCase("credit card")){
             //for all credit card purchases sum the purchases where the account matches ssn and the date of purchase
             for (CreditCardPurchase ccPurchase : CreditCardPurchase.purchases) {
                 if (ccPurchase.getSSN() == this.getCustomerID()) {
-                    sum += ccPurchase.getPrice();
+                    amount += ccPurchase.getPrice();
                 }
             }
-            //set amount to the formatted sum of credit card purchases
-            amount = sum;
         }
         //else the account is a short or long term loan
         else {
@@ -321,14 +301,15 @@ public class LoanAccount extends Account{
     }//end of calcCurrentPayment
 
     //returns all loan accounts that match the given ssn and account type
-    static LoanAccount search(int ssn, String type){
+    static ArrayList<LoanAccount> search(int ssn, String type){
+        ArrayList<LoanAccount> accounts = new ArrayList<>();
         for (LoanAccount loan : loans) {
             //if it is a match
             if (loan.getCustomerID() == ssn && loan.getAccountType().equalsIgnoreCase(type)) {
-                return loan;
+                accounts.add(loan);
             }
         }
-        return null;
+        return accounts;
     }//end of search
 
     //returns all loan accounts that match the given ssn
