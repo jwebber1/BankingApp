@@ -238,8 +238,8 @@ class AccountManagementScene {
                     TableColumn<LoanAccount, String> datePaymentDue = new TableColumn<>("Date Payment Due");
                     datePaymentDue.setCellValueFactory(new PropertyValueFactory<>("datePaymentDue"));
 
-                    TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Remaining");
-                    paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsLeft"));
+                    TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Made");
+                    paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsMade"));
 
                     loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, interestDue, datePaymentDue, currentPayment, paymentsLeft);
                     fieldVBox.getChildren().addAll(loanTable, buttonHBox);

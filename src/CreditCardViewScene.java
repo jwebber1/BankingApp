@@ -1,3 +1,5 @@
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -9,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -30,6 +33,10 @@ public class CreditCardViewScene {
     private ComboBox customerBox; // The customer selection box (which allows searching by customer).
     // Stores the "customerBox"'s selected customer.
     private final StringProperty customerProperty = new SimpleStringProperty("");
+
+    private final StringProperty costProperty = new SimpleStringProperty("");
+    private final StringProperty descriptionProperty = new SimpleStringProperty("");
+    private final Property<LocalDate> dateProperty = new SimpleObjectProperty<>();
 
     public CreditCardViewScene(int customerId) {
         this.customerId = customerId;
@@ -57,6 +64,25 @@ public class CreditCardViewScene {
         }
 
         setupCreditCardPurchaseTable();
+
+        if (UIHelpers.currentUserLevel != 0) {
+            Label makePurchaseLabel = new Label("Make Purchase");
+            fieldVBox.getChildren().add(makePurchaseLabel);
+
+            HBox balanceField = UIHelpers.createHBox("Cost:", UIHelpers.createBalanceField(costProperty));
+            fieldVBox.getChildren().add(balanceField);
+
+            TextField descriptionField = UIHelpers.createTextField(descriptionProperty);
+            fieldVBox.getChildren().add(UIHelpers.createHBox("Description:", descriptionField));
+
+            DatePicker datePicker = UIHelpers.createDatePicker(dateProperty);
+            fieldVBox.getChildren().add(UIHelpers.createHBox("Date:", datePicker));
+
+            Button backButton = new Button("Save");
+            backButton.setOnAction(x -> {
+                LoanAccount.
+            });
+        }
 
         // Back Button
         Button backButton = new Button("Back");

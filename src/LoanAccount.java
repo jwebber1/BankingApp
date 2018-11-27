@@ -329,15 +329,14 @@ public class LoanAccount extends Account{
     }//end of calcCurrentPayment
 
     //returns all loan accounts that match the given ssn and account type
-    static ArrayList<LoanAccount> search(int ssn, String type){
-        ArrayList<LoanAccount> accounts = new ArrayList<>();
+    static LoanAccount search(int ssn, String type){
         for (LoanAccount loan : loans) {
             //if it is a match
             if (loan.getCustomerID() == ssn && loan.getAccountType().equalsIgnoreCase(type)) {
-                accounts.add(loan);
+                return loan;
             }
         }
-        return accounts;
+        return null;
     }//end of search
 
     //returns all loan accounts that match the given ssn

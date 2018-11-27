@@ -257,8 +257,6 @@ class AccountAddEditScene {
                             Double.parseDouble(interestRateProperty.get()),
                             loanType.toLowerCase()
                     );
-//                    Date datePaymentDue = Date.from(datePaymentDueProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-//                    loanAccount.setDatePaymentDue(datePaymentDue);
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
