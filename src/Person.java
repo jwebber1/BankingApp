@@ -56,10 +56,6 @@ public class Person {
         //buffer string to temporarily hold the line retrieved
         String line;
 
-        //creates the ArrayList of data
-        ArrayList<Person> importPerson = new ArrayList<>();
-        ArrayList<ArrayList> accounts = new ArrayList<>();
-
         //generic counter to know the line currently on
         int lineNum = 0;
 
