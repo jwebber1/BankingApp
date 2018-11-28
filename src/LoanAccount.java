@@ -33,7 +33,7 @@ public class LoanAccount extends Account{
         super(cusID, Double.valueOf(loanDecimalFormatter.format(balance)), dateOpened, loanType);
         paymentsMade = payments;
         initialAmount = Double.valueOf(loanDecimalFormatter.format(initial));
-        interestRate = changeInterestRate(currIntRate);
+        interestRate = currIntRate;
         mainAccountType = "Loan - " + accountType;
         currentPaymentDue = currentPayDue;
         interestDue = monthlyInterestDue;
@@ -43,7 +43,6 @@ public class LoanAccount extends Account{
         missedPaymentFlag = missedPayFlag;
     }//end of Constructor for import method
 
-    //TODO: use this Constructor for editing an account
     //Constructor used only for editing an existing account
     public LoanAccount(int cusID, double balance, double payments, double initial, double currentPayDue,
                        double currIntRate, Date dateOpened, Date datePayDue,
@@ -123,7 +122,7 @@ public class LoanAccount extends Account{
         //if it is a credit card
         if (getAccountType().equalsIgnoreCase("Credit Card")){
             setPrincipalDue(getCurrentPaymentDue());
-            setInterestDue(getPrincipalDue() * getInterestRate());
+            setInterestDue(Double.valueOf(loanDecimalFormatter.format(getPrincipalDue() * getInterestRate())));
             amount = getPrincipalDue() + getInterestDue();
         }
         //else it is a short or long term loan
@@ -158,7 +157,7 @@ public class LoanAccount extends Account{
             //calculate and set current payment, principal, and interest due
             setCurrentPaymentDue(getCurrentPaymentDue() + cost);
             setPrincipalDue(getCurrentPaymentDue());
-            setInterestDue(getPrincipalDue() * getInterestRate());
+            setInterestDue(Double.valueOf(loanDecimalFormatter.format(getPrincipalDue() * getInterestRate())));
             //calculate and set new account balance
             setAccountBalance(getPrincipalDue() + getInterestDue());
         }
@@ -166,7 +165,7 @@ public class LoanAccount extends Account{
 
     //returns true if new CC purchase would put account over limit and false if it would not
     boolean ccPurchaseIsTooMuch(double newAmount){
-        return (getCurrentPaymentDue() + newAmount) < getInitialAmount();
+        return (getCurrentPaymentDue() + newAmount) > getInitialAmount();
     }//end of isCCPurchaseTooMuch
 
     //checks to see if payment is late
@@ -190,14 +189,14 @@ public class LoanAccount extends Account{
             //if the payment is equal to the current amount due
             if (amount == getAccountBalance()){
                 //clear the balance and payment due
-                setAccountBalance(fee);
+                setCurrentPaymentDue(fee);
             }
             //if the payment is less than the current amount due
             if (amount < getAccountBalance()){
                 //charge fee for late payment/too little payed
                 fee = 75.00;
                 //calculate new account balance
-                setAccountBalance(getAccountBalance() - amount + fee);
+                setCurrentPaymentDue(getAccountBalance() - amount + fee);
             }
             //get all purchases for this account
             ArrayList<CreditCardPurchase> purchases = CreditCardPurchase.search(getCustomerID());
@@ -205,10 +204,10 @@ public class LoanAccount extends Account{
             for (CreditCardPurchase purchase: purchases){
                 CreditCardPurchase.purchases.remove(purchase);
             }
-            //update current payment, principal, and interest due
-            setCurrentPaymentDue(getAccountBalance());
+            //update account balance, principal, and interest due
             setPrincipalDue(getCurrentPaymentDue());
-            setInterestDue(getPrincipalDue() * getInterestRate());
+            setInterestDue(Double.valueOf(loanDecimalFormatter.format(getPrincipalDue() * getInterestRate())));
+            setAccountBalance(getPrincipalDue() + getInterestDue());
             //increment date payment due by one month
             setDatePaymentDue(incrementDate(getDatePaymentDue(), 1));
         }

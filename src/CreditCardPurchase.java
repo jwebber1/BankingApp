@@ -25,11 +25,11 @@ public class CreditCardPurchase {
     //returns all credit card purchases that match the given ssn
     public static ArrayList<CreditCardPurchase> search(int ssn){
         ArrayList<CreditCardPurchase> ccPurchases = new ArrayList<>();
-        for (int i = 0; i < purchases.size(); i++){
+        for (CreditCardPurchase purchase : purchases){
             //if it is a match
-            if (purchases.get(i).getSSN() == ssn){
+            if (purchase.getSSN() == ssn){
                 //add the match to ccPurchases
-                ccPurchases.add(purchases.get(i));
+                ccPurchases.add(purchase);
             }
         }
         return ccPurchases;
