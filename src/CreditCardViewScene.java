@@ -126,6 +126,7 @@ public class CreditCardViewScene {
         Date date = Date.from(dateProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
         loan.makeCCPurchase(cost, descriptionProperty.get(), date);
         try {
+            LoanAccount.exportFile();
             CreditCardPurchase.exportFile();
             creditCardPurchaseTable.setItems(FXCollections.observableArrayList(CreditCardPurchase.search(id)));
             creditCardPurchaseTable.refresh();
