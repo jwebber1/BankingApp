@@ -152,7 +152,7 @@ public class LoanAccount extends Account{
         //if the purchase would not put account over the limit
         if (!ccPurchaseIsTooMuch(cost)){
             //create and add the new purchase to the purchases arrayList
-            CreditCardPurchase purchase = new CreditCardPurchase(getCustomerID(), desc, cost, date, false);
+            CreditCardPurchase purchase = new CreditCardPurchase(getCustomerID(), desc, cost, date);
             CreditCardPurchase.purchases.add(purchase);
             //calculate and set current payment, principal, and interest due
             setCurrentPaymentDue(getCurrentPaymentDue() + cost);
@@ -190,9 +190,6 @@ public class LoanAccount extends Account{
             if (amount == getAccountBalance()){
                 //clear the balance and payment due
                 setCurrentPaymentDue(fee);
-                for (CreditCardPurchase purchase : CreditCardPurchase.purchases){
-                    purchase.setPaid(true);
-                }
             }
             //if the payment is less than the current amount due
             if (amount < getAccountBalance()){

@@ -12,16 +12,14 @@ public class CreditCardPurchase {
     private String description;
     private double price;
     private Date dateOfPurchase;
-    private boolean paid;
     static ArrayList<CreditCardPurchase> purchases = new ArrayList<>();
 
     //create a new CreditCardPurchase object instantiated with the given variables
-    public CreditCardPurchase(int ssn, String desc, double cost, Date date, boolean isPaid){
+    public CreditCardPurchase(int ssn, String desc, double cost, Date date){
         SSN = ssn;
         description = desc;
         price = Double.valueOf(ccDecimalFormatter.format(cost));
         dateOfPurchase = date;
-        paid = isPaid;
     }//end of CreditCardPurchase Constructor
 
     //returns all credit card purchases that match the given ssn
@@ -54,10 +52,9 @@ public class CreditCardPurchase {
                 String desc = field[1];
                 double price = Double.parseDouble(field[2]);
                 Date date = ccDateFormatter.parse(field[3]);
-                boolean isPaid = Boolean.parseBoolean(field[4]);
 
                 //create new CreditCardPurchase object
-                CreditCardPurchase purchase = new CreditCardPurchase(ssn, desc, price, date, isPaid);
+                CreditCardPurchase purchase = new CreditCardPurchase(ssn, desc, price, date);
 
                 //add purchase to the arraylist
                 purchases.add(purchase);
@@ -75,7 +72,7 @@ public class CreditCardPurchase {
         PrintWriter ccWriter = new PrintWriter(new FileOutputStream("memory/ccpurchases.txt"));
 
         //printing the headers of the files
-        ccWriter.println("SSN,Description,Price,DateOfPurchase,IsPaid");
+        ccWriter.println("SSN,Description,Price,DateOfPurchase,");
 
         //go through all the checking accounts
         for (CreditCardPurchase purchase : purchases) {
@@ -83,8 +80,7 @@ public class CreditCardPurchase {
                     purchase.getSSN() + "," +
                             purchase.getDescription() + "," +
                             purchase.getPrice() + "," +
-                            ccDateFormatter.format(purchase.getDateOfPurchase()) + "," +
-                            purchase.paid + ","
+                            ccDateFormatter.format(purchase.getDateOfPurchase()) + ","
             );
             ccWriter.flush();
         }
@@ -94,12 +90,6 @@ public class CreditCardPurchase {
     }//end of exportFile
 
     //Getters and Setters for CreditCardPurchase Class
-    public boolean isPaid() {
-        return paid;
-    }
-    public void setPaid(boolean paid) {
-        this.paid = paid;
-    }
     public int getSSN() {
         return SSN;
     }
