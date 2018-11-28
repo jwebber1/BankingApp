@@ -305,7 +305,7 @@ public class LoanAccount extends Account{
         for (LoanAccount loan : loans) {
             //if it is a match
             if (loan.getCustomerID() == ssn && loan.getAccountType().equalsIgnoreCase(type)) {
-                return null;
+                return loan;
             }
         }
         return null;
