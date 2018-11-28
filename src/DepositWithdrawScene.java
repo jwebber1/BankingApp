@@ -45,8 +45,15 @@ class DepositWithdrawScene {
 
         // Payment Due Label (For Loans)
         if (editedAccount instanceof LoanAccount) {
-            Label paymentDueLabel = new Label("Payment Due: $" + ((LoanAccount) editedAccount).getCurrentPaymentDue());
-            fieldVBox.getChildren().add(paymentDueLabel);
+            if (!editedAccount.accountType.equalsIgnoreCase("credit card")) {
+                // Payment Due
+                Label paymentDueLabel = new Label("Payment Due: $" + ((LoanAccount) editedAccount).getCurrentPaymentDue());
+                fieldVBox.getChildren().add(paymentDueLabel);
+
+                // Complete Payoff Amount
+                Label completePayoffAmountLabel = new Label("Complete Payoff Amount: $" + ((LoanAccount) editedAccount).calcPayOff());
+                fieldVBox.getChildren().add(completePayoffAmountLabel);
+            }
         }
 
         // Withdraw or Deposit Button
@@ -76,11 +83,25 @@ class DepositWithdrawScene {
     private void withdrawOrDeposit() {
         try {
             double amount = Double.parseDouble(depositOrWithdrawAmount.get().replace("$", ""));
+            if (amount <= 0) {
+                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You must enter an amount greater than 0.");
+                return;
+            }
+            if (amount >= 99999999) {
+                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The amount you've entered is too large!");
+                return;
+            }
             if (editedAccount instanceof CheckingAccount) {
                 if (isWithdraw) ((CheckingAccount)editedAccount).withdraw(amount);
                 else ((CheckingAccount)editedAccount).deposit(amount);
                 CheckingAccount.exportFile();
             } else if (editedAccount instanceof LoanAccount) {
+                if (amount > editedAccount.getAccountBalance()) {
+                    UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot make a payment larger than " +
+                            "a loan's total balance.");
+                    return;
+                }
+
                 if (((LoanAccount)editedAccount).getCurrentPaymentDue() > amount) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                             "This amount does not fully cover this month's payment ($" +((LoanAccount) editedAccount).getCurrentPaymentDue()

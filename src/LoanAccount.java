@@ -101,7 +101,7 @@ public class LoanAccount extends Account{
 
     //TODO: Use this when to show how much is needed to pay off a short or long term loan
     //calculates the amount to pay off the loan right now
-    private double calcPayOff(){
+    double calcPayOff(){
         double calculation = calcLength() - getPaymentsMade() * getCurrentPaymentDue();
         return Double.parseDouble(loanDecimalFormatter.format(calculation));
     }//end of calcPayOff

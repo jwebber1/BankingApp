@@ -123,7 +123,18 @@ public class CreditCardViewScene {
                     "This purchase goes beyond this CC account's limit, and has been denied.");
             return;
         }
+        if (cost <= 0) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "A purchase must be greater than $0.00.");
+            return;
+        }
         Date date = Date.from(dateProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        String desc = descriptionProperty.get();
+        if (desc.isEmpty() || desc.length() > 255) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "A description must not be empty or exceed a length of 255 characters.");
+            return;
+        }
         loan.makeCCPurchase(cost, descriptionProperty.get(), date);
         try {
             LoanAccount.exportFile();

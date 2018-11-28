@@ -48,13 +48,15 @@ class AccountManagementScene {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
-        ObservableList<String> personNames = FXCollections.observableArrayList();
-        for (Person person : Person.people) {
-            personNames.add(person.lastName + ", " + person.firstName);
+        if (UIHelpers.currentUserLevel != 0) {
+            ObservableList<String> personNames = FXCollections.observableArrayList();
+            for (Person person : Person.people) {
+                personNames.add(person.lastName + ", " + person.firstName);
+            }
+            customerBox = UIHelpers.createComboBox(personNames, customerProperty);
+            fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
+            customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> changeSelectedCustomer());
         }
-        customerBox = UIHelpers.createComboBox(personNames, customerProperty);
-        fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
-        customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> changeSelectedCustomer());
 
         initializeButtonBox();
         setupAccountTable();

@@ -78,8 +78,6 @@ class AccountAddEditScene {
                 loanTypeProperty.set("Short Term");
             }
             interestRateProperty.set(Double.toString(((LoanAccount) editedAccount).getInterestRate()));
-//            LocalDate datePaymentDue = ((LoanAccount)editedAccount).getDatePaymentDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//            datePaymentDueProperty.setValue(datePaymentDue);
         } else if (editedAccount instanceof SavingAccount) {
             interestRateProperty.set(Double.toString(((SavingAccount) editedAccount).getCurrentInterestRate()));
         } else if (editedAccount instanceof CD) {
@@ -116,11 +114,6 @@ class AccountAddEditScene {
         }
         customerBox = UIHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
-
-//        ComboBox accountTypeBox = UIHelpers.createComboBox(UIHelpers.accountTypes, accountTypeProperty);
-//        accountTypeBox.valueProperty().addListener((observable, oldValue, newValue) -> updateAccountType(newValue.toString()));
-//        accountTypeBox.getEditor().setEditable(false);
-//        fieldVBox.getChildren().add(UIHelpers.createHBox("Account Type:", accountTypeBox));
 
         HBox balanceField = UIHelpers.createHBox(
                 "Account Balance:", UIHelpers.createBalanceField(accountBalanceProperty));
@@ -241,24 +234,26 @@ class AccountAddEditScene {
                                 "protection because this customer does not have a savings account.");
                     }
 
-                    double interestRate;
+                    double savingInterestRate;
                     try {
-                        interestRate = Double.parseDouble(interestRateProperty.get());
+                        savingInterestRate = Double.parseDouble(interestRateProperty.get());
                     } catch (NumberFormatException | NullPointerException e) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
                                 "number (such as \"0.2\" for 20%).");
                         return;
                     }
+                    if (savingInterestRate < 0.001 || savingInterestRate > 1.0) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be greater than or equal to 0.001 and less than or equal to 1.0.");
+                        return;
+                    }
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
                             accountBalance,
-                            interestRate,
+                            savingInterestRate,
                             new Date()
                     );
                     SavingAccount.savingAccounts.add(savingAccount);
                     SavingAccount.exportFile();
-
-
                     break;
                 case CHECKING:
                     if (overdraftProtectionProperty.get().equals("True") && SavingAccount.search(customerId) == null) {
@@ -283,6 +278,10 @@ class AccountAddEditScene {
                     } catch (NumberFormatException | NullPointerException e) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
                                 "number (such as \"0.2\" for 20%).");
+                        return;
+                    }
+                    if (loanInterestRate <= 0.001 || loanInterestRate > 1.0) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be greater than or equal to 0.001.");
                         return;
                     }
                     String loanType = loanTypeProperty.get();
@@ -319,6 +318,10 @@ class AccountAddEditScene {
                     } catch (NumberFormatException | NullPointerException e) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
                                 "number (such as \"0.2\" for 20%).");
+                        return;
+                    }
+                    if (cdInterestRate <= 0.001 || cdInterestRate > 1.0) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be greater than or equal to 0.001.");
                         return;
                     }
                     CD cd = new CD(
