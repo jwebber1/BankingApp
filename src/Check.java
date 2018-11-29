@@ -185,6 +185,15 @@ public class Check{
 
                 //if it finds the check, break out
                 if(foundCheck.equals(check)){
+                    //get the checking account of this customer
+                    CheckingAccount customerChecking = CheckingAccount.search(customerID);
+
+                    //charge the account $15
+                    customerChecking.setAccountBalance(customerChecking.getAccountBalance() - 15.0);
+
+                    //change account type if fall below $1000 (just in case)
+                    if(customerChecking.getAccountType().equals("gold") && customerChecking.getAccountBalance() < 1000.0){customerChecking.setAccountType("regular");}
+
                     break;
                 }
                 count++;
