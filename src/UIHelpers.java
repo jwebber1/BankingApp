@@ -147,7 +147,7 @@ class UIHelpers {
         }
 
         // Contains Numbers
-        if (property.get().matches("^[a-zA-Z]$")) {
+        if (!property.get().matches("^[a-zA-Z]*$")) {
             errorMessage += fieldName + " field cannot contain numbers or special characters.\n";
         }
 
@@ -220,15 +220,16 @@ class UIHelpers {
                 }
                 break;
         }
-        navigateToScene(new AccountManagementScene(selectedAccounts).root);
+        navigateToScene(new AccountManagementScene().root);
     }
 
     // Checks number field input.
-    static String checkNumberField(String fieldName, StringProperty property) {
+    static String
+    checkNumberField(String fieldName, StringProperty property) {
         String errorMessage = "";
 
         // Contains ONLY Numbers
-        if (property.get().matches("^[0-9]$")) {
+        if (!property.get().matches("^[0-9]*$")) {
             errorMessage += fieldName + " field must contain only numbers.\n";
         }
 

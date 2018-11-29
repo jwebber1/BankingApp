@@ -185,8 +185,8 @@ class AccountAddEditScene {
         }
 
         double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
-        if (accountBalance <= 0) {
-            errorMessage += "Account balance must be a greater than 0.\n";
+        if (accountBalance <= 0.01) {
+            errorMessage += "Account balance cannot be less than $0.01.\n";
         }
 
         if (accountTypeProperty.get().isEmpty()) {
