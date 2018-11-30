@@ -40,6 +40,8 @@ public class CreditCardViewScene {
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
     private final Property<LocalDate> dateProperty = new SimpleObjectProperty<>();
 
+    private Label balanceLabel = new Label("Account Balance: $????");
+
     public CreditCardViewScene(int customerId) {
         this.customerId = customerId;
 
@@ -62,8 +64,18 @@ public class CreditCardViewScene {
                 );
                 creditCardPurchaseTable.setItems(purchases);
                 creditCardPurchaseTable.refresh();
+
+                LoanAccount account = LoanAccount.search(id, "credit card");
+                if (account == null) {
+                    balanceLabel.textProperty().set("Account Balance: $????");
+                    return;
+                }
+                balanceLabel.textProperty().set("Account Balance: $" + account.accountBalance);
             });
+        } else {
+            balanceLabel.textProperty().set("Account Balance: $" + LoanAccount.search(customerId, "credit card").accountBalance);
         }
+        fieldVBox.getChildren().add(balanceLabel);
 
         setupCreditCardPurchaseTable();
         fieldVBox.getChildren().add(creditCardPurchaseTable);
@@ -102,12 +114,12 @@ public class CreditCardViewScene {
 
     // Runs on clicking the "Save Purchase" button. Saves the purchase created.
     private void saveCreditCardPurchase() {
-        if (customerProperty.get() == null) {
-            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "A customer must be selected.");
-            return;
-        }
         int id = customerId;
         if (customerId == 0) {
+            if (customerProperty.get() == null) {
+                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "A customer must be selected.");
+                return;
+            }
             int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
             Person selectedCustomer = Person.people.get(selectedCustomerId);
             id = selectedCustomer.id;
@@ -126,6 +138,11 @@ public class CreditCardViewScene {
         if (cost <= 0) {
             UIHelpers.showAlert(Alert.AlertType.INFORMATION,
                     "A purchase must be greater than $0.00.");
+            return;
+        }
+        if (dateProperty.getValue() == null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
+                    "You must enter a date.");
             return;
         }
         Date date = Date.from(dateProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());

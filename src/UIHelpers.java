@@ -48,7 +48,7 @@ class UIHelpers {
             "Credit Card"
     );
     static ObservableList<String> checkingAccountTypes = FXCollections.observableArrayList(
-            "That's My Bank",
+            "Regular",
             "Gold"
     );
 
