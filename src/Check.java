@@ -12,6 +12,7 @@ public class Check{
     Date dateCheck;
     String memo;
     Date dateHonored;
+    //todo: include boolean isStopped
     static ArrayList<Check> checks = new ArrayList<>();
 
     //constructor for the Check class (without date honored)
@@ -23,7 +24,7 @@ public class Check{
         this.dateCheck = dateCheckIn;
         this.memo = memoIn;
         this.dateHonored = null;
-
+        //todo: boolean isStopped
     }
 
     //constructor for the Check class (with date honored)
@@ -35,7 +36,7 @@ public class Check{
         this.dateCheck = dateCheckIn;
         this.memo = memoIn;
         this.dateHonored = dateHonored;
-
+        //todo: boolean isStopped
     }
 
     //getters and setters
@@ -53,6 +54,7 @@ public class Check{
     public void setMemo(String memo) {this.memo = memo;}
     public Date getDateHonored() {return dateHonored;}
     public void setDateHonored(Date dateHonored) {this.dateHonored = dateHonored;}
+    //todo: is stopped
 
     //current method to grab data from the checks textfile in "memory"
     public static void importFile() throws IOException, ParseException {
@@ -87,6 +89,7 @@ public class Check{
                 String payTo = splitLine[3];
                 Date dateCheck = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
                 String memo = splitLine[5];
+                //todo: boolean isStopped
 
                 //create a new check depending on the 6th position of the line
                 if(splitLine[6].equals("")) {
@@ -127,6 +130,7 @@ public class Check{
                     check.getMemo() + "," +
                     (check.getDateHonored() == null ? "": new SimpleDateFormat("MM/dd/yyy").format(check.getDateHonored()))
                      + ",");
+            //todo: boolean isStopped
             checkWriter.flush();
         }
 
@@ -187,7 +191,9 @@ public class Check{
                 if(foundCheck.equals(check)){
                     //get the checking account of this customer
                     CheckingAccount customerChecking = CheckingAccount.search(check.getCustomerID());
-
+                    
+                    //todo: include isStopped, set to true
+                    
                     //charge the account $15
                     customerChecking.setAccountBalance(customerChecking.getAccountBalance() - 15.0);
 
@@ -201,6 +207,7 @@ public class Check{
 
             //remove the check at the found location
             checks.remove(count);
+            //todo: Remove ^^^^^
         }
     }//end of stopCheck
 
