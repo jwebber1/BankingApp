@@ -183,10 +183,10 @@ public class Check{
             //go through each check...
             for(Check check: Check.checks){
 
-                //if it finds the check, break out
+                //if it finds the check, charge checking and break out
                 if(foundCheck.equals(check)){
                     //get the checking account of this customer
-                    CheckingAccount customerChecking = CheckingAccount.search(customerID);
+                    CheckingAccount customerChecking = CheckingAccount.search(check.getCustomerID());
 
                     //charge the account $15
                     customerChecking.setAccountBalance(customerChecking.getAccountBalance() - 15.0);
