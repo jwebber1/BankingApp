@@ -153,7 +153,7 @@ public class CheckingAccount extends Account{
             if(savingsNotEnough){
 
                 //get the new balance for checking after the overdraft
-                double overdraftAmt = ((customersSaving.getAccountBalance()+accountBalance) - withdrawAmt);
+                double overdraftAmt = ((customersSaving.getAccountBalance()+accountBalance+charge) - withdrawAmt);
 
                 //drain the Savings account to $0
                 customersSaving.setAccountBalance(0.0);
@@ -168,8 +168,11 @@ public class CheckingAccount extends Account{
             else{
 
                 //set the new Savings balance
-                customersSaving.setAccountBalance((customersSaving.getAccountBalance()+accountBalance) - withdrawAmt);
+                customersSaving.setAccountBalance((customersSaving.getAccountBalance()+accountBalance+charge) - withdrawAmt);
 
+                //since charge was pushed through the excess in savings account, undo the $.50 charge below
+                charge -= 0.5;
+                
                 //set the checking balance to $0
                 setAccountBalance(0.0);
             }
