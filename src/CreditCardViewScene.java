@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -53,6 +54,7 @@ public class CreditCardViewScene {
             for (Person person : Person.people) {
                 personNames.add(person.lastName + ", " + person.firstName);
             }
+            Collections.sort(personNames);
             customerBox = UIHelpers.createComboBox(personNames, customerProperty);
             fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
             customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> {
@@ -121,6 +123,10 @@ public class CreditCardViewScene {
                 return;
             }
             int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
+            if (selectedCustomerId == -1) {
+                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "A customer must be selected.");
+                return;
+            }
             Person selectedCustomer = Person.people.get(selectedCustomerId);
             id = selectedCustomer.id;
         }
@@ -129,35 +135,46 @@ public class CreditCardViewScene {
             UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The selected customer does not have a CC account.");
             return;
         }
+        String errorMessage = "";
+
         double cost = Double.parseDouble(costProperty.get().replace("$", ""));
         if (loan.ccPurchaseIsTooMuch(cost)) {
-            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
-                    "This purchase goes beyond this CC account's limit, and has been denied.");
-            return;
+            errorMessage += "This purchase goes beyond this CC account's limit, and has been denied.";
         }
         if (cost <= 0) {
-            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
-                    "A purchase must be greater than $0.00.");
-            return;
+            errorMessage += "A purchase must be greater than $0.00.";
         }
         if (dateProperty.getValue() == null) {
-            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
-                    "You must enter a date.");
-            return;
+            errorMessage += "You must enter a date.";
         }
-        Date date = Date.from(dateProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
         String desc = descriptionProperty.get();
         if (desc.isEmpty() || desc.length() > 255) {
-            UIHelpers.showAlert(Alert.AlertType.INFORMATION,
-                    "A description must not be empty or exceed a length of 255 characters.");
+            errorMessage += "A description must not be empty or exceed a length of 255 characters.";
+        }
+
+        if (!errorMessage.isEmpty()) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION, errorMessage);
             return;
         }
+
+        Date date = Date.from(dateProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
         loan.makeCCPurchase(cost, descriptionProperty.get(), date);
         try {
             LoanAccount.exportFile();
             CreditCardPurchase.exportFile();
             creditCardPurchaseTable.setItems(FXCollections.observableArrayList(CreditCardPurchase.search(id)));
             creditCardPurchaseTable.refresh();
+
+            int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
+            Person selectedCustomer = Person.people.get(selectedCustomerId);
+            int cusId = selectedCustomer.id;
+            LoanAccount account = LoanAccount.search(cusId, "credit card");
+            if (account == null) {
+                balanceLabel.textProperty().set("Account Balance: $????");
+                return;
+            }
+            balanceLabel.textProperty().set("Account Balance: $" + account.accountBalance);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

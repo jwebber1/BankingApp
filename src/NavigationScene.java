@@ -16,7 +16,8 @@ class NavigationScene {
     public NavigationScene() {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
-        Label nameLabel = new Label(UIHelpers.currentUser.lastName + ", " + UIHelpers.currentUser.firstName);
+        Label nameLabel = new Label(UIHelpers.currentUser.lastName + ", " + UIHelpers.currentUser.firstName +
+                " - " + UIHelpers.userLevels.get(UIHelpers.currentUserLevel));
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(nameLabel);
         if (UIHelpers.currentUserLevel > 0) {

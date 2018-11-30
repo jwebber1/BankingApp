@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -112,6 +113,7 @@ class AccountAddEditScene {
         for (Person person : Person.people) {
             personNames.add(person.lastName + ", " + person.firstName);
         }
+        Collections.sort(personNames);
         customerBox = UIHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
 

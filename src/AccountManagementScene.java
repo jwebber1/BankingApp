@@ -11,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -51,6 +52,7 @@ class AccountManagementScene {
             for (Person person : Person.people) {
                 personNames.add(person.lastName + ", " + person.firstName);
             }
+            Collections.sort(personNames);
             customerBox = UIHelpers.createComboBox(personNames, customerProperty);
             fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
             customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> changeSelectedCustomer());
@@ -144,6 +146,7 @@ class AccountManagementScene {
                     if (customerId <= 1) {
                         CheckingAccount account = checkingTable.getSelectionModel().getSelectedItem();
                         if (account == null) {
+                            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You must select an account to view checks.");
                             return;
                         }
                         customerId = account.customerID;
@@ -353,7 +356,6 @@ class AccountManagementScene {
                                     "($" + ((CD) selectedAccount).withdraw() + "). Continue?" :
                             "Would you like to close this CD (withdrawing $" + ((CD) selectedAccount).withdraw() +
                                     " money in the process)?",
-
                     ButtonType.YES, ButtonType.NO);
             alert.showAndWait();
 
