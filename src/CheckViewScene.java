@@ -129,7 +129,7 @@ public class CheckViewScene {
 
         buttonHBox.getChildren().add(backButton);
         fieldVBox.getChildren().add(buttonHBox);
-    }
+    } // End of Constructor
 
     // The "Save Purchase" click event.
     private void savePurchase() {
@@ -296,4 +296,4 @@ public class CheckViewScene {
         checkTable.setItems(checks);
         checkTable.refresh();
     }
-}
+} // End of CheckViewScene

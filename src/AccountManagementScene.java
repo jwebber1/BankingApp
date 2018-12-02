@@ -2,7 +2,6 @@ import Enums.AccountType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -39,7 +38,7 @@ class AccountManagementScene {
     // Stores the "customerBox"'s selected customer.
     private final StringProperty customerProperty = new SimpleStringProperty("");
 
-    ObservableList<Account> accounts;
+    ObservableList<Account> accounts; // The account shown in the displayed account table.
 
     // Constructor
     AccountManagementScene() {
@@ -60,7 +59,7 @@ class AccountManagementScene {
 
         initializeButtonBox();
         setupAccountTable();
-    }
+    } // End of Constructor
 
     // Injects the correct buttons into the buttonBox based on the account type.
     private void initializeButtonBox() {
@@ -88,6 +87,13 @@ class AccountManagementScene {
             buttonHBox.getChildren().addAll(depositButton, withdrawButton);
         }
 
+        if (UIHelpers.selectedAccountType == AccountType.CHECKING || UIHelpers.selectedAccountType == AccountType.SAVING) {
+            // Transfer Button
+            Button transferButton = new Button("Transfer");
+            transferButton.setOnAction(x -> transfer());
+            buttonHBox.getChildren().add(transferButton);
+        }
+
         if (UIHelpers.currentUserLevel != 0) {
             // Add Button
             Button addButton = new Button("Add");
@@ -96,12 +102,14 @@ class AccountManagementScene {
             // Edit Button
             Button editButton = new Button("Edit");
             editButton.setOnAction(x -> editAccount());
+            buttonHBox.getChildren().addAll(addButton, editButton);
 
-            // Close Button
-            Button closeButton = new Button("Close");
-            closeButton.setOnAction(x -> closeAccount());
-
-            buttonHBox.getChildren().addAll(addButton, editButton, closeButton);
+            if (UIHelpers.selectedAccountType != AccountType.CD || UIHelpers.currentUserLevel == 2) {
+                // Close Button
+                Button closeButton = new Button("Close");
+                closeButton.setOnAction(x -> closeAccount());
+                buttonHBox.getChildren().add(closeButton);
+            }
         }
     }
 
@@ -341,6 +349,26 @@ class AccountManagementScene {
         UIHelpers.navigateToScene(new AccountAddEditScene(selectedAccount).root);
     }
 
+    // The "Transfer" button click event.
+    private void transfer() {
+        Account selectedAccount = getSelectedAccount();
+        if (selectedAccount == null) {
+            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You must select an account to transfer from.");
+            return;
+        }
+        CheckingAccount checkingAccount = CheckingAccount.search(selectedAccount.customerID);
+        SavingAccount savingAccount = SavingAccount.search(selectedAccount.customerID);
+        if (checkingAccount == null || savingAccount == null) {
+            if (UIHelpers.currentUserLevel == 0) {
+                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You must have both a Savings and Checking account to transfer funds.");
+            } else{
+                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The customer with the selected account must have both a Savings and Checking account.");
+            }
+            return;
+        }
+        UIHelpers.navigateToScene(new TransferScene(savingAccount, checkingAccount).root);
+    }
+
     // The "Close" button click event. Closes the selected account (displays error if no account selected).
     private void closeAccount() {
         Account selectedAccount = getSelectedAccount();
@@ -378,14 +406,16 @@ class AccountManagementScene {
                 try {
                     switch (UIHelpers.selectedAccountType) {
                         case LOAN:
-                            Alert payOffAlert = new Alert(Alert.AlertType.CONFIRMATION,
-                                    "This loan has not been payed off in full- closing it will pay off it's remaining balance. " +
-                                            "Are you sure you wish to close this account?", ButtonType.YES, ButtonType.NO);
-                            payOffAlert.showAndWait();
-                            if (payOffAlert.getResult() == ButtonType.YES) {
-                                ((LoanAccount) selectedAccount).payOffLoan();
-                                LoanAccount.loans.remove(selectedAccount);
-                                LoanAccount.exportFile();
+                            if (!selectedAccount.accountType.equalsIgnoreCase("credit card")) {
+                                Alert payOffAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                                        "This loan has not been payed off in full- closing it will pay off its remaining balance ($" +
+                                                ((LoanAccount) selectedAccount).calcPayOff() + "). Are you sure you wish to close this account?",
+                                        ButtonType.YES, ButtonType.NO);
+                                payOffAlert.showAndWait();
+                                if (payOffAlert.getResult() == ButtonType.YES) {
+                                    LoanAccount.loans.remove(selectedAccount);
+                                    LoanAccount.exportFile();
+                                }
                             }
                             break;
                         case SAVING:
@@ -466,4 +496,4 @@ class AccountManagementScene {
         }
         UIHelpers.navigateToScene(new CreditCardViewScene(selectedAccount.customerID).root);
     }
-}
+} // End of AccountManagementScene

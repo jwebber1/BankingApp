@@ -50,7 +50,9 @@ public class PersonAddEditScene {
 
     // Constructors
     public PersonAddEditScene() {
+        // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
+
         createBaseCustomerCreationNodes();
     }
     public PersonAddEditScene(Person editedPerson) {
@@ -69,7 +71,7 @@ public class PersonAddEditScene {
         firstNameProperty.set(editedPerson.firstName);
         lastNameProperty.set(editedPerson.lastName);
         userLevelProperty.set(UIHelpers.userLevels.get(editedPerson.userLevel));
-    }
+    } // End of Constructors
 
     // Creates base fields that are used by all account types.
     private void createBaseCustomerCreationNodes() {
@@ -170,4 +172,4 @@ public class PersonAddEditScene {
             UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
         }
     }
-}
+} // End of PersonAddEditScene

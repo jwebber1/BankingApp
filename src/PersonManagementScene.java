@@ -55,7 +55,7 @@ class PersonManagementScene {
         buttonHBox.getChildren().add(cancelButton);
 
         fieldVBox.getChildren().addAll(personTable, buttonHBox);
-    }
+    } // End of Constructor
 
     // Injects fields into person table and binds the data to it.
     public void setupPersonTable() {
@@ -88,4 +88,4 @@ class PersonManagementScene {
         }
         UIHelpers.navigateToScene(new PersonAddEditScene(selectedPerson).root);
     }
-}
+} // End of PersonManagementScene

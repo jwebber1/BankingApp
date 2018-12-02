@@ -23,11 +23,13 @@ public class AccountTypeSelectionScene {
     AccountTypeSelectionScene() {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
+        // User Name Label
         Label nameLabel = new Label(UIHelpers.currentUser.lastName + ", " + UIHelpers.currentUser.firstName +
                 " - " + UIHelpers.userLevels.get(UIHelpers.currentUserLevel));
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
         fieldVBox.getChildren().add(nameLabel);
 
+        // Creates and injects navigation buttons (all if not customer, else just the accounts the user has).
         if (UIHelpers.currentUserLevel == 0) {
             int customerId = UIHelpers.currentUser.id;
             if (CheckingAccount.search(customerId) != null) {
@@ -48,8 +50,10 @@ public class AccountTypeSelectionScene {
             UIHelpers.createButton("Savings", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.SAVING));
             UIHelpers.createButton("CDs", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.CD));
         }
+
+        // Adds back button if user is not customer.
         if (UIHelpers.currentUserLevel > 0) {
             UIHelpers.createButton("Back", fieldVBox, x -> UIHelpers.navigateToScene(new NavigationScene().root));
         }
-    }
-}
+    } // End of Constructor
+} // End of AccountTypeSelectionScene

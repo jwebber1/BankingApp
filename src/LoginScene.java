@@ -22,10 +22,13 @@ class LoginScene {
     private VBox fieldVBox = new VBox();
     StackPane root = new StackPane(fieldVBox);
 
+    // Social security field property.
     private final StringProperty socialSecurityProperty = new SimpleStringProperty("");
 
+    // Constructor
     LoginScene() {
         try {
+            // Initializes application (imports data and initializes scenes).
             for (AccountType type : AccountType.values()) {
                 UIHelpers.accountTypes.add(type.name);
             }
@@ -54,12 +57,11 @@ class LoginScene {
         // Save Button
         Button loginButton = UIHelpers.createButton("Login", fieldVBox, x -> login());
         loginButton.setAlignment(Pos.BASELINE_RIGHT);
-
-        UIHelpers.setBaseSceneSettings(root, fieldVBox);
-    }
+    } // End of Constructor
 
     // The "Login" button click event. Logs in as the user with the entered SSN (ensuring that the SSN is valid).
     private void login() {
+        // Checks SSN
         String errorMessage = "";
         errorMessage += UIHelpers.checkNumberField("Social Security #", socialSecurityProperty);
         if (socialSecurityProperty.get().length() != 9) {
@@ -68,6 +70,7 @@ class LoginScene {
 
         Person person = null;
         if (errorMessage.isEmpty()) {
+            // If SSN is valid, checks if the user exists.
             int socialSecurityNumber = Integer.parseInt(socialSecurityProperty.get());
             person = Person.searchPeopleByCustomerID(socialSecurityNumber);
             if (person == null) {
@@ -80,8 +83,10 @@ class LoginScene {
         }
 
         if (!errorMessage.isEmpty()) {
+            // Shows errors (if any).
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
+            // Logs user in and navigates to the correct scene for their user level.
             UIHelpers.currentUser = person;
             UIHelpers.currentUserLevel = person.userLevel;
             if (person.userLevel == 0) {
@@ -91,4 +96,4 @@ class LoginScene {
             }
         }
     }
-}
+} // End of LoginScene

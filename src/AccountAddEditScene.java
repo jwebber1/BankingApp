@@ -26,15 +26,19 @@ import java.util.Date;
  */
 
 class AccountAddEditScene {
-    private Account editedAccount;
-    private ComboBox customerBox;
+    // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "root" contains all UI of the scene (this is transferred on navigation to another page).
+    private VBox fieldVBox = new VBox();
+    StackPane root = new StackPane(fieldVBox);
+
+    private Account editedAccount; // The account being edited.
+    private ComboBox customerBox; // The box that displays customers.
 
     // Fields Needed By All Account Types
     private final StringProperty customerProperty = new SimpleStringProperty("");
     private final StringProperty accountTypeProperty = new SimpleStringProperty("");
     private final StringProperty accountBalanceProperty = new SimpleStringProperty("$");
-
-    private final StringProperty interestRateProperty = new SimpleStringProperty("0.2");
+    private final StringProperty interestRateProperty = new SimpleStringProperty("2.0");
 
     // Checking Account Specific Fields
     private final StringProperty checkingAccountTypeProperty = new SimpleStringProperty("");
@@ -42,8 +46,6 @@ class AccountAddEditScene {
 
     // Loan Specific Fields
     private final StringProperty loanTypeProperty = new SimpleStringProperty("");
-//    private final Property<LocalDate> datePaymentDueProperty = new SimpleObjectProperty<>();
-
     private final Property<LocalDate> dateCDDueProperty = new SimpleObjectProperty<>();
 
     // Boxes to Hold Nodes
@@ -53,9 +55,7 @@ class AccountAddEditScene {
     private VBox loanFieldsVBox = new VBox();
     private VBox cdFieldsVBox = new VBox();
 
-    private VBox fieldVBox = new VBox();
-    StackPane root = new StackPane(fieldVBox);
-
+    // Constructor
     AccountAddEditScene() {
         initScene();
     }
@@ -86,21 +86,24 @@ class AccountAddEditScene {
             LocalDate dateCDDue = ((CD) editedAccount).getDateCDDue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             dateCDDueProperty.setValue(dateCDDue);
         }
-    }
+    } // End of Constructors
 
+    // Initializes the scene with the correct fields.
     public void initScene() {
+        // Sets base scene settings.
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
-
+        // Creates and injects nodes into UI.
         createBaseAccountCreationNodes();
         createCheckingFields();
         createLoanFields();
         createCdFields();
 
-        accountTypeProperty.set(UIHelpers.selectedAccountType.name);
-        updateAccountType(UIHelpers.selectedAccountType.name);
+        accountTypeProperty.set(UIHelpers.selectedAccountType.name); // Set account type for this account.
+        updateAccountType(UIHelpers.selectedAccountType.name); // Updates fields that should show based on account type.
 
+        // Set fields boxes spacing
         savingsAccountFieldsVBox.setSpacing(8);
         checkingAccountFieldsVBox.setSpacing(8);
         loanFieldsVBox.setSpacing(8);
@@ -109,6 +112,7 @@ class AccountAddEditScene {
 
     // Creates base fields that are used by all account types.
     private void createBaseAccountCreationNodes() {
+        // Creates customer box.
         ObservableList<String> personNames = FXCollections.observableArrayList();
         for (Person person : Person.people) {
             personNames.add(person.lastName + ", " + person.firstName);
@@ -121,12 +125,15 @@ class AccountAddEditScene {
                 "Account Balance:", UIHelpers.createBalanceField(accountBalanceProperty));
         fieldVBox.getChildren().add(balanceField);
 
-        cdFieldsVBox.getChildren().add(UIHelpers.createHBox(
-                "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
-        savingsAccountFieldsVBox.getChildren().add(UIHelpers.createHBox(
-                "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
-        loanFieldsVBox.getChildren().add(UIHelpers.createHBox(
-                "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
+        // Shows interest rate only if user is a manager.
+        if (UIHelpers.currentUserLevel == 2) {
+            cdFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                    "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
+            savingsAccountFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                    "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
+            loanFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                    "Interest Rate:", UIHelpers.createTextField(interestRateProperty)));
+        }
 
         // Cancel Button
         Button cancelButton = new Button("Cancel");
@@ -162,9 +169,6 @@ class AccountAddEditScene {
     private void createLoanFields() {
         ComboBox loanTypeBox = UIHelpers.createComboBox(UIHelpers.loanTypes, loanTypeProperty);
         loanFieldsVBox.getChildren().add(UIHelpers.createHBox("Loan Type:", loanTypeBox));
-
-//        DatePicker datePicker = UIHelpers.createDatePicker(datePaymentDueProperty);
-//        loanFieldsVBox.getChildren().add(UIHelpers.createHBox("Date Payment Due:", datePicker));
     }
 
     // Creates fields used by loans.
@@ -218,6 +222,7 @@ class AccountAddEditScene {
 
 
         if (!errorMessage.isEmpty()) {
+            // Shows error messages (if any).
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
             switch (UIHelpers.selectedAccountType) {
@@ -262,11 +267,11 @@ class AccountAddEditScene {
                         savingInterestRate = Double.parseDouble(interestRateProperty.get());
                     } catch (NumberFormatException | NullPointerException e) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
-                                "number (such as \"0.2\" for 20%).");
+                                "number (such as \"2.0\" for 2%).");
                         return;
                     }
-                    if (savingInterestRate < 0.001 || savingInterestRate > 1.0) {
-                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be greater than or equal to 0.001 and less than or equal to 1.0.");
+                    if (savingInterestRate < 0.001 || savingInterestRate > 100.0) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be greater than or equal to 0.001 and less than or equal to 100.0.");
                         return;
                     }
                     SavingAccount savingAccount = new SavingAccount(
@@ -394,4 +399,4 @@ class AccountAddEditScene {
         fieldVBox.getChildren().remove(buttonHBox);
         fieldVBox.getChildren().add(buttonHBox);
     }
-}
+} // End of AccountAddEditScene

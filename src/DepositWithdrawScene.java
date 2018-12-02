@@ -30,6 +30,7 @@ class DepositWithdrawScene {
     // The amount being deposited or withdrawn.
     private final StringProperty depositOrWithdrawAmount = new SimpleStringProperty("$");
 
+    // Constructor
     DepositWithdrawScene(Account editedAccount, boolean isWithdraw) {
         this.isWithdraw = isWithdraw;
         this.editedAccount = editedAccount;
@@ -77,7 +78,7 @@ class DepositWithdrawScene {
 
         buttonHBox.getChildren().addAll(cancelButton, withdrawOrDepositButton);
         fieldVBox.getChildren().addAll(amountField, buttonHBox);
-    }
+    } // End of Constructor
 
     // The "Withdraw" and "Deposit" buttons click events.
     private void withdrawOrDeposit() {
@@ -132,4 +133,4 @@ class DepositWithdrawScene {
             e.printStackTrace();
         }
     }
-}
+} // End of DepositWithdrawScene
