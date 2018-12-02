@@ -90,7 +90,7 @@ public class Check{
                 String payTo = splitLine[3];
                 Date dateCheck = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
                 String memo = splitLine[5];
-                Boolean isStopped = splitLine[7];
+                Boolean isStopped = Boolean.parseBoolean(splitLine[7]);
 
                 //create a new check depending on the 6th position of the line
                 if(splitLine[6].equals("")) {
@@ -98,7 +98,7 @@ public class Check{
                 }
                 else {
                     Date dateHonored = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[6]);
-                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo, dateHonored, isStopped));
+                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo,  isStopped, dateHonored));
                 }
 
                 //debugging importPersons
