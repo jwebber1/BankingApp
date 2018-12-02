@@ -12,30 +12,31 @@ public class Check{
     Date dateCheck;
     String memo;
     Date dateHonored;
+    Boolean isStopped;
     static ArrayList<Check> checks = new ArrayList<>();
 
     //constructor for the Check class (without date honored)
-    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn){
+    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, Boolean stopped){
         this.customerID = cusIdIn;
         this.checkID = checkIdIn;
         this.checkAmt = checkAmtIn;
         this.payTo = payToIn;
         this.dateCheck = dateCheckIn;
         this.memo = memoIn;
+        this.isStopped = stopped;
         this.dateHonored = null;
-
     }
 
     //constructor for the Check class (with date honored)
-    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, Date dateHonored){
+    public Check(int cusIdIn, int checkIdIn, double checkAmtIn, String payToIn, Date dateCheckIn, String memoIn, Boolean stopped, Date dateHonored){
         this.customerID = cusIdIn;
         this.checkID = checkIdIn;
         this.checkAmt = checkAmtIn;
         this.payTo = payToIn;
         this.dateCheck = dateCheckIn;
         this.memo = memoIn;
+        this.isStopped = stopped;
         this.dateHonored = dateHonored;
-
     }
 
     //getters and setters
@@ -53,6 +54,8 @@ public class Check{
     public void setMemo(String memo) {this.memo = memo;}
     public Date getDateHonored() {return dateHonored;}
     public void setDateHonored(Date dateHonored) {this.dateHonored = dateHonored;}
+    public Boolean getIsStopped() {return isStopped;}
+    public void setIsStopped(Boolean isStopped) {this.isStopped = isStopped;}
 
     //current method to grab data from the checks textfile in "memory"
     public static void importFile() throws IOException, ParseException {
@@ -87,14 +90,15 @@ public class Check{
                 String payTo = splitLine[3];
                 Date dateCheck = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[4]);
                 String memo = splitLine[5];
+                Boolean isStopped = splitLine[7];
 
                 //create a new check depending on the 6th position of the line
                 if(splitLine[6].equals("")) {
-                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo));
+                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo, isStopped));
                 }
                 else {
                     Date dateHonored = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[6]);
-                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo, dateHonored));
+                    checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo, dateHonored, isStopped));
                 }
 
                 //debugging importPersons
@@ -125,8 +129,8 @@ public class Check{
                     check.getPayTo() + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(check.getDateCheck()) + "," +
                     check.getMemo() + "," +
-                    (check.getDateHonored() == null ? "": new SimpleDateFormat("MM/dd/yyy").format(check.getDateHonored()))
-                     + ",");
+                    (check.getDateHonored() == null ? "": new SimpleDateFormat("MM/dd/yyy").format(check.getDateHonored())) + "," +
+                    check.getIsStopped() + ",");
             checkWriter.flush();
         }
 
@@ -178,20 +182,27 @@ public class Check{
 
         //if the check was found AND it has not been honored yet...
         if(foundCheck != null && foundCheck.getDateHonored() == null){
-            int count = 0;
 
             //go through each check...
             for(Check check: Check.checks){
 
-                //if it finds the check, break out
+                //if it finds the check, charge checking and break out
                 if(foundCheck.equals(check)){
+                    //get the checking account of this customer
+                    CheckingAccount customerChecking = CheckingAccount.search(check.getCustomerID());
+                    
+                    //set isStopped to true
+                    check.setIsStopped(true);
+                    
+                    //charge the account $15
+                    customerChecking.setAccountBalance(customerChecking.getAccountBalance() - 15.0);
+
+                    //change account type if fall below $1000 (just in case)
+                    if(customerChecking.getAccountType().equals("gold") && customerChecking.getAccountBalance() < 1000.0){customerChecking.setAccountType("regular");}
+
                     break;
                 }
-                count++;
             }
-
-            //remove the check at the found location
-            checks.remove(count);
         }
     }//end of stopCheck
 

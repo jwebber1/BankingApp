@@ -83,11 +83,11 @@ class DepositWithdrawScene {
     private void withdrawOrDeposit() {
         try {
             double amount = Double.parseDouble(depositOrWithdrawAmount.get().replace("$", ""));
-            if (amount <= 0) {
-                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You must enter an amount greater than 0.");
+            if (amount <= 0.01) {
+                UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot enter an amount less than $0.01.");
                 return;
             }
-            if (amount >= 99999999) {
+            if (amount >= 999999) {
                 UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The amount you've entered is too large!");
                 return;
             }
@@ -119,6 +119,10 @@ class DepositWithdrawScene {
                     LoanAccount.exportFile();
                 }
             } else if (editedAccount instanceof SavingAccount) {
+                if (isWithdraw && amount > editedAccount.accountBalance) {
+                    UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot withdraw more money than is in the account.");
+                    return;
+                }
                 if (isWithdraw) ((SavingAccount) editedAccount).withdraw(amount);
                 else ((SavingAccount) editedAccount).deposit(amount);
                 LoanAccount.exportFile();

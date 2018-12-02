@@ -24,28 +24,8 @@ public class Person {
         this.userLevel = uLevel;
     }
 
-    //getters and setters
-    public int getId() {return id;}
-    public void setId(int id) {this.id = id;}
-    public String getStreetAddress() {return streetAddress;}
-    public void setStreetAddress(String streetAddress) {this.streetAddress = streetAddress;}
-    public String getCity() {return city;}
-    public void setCity(String city) {this.city = city;}
-    public String getState() {return state;}
-    public void setState(String state) {this.state = state;}
-    public String getZipCode() {return zipCode;}
-    public void setZipCode(String zipCode) {this.zipCode = zipCode;}
-    public String getFirstName() {return firstName;}
-    public void setfirstName(String firstName) {this.firstName = firstName;}
-    public String getLastName() {return lastName;}
-    public void setlastName(String lastName) {this.lastName = lastName;}
-    public int getUserLevel() {return userLevel;}
-    public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
-
-
     //current method to grab data from the persons textfile in "memory"
     public static void importFile() throws IOException, ParseException {
-
         //creates a file referencing the text file in the memory folder
         File personsFileIn = new File("memory/people.txt");
 
@@ -77,16 +57,10 @@ public class Person {
                 String zipCode = splitLine[4];
                 String firstName = splitLine[5];
                 String lastName = splitLine[6];
-                int userLevel = 1;  //default to customer
-                //hard code userLevel to ssn
-                if (socialSecurityNumber == 000000002 || socialSecurityNumber == 000000001){userLevel = 2;}
-                else if (socialSecurityNumber == 000000000){userLevel = 3;}
+                int userLevel = Integer.parseInt(splitLine[7]);
 
                 //add the new data (in our case checking) to the ArrayList
                 people.add(new Person(socialSecurityNumber, streetAddress, city, state, zipCode, firstName, lastName, userLevel));
-
-                //debugging importPersons
-                //System.out.println("count: " + (lineNum) + "\t" + people.get(lineNum-1).toString());
             }
 
             //increment the line number
@@ -99,41 +73,60 @@ public class Person {
 
     //export people to people.txt
     public static void exportFile() throws FileNotFoundException {
-
         //create a new PrintWriter to write to a file
         PrintWriter personWriter = new PrintWriter(new FileOutputStream("memory/people.txt",false));
 
         //printing the headers of the files
-        personWriter.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,");
-
+        personWriter.println("SocialSecurityNumber,Address,City,State,ZIP,FirstName,LastName,UserLevel,");
 
         for(Person person: people) {
-            personWriter.println(person.getId() + "," + person.getStreetAddress() + "," +
-                    person.getCity() + "," + person.getState() + "," + person.getZipCode() + "," +
-                    person.getFirstName() + "," + person.getLastName() + ",");
+            personWriter.println(
+                    person.getId() + "," +
+                            person.getStreetAddress() + "," +
+                            person.getCity() + "," +
+                            person.getState() + "," +
+                            person.getZipCode() + "," +
+                            person.getFirstName() + "," +
+                            person.getLastName() + "," +
+                            person.getUserLevel() + ",");
 
             personWriter.flush();
         }
         //close the PrintWriter object
         personWriter.flush();
         personWriter.close();
-
     }//end of exportFile()
 
     //find one person given a customerID
     public static Person searchPeopleByCustomerID(int custId){
-
         //initialize searchResults to null
         Person searchResults = null;
-
         //loop through people in global arraylist
         for (Person person: people) {
             if(person.getId() == custId){
                 searchResults = person;
             }
         }
-
         //return found person OR null
         return searchResults;
     }
+
+    //Getters and setters for Person Class
+    //getters and setters
+    public int getId() {return id;}
+    public void setId(int id) {this.id = id;}
+    public String getStreetAddress() {return streetAddress;}
+    public void setStreetAddress(String streetAddress) {this.streetAddress = streetAddress;}
+    public String getCity() {return city;}
+    public void setCity(String city) {this.city = city;}
+    public String getState() {return state;}
+    public void setState(String state) {this.state = state;}
+    public String getZipCode() {return zipCode;}
+    public void setZipCode(String zipCode) {this.zipCode = zipCode;}
+    public String getFirstName() {return firstName;}
+    public void setfirstName(String firstName) {this.firstName = firstName;}
+    public String getLastName() {return lastName;}
+    public void setlastName(String lastName) {this.lastName = lastName;}
+    public int getUserLevel() {return userLevel;}
+    public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
 }//end of Person

@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -112,6 +113,7 @@ class AccountAddEditScene {
         for (Person person : Person.people) {
             personNames.add(person.lastName + ", " + person.firstName);
         }
+        Collections.sort(personNames);
         customerBox = UIHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
 
@@ -185,8 +187,29 @@ class AccountAddEditScene {
         }
 
         double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
-        if (accountBalance <= 0) {
-            errorMessage += "Account balance must be a greater than 0.\n";
+
+        switch (UIHelpers.selectedAccountType) {
+            case CD:
+                if (accountBalance <= 0.01) {
+                    errorMessage += "CD balance cannot be less than $0.01.\n";
+                }
+                break;
+            case LOAN:
+                if (loanTypeProperty.get().equalsIgnoreCase("credit card")) {
+                    if (accountBalance < 0) {
+                        errorMessage += "Credit card balance cannot be less than $0.00.\n";
+                    }
+                } else {
+                    if (accountBalance <= 0.01) {
+                        errorMessage += "Loan account balance cannot be less than $0.01.\n";
+                    }
+                }
+                break;
+            case SAVING:
+                if (accountBalance < 0) {
+                    errorMessage += "Savings account balance cannot be less than $0.00.\n";
+                }
+                break;
         }
 
         if (accountTypeProperty.get().isEmpty()) {
@@ -313,6 +336,10 @@ class AccountAddEditScene {
                     break;
                 case CD:
                     double cdInterestRate;
+                    if (dateCDDueProperty.getValue() == null) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "A CD must have a date due.");
+                        return;
+                    }
                     try {
                         cdInterestRate = Double.parseDouble(interestRateProperty.get());
                     } catch (NumberFormatException | NullPointerException e) {

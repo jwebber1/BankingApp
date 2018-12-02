@@ -2,6 +2,7 @@ import Enums.AccountType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -10,14 +11,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 /**
  * Allows viewing of all types of accounts, and allows navigation to adding accounts, allows selection of an account to
  * edit, close, view checks for, withdraw from, and deposit into.
  *
- * @author  Hunter Berten
+ * @author Hunter Berten
  */
 
 class AccountManagementScene {
@@ -38,12 +39,10 @@ class AccountManagementScene {
     // Stores the "customerBox"'s selected customer.
     private final StringProperty customerProperty = new SimpleStringProperty("");
 
-    ObservableList<Account> accounts; // The displayed accounts.
+    ObservableList<Account> accounts;
 
     // Constructor
-    AccountManagementScene(ArrayList<Account> accounts) {
-        this.accounts = FXCollections.observableArrayList(accounts);
-
+    AccountManagementScene() {
         // Sets base scene settings (padding, etc.).
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
@@ -53,6 +52,7 @@ class AccountManagementScene {
             for (Person person : Person.people) {
                 personNames.add(person.lastName + ", " + person.firstName);
             }
+            Collections.sort(personNames);
             customerBox = UIHelpers.createComboBox(personNames, customerProperty);
             fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
             customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> changeSelectedCustomer());
@@ -107,178 +107,137 @@ class AccountManagementScene {
 
     // Filters the account box by the selected customer.
     private void changeSelectedCustomer() {
-        int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
-        Person selectedCustomer = Person.people.get(selectedCustomerId);
-        int customerId = selectedCustomer.id;
-        setupAccountTable(customerId);
+        setupAccountTable();
     }
 
     // Initializes the account table for the current account type.
     private void setupAccountTable() {
-        setupAccountTable(0);
-    }
-    private void setupAccountTable(int searchId) {
         initializeButtonBox(); // Initializes the button box with the correct buttons.
 
         // Removes all previous tables and buttons.
         fieldVBox.getChildren().removeAll(savingsTable, checkingTable, cdTable, loanTable, buttonHBox);
 
-        // Ensures the correct accounts are displayed (the selected type and only the current user's if they are only a
-        // customer level user).
-        if (searchId != 0) {
-            switch (UIHelpers.selectedAccountType) {
-                case CHECKING:
-                    accounts = FXCollections.observableArrayList(CheckingAccount.search(searchId));
-                    break;
-                case LOAN:
-                    accounts = FXCollections.observableArrayList(LoanAccount.search(searchId));
-                    break;
-                case SAVING:
-                    accounts = FXCollections.observableArrayList(SavingAccount.search(searchId));
-                    break;
-                case CD:
-                    accounts = FXCollections.observableArrayList(CD.search(searchId));
-                    break;
-            }
-        } else if (UIHelpers.currentUserLevel != 0) {
-            switch (UIHelpers.selectedAccountType) {
-                case CHECKING:
-                    accounts = FXCollections.observableArrayList(CheckingAccount.checkingAccounts);
-                    break;
-                case LOAN:
-                    accounts = FXCollections.observableArrayList(LoanAccount.loans);
-                    break;
-                case SAVING:
-                    accounts = FXCollections.observableArrayList(SavingAccount.savingAccounts);
-                    break;
-                case CD:
-                    accounts = FXCollections.observableArrayList(CD.cds);
-                    break;
-            }
-        }
+        setDisplayedAccounts();
 
         // Adds the correct fields to the table for the selected account type.
-        if (!accounts.isEmpty() && accounts.get(0) != null) {
-            switch (UIHelpers.selectedAccountType) {
-                case CHECKING: {
-                    checkingTable.getColumns().clear();
-                    if (UIHelpers.currentUserLevel != 0) {
-                        TableColumn<CheckingAccount, String> ssn = new TableColumn<>("SSN");
-                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                        checkingTable.getColumns().add(ssn);
-                    }
+        switch (UIHelpers.selectedAccountType) {
+            case CHECKING: {
+                checkingTable.getColumns().clear();
+                if (UIHelpers.currentUserLevel != 0) {
+                    TableColumn<CheckingAccount, String> ssn = new TableColumn<>("SSN");
+                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                    checkingTable.getColumns().add(ssn);
+                }
 
-                    TableColumn<CheckingAccount, String> type = new TableColumn<>("Type");
-                    TableColumn<CheckingAccount, String> dateOpened = new TableColumn<>("Date Opened");
-                    TableColumn<CheckingAccount, String> balance = new TableColumn<>("Balance");
+                TableColumn<CheckingAccount, String> type = new TableColumn<>("Type");
+                TableColumn<CheckingAccount, String> dateOpened = new TableColumn<>("Date Opened");
+                TableColumn<CheckingAccount, String> balance = new TableColumn<>("Balance");
 
-                    type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
-                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+                type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
+                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
 
-                    checkingTable.getColumns().addAll(type, dateOpened, balance);
-                    fieldVBox.getChildren().addAll(checkingTable, buttonHBox);
+                checkingTable.getColumns().addAll(type, dateOpened, balance);
+                fieldVBox.getChildren().addAll(checkingTable, buttonHBox);
 
-                    Button viewChecksButton = new Button("View Checks");
-                    viewChecksButton.setOnAction(x -> {
-                        int customerId = UIHelpers.currentUser.id;
-                        if (customerId <= 1) {
-                            CheckingAccount account = checkingTable.getSelectionModel().getSelectedItem();
-                            if (account == null) {
-                                return;
-                            }
-                            customerId = account.customerID;
+                Button viewChecksButton = new Button("View Checks");
+                viewChecksButton.setOnAction(x -> {
+                    int customerId = UIHelpers.currentUser.id;
+                    if (customerId <= 1) {
+                        CheckingAccount account = checkingTable.getSelectionModel().getSelectedItem();
+                        if (account == null) {
+                            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You must select an account to view checks.");
+                            return;
                         }
-                        UIHelpers.navigateToScene(new CheckViewScene(customerId).root);
-                    });
-
-                    buttonHBox.getChildren().add(viewChecksButton);
-                    break;
-                }
-                case SAVING: {
-                    savingsTable.getColumns().clear();
-                    if (UIHelpers.currentUserLevel != 0) {
-                        TableColumn<SavingAccount, String> ssn = new TableColumn<>("SSN");
-                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                        savingsTable.getColumns().add(ssn);
+                        customerId = account.customerID;
                     }
+                    UIHelpers.navigateToScene(new CheckViewScene(customerId).root);
+                });
 
-                    TableColumn<SavingAccount, String> dateOpened = new TableColumn<>("Date Opened");
-                    TableColumn<SavingAccount, String> balance = new TableColumn<>("Balance");
-                    TableColumn<SavingAccount, String> currentInterestRate = new TableColumn<>("Interest");
-
-                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-                    currentInterestRate.setCellValueFactory(new PropertyValueFactory<>("currentInterestRate"));
-
-                    savingsTable.getColumns().addAll(dateOpened, balance, currentInterestRate);
-                    fieldVBox.getChildren().addAll(savingsTable, buttonHBox);
-                    break;
-                }
-                case LOAN: {
-                    loanTable.getColumns().clear();
-                    if (UIHelpers.currentUserLevel != 0) {
-                        TableColumn<LoanAccount, String> ssn = new TableColumn<>("SSN");
-                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                        loanTable.getColumns().add(ssn);
-                    }
-
-                    TableColumn<LoanAccount, String> type = new TableColumn<>("Type");
-                    TableColumn<LoanAccount, String> dateOpened = new TableColumn<>("Date Opened");
-                    TableColumn<LoanAccount, String> balance = new TableColumn<>("Balance");
-                    TableColumn<LoanAccount, String> calculatedBalance = new TableColumn<>("Initial Amount");
-                    TableColumn<LoanAccount, String> currentPayment = new TableColumn<>("Current Payment");
-                    TableColumn<LoanAccount, String> interestDue = new TableColumn<>("Interest Due");
-
-                    type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
-                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-                    calculatedBalance.setCellValueFactory(new PropertyValueFactory<>("initialAmount"));
-                    currentPayment.setCellValueFactory(new PropertyValueFactory<>("currentPaymentDue"));
-                    interestDue.setCellValueFactory(new PropertyValueFactory<>("interestDue"));
-
-                    TableColumn<LoanAccount, String> interestRate = new TableColumn<>("Interest Rate");
-                    interestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
-
-                    TableColumn<LoanAccount, String> datePaymentDue = new TableColumn<>("Date Payment Due");
-                    datePaymentDue.setCellValueFactory(new PropertyValueFactory<>("datePaymentDue"));
-
-                    TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Made");
-                    paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsMade"));
-
-                    loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, interestDue, datePaymentDue, currentPayment, paymentsLeft);
-                    fieldVBox.getChildren().addAll(loanTable, buttonHBox);
-                    break;
-                }
-                case CD: {
-                    cdTable.getColumns().clear();
-                    if (UIHelpers.currentUserLevel != 0) {
-                        TableColumn<CD, String> ssn = new TableColumn<>("SSN");
-                        ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
-                        cdTable.getColumns().add(ssn);
-                    }
-
-                    TableColumn<CD, String> type = new TableColumn<>("Type");
-                    TableColumn<CD, String> dateOpened = new TableColumn<>("Date Opened");
-                    TableColumn<CD, String> balance = new TableColumn<>("Balance");
-
-                    type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
-                    dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
-                    balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
-
-                    TableColumn<CD, String> dateCDDue = new TableColumn<>("Date Due");
-                    dateCDDue.setCellValueFactory(new PropertyValueFactory<>("dateCDDue"));
-
-                    cdTable.getColumns().addAll(type, dateOpened, balance, dateCDDue);
-                    fieldVBox.getChildren().addAll(cdTable, buttonHBox);
-                    break;
-                }
+                buttonHBox.getChildren().add(viewChecksButton);
+                break;
             }
-        } else {
-            fieldVBox.getChildren().add(buttonHBox);
+            case SAVING: {
+                savingsTable.getColumns().clear();
+                if (UIHelpers.currentUserLevel != 0) {
+                    TableColumn<SavingAccount, String> ssn = new TableColumn<>("SSN");
+                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                    savingsTable.getColumns().add(ssn);
+                }
+
+                TableColumn<SavingAccount, String> dateOpened = new TableColumn<>("Date Opened");
+                TableColumn<SavingAccount, String> balance = new TableColumn<>("Balance");
+                TableColumn<SavingAccount, String> currentInterestRate = new TableColumn<>("Interest");
+
+                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+                currentInterestRate.setCellValueFactory(new PropertyValueFactory<>("currentInterestRate"));
+
+                savingsTable.getColumns().addAll(dateOpened, balance, currentInterestRate);
+                fieldVBox.getChildren().addAll(savingsTable, buttonHBox);
+                break;
+            }
+            case LOAN: {
+                loanTable.getColumns().clear();
+                if (UIHelpers.currentUserLevel != 0) {
+                    TableColumn<LoanAccount, String> ssn = new TableColumn<>("SSN");
+                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                    loanTable.getColumns().add(ssn);
+                }
+
+                TableColumn<LoanAccount, String> type = new TableColumn<>("Type");
+                TableColumn<LoanAccount, String> dateOpened = new TableColumn<>("Date Opened");
+                TableColumn<LoanAccount, String> balance = new TableColumn<>("Balance");
+                TableColumn<LoanAccount, String> calculatedBalance = new TableColumn<>("Initial Amount");
+                TableColumn<LoanAccount, String> currentPayment = new TableColumn<>("Current Payment");
+                TableColumn<LoanAccount, String> interestDue = new TableColumn<>("Interest Due");
+
+                type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
+                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+                calculatedBalance.setCellValueFactory(new PropertyValueFactory<>("initialAmount"));
+                currentPayment.setCellValueFactory(new PropertyValueFactory<>("currentPaymentDue"));
+                interestDue.setCellValueFactory(new PropertyValueFactory<>("interestDue"));
+
+                TableColumn<LoanAccount, String> interestRate = new TableColumn<>("Interest Rate");
+                interestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
+
+                TableColumn<LoanAccount, String> datePaymentDue = new TableColumn<>("Date Payment Due");
+                datePaymentDue.setCellValueFactory(new PropertyValueFactory<>("datePaymentDue"));
+
+                TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Made");
+                paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsMade"));
+
+                loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, interestDue, datePaymentDue, currentPayment, paymentsLeft);
+                fieldVBox.getChildren().addAll(loanTable, buttonHBox);
+                break;
+            }
+            case CD: {
+                cdTable.getColumns().clear();
+                if (UIHelpers.currentUserLevel != 0) {
+                    TableColumn<CD, String> ssn = new TableColumn<>("SSN");
+                    ssn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+                    cdTable.getColumns().add(ssn);
+                }
+
+                TableColumn<CD, String> type = new TableColumn<>("Type");
+                TableColumn<CD, String> dateOpened = new TableColumn<>("Date Opened");
+                TableColumn<CD, String> balance = new TableColumn<>("Balance");
+
+                type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
+                dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
+                balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
+
+                TableColumn<CD, String> dateCDDue = new TableColumn<>("Date Due");
+                dateCDDue.setCellValueFactory(new PropertyValueFactory<>("dateCDDue"));
+
+                cdTable.getColumns().addAll(type, dateOpened, balance, dateCDDue);
+                fieldVBox.getChildren().addAll(cdTable, buttonHBox);
+                break;
+            }
         }
 
-        setAccountTableItems(FXCollections.observableArrayList(accounts));
+        setAccountTableItems();
 
         // Back Button
         Button backButton = new Button("Back");
@@ -311,6 +270,65 @@ class AccountManagementScene {
         return selectedAccount;
     }
 
+    private void setDisplayedAccounts() {
+        // Ensures the correct accounts are displayed (the selected type and only the current user's if they are only a
+        // customer level user).
+
+        int customerId = 0;
+        if (customerBox != null && customerBox.getSelectionModel().getSelectedIndex() >= 0) {
+            int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
+            Person selectedCustomer = Person.people.get(selectedCustomerId);
+            customerId = selectedCustomer.id;
+        }
+
+        if (UIHelpers.currentUserLevel == 0) {
+            switch (UIHelpers.selectedAccountType) {
+                case CHECKING:
+                    accounts = FXCollections.observableArrayList(CheckingAccount.search(UIHelpers.currentUser.id));
+                    break;
+                case LOAN:
+                    accounts = FXCollections.observableArrayList(LoanAccount.search(UIHelpers.currentUser.id));
+                    break;
+                case SAVING:
+                    accounts = FXCollections.observableArrayList(SavingAccount.search(UIHelpers.currentUser.id));
+                    break;
+                case CD:
+                    accounts = FXCollections.observableArrayList(CD.search(UIHelpers.currentUser.id));
+                    break;
+            }
+        } else if (customerId <= 0) {
+            switch (UIHelpers.selectedAccountType) {
+                case CHECKING:
+                    accounts = FXCollections.observableArrayList(CheckingAccount.checkingAccounts);
+                    break;
+                case LOAN:
+                    accounts = FXCollections.observableArrayList(LoanAccount.loans);
+                    break;
+                case SAVING:
+                    accounts = FXCollections.observableArrayList(SavingAccount.savingAccounts);
+                    break;
+                case CD:
+                    accounts = FXCollections.observableArrayList(CD.cds);
+                    break;
+            }
+        } else {
+            switch (UIHelpers.selectedAccountType) {
+                case CHECKING:
+                    accounts = FXCollections.observableArrayList(CheckingAccount.search(customerId));
+                    break;
+                case LOAN:
+                    accounts = FXCollections.observableArrayList(LoanAccount.search(customerId));
+                    break;
+                case SAVING:
+                    accounts = FXCollections.observableArrayList(SavingAccount.search(customerId));
+                    break;
+                case CD:
+                    accounts = FXCollections.observableArrayList(CD.search(customerId));
+                    break;
+            }
+        }
+    }
+
     // The "Edit" button click event. Navigates to AccountAddEditScreen with the selected account (if an account is
     // selected- otherwise, displays an error message).
     private void editAccount() {
@@ -335,10 +353,9 @@ class AccountManagementScene {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                     ((CD) selectedAccount).getDateCDDue().compareTo(new Date()) > 0 ?
                             "This CD is not fully mature, and you will only be able to receive the initial deposit " +
-                            "($" + ((CD) selectedAccount).withdraw() + "). Continue?" :
+                                    "($" + ((CD) selectedAccount).withdraw() + "). Continue?" :
                             "Would you like to close this CD (withdrawing $" + ((CD) selectedAccount).withdraw() +
-                            " money in the process)?",
-
+                                    " money in the process)?",
                     ButtonType.YES, ButtonType.NO);
             alert.showAndWait();
 
@@ -359,22 +376,26 @@ class AccountManagementScene {
 
             if (alert.getResult() == ButtonType.YES) {
                 try {
-                    if (selectedAccount instanceof LoanAccount) {
-                        Alert payOffAlert = new Alert(Alert.AlertType.CONFIRMATION,
-                            "This loan has not been payed off in full- closing it will pay off it's remaining balance. " +
-                                        "Are you sure you wish to close this account?", ButtonType.YES, ButtonType.NO);
-                        payOffAlert.showAndWait();
-                        if (payOffAlert.getResult() == ButtonType.YES) {
-                            ((LoanAccount) selectedAccount).payOffLoan();
-                            LoanAccount.loans.remove(selectedAccount);
-                            LoanAccount.exportFile();
-                        }
-                    } else if (selectedAccount instanceof SavingAccount) {
-                        SavingAccount.savingAccounts.remove(selectedAccount);
-                        SavingAccount.exportFile();
-                    } else if (selectedAccount instanceof CheckingAccount) {
-                        CheckingAccount.checkingAccounts.remove(selectedAccount);
-                        CheckingAccount.exportFile();
+                    switch (UIHelpers.selectedAccountType) {
+                        case LOAN:
+                            Alert payOffAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                                    "This loan has not been payed off in full- closing it will pay off it's remaining balance. " +
+                                            "Are you sure you wish to close this account?", ButtonType.YES, ButtonType.NO);
+                            payOffAlert.showAndWait();
+                            if (payOffAlert.getResult() == ButtonType.YES) {
+                                ((LoanAccount) selectedAccount).payOffLoan();
+                                LoanAccount.loans.remove(selectedAccount);
+                                LoanAccount.exportFile();
+                            }
+                            break;
+                        case SAVING:
+                            SavingAccount.savingAccounts.remove(selectedAccount);
+                            SavingAccount.exportFile();
+                            break;
+                        case CHECKING:
+                            CheckingAccount.checkingAccounts.remove(selectedAccount);
+                            CheckingAccount.exportFile();
+                            break;
                     }
                     setAccountTableItems();
                 } catch (FileNotFoundException e) {
@@ -386,46 +407,40 @@ class AccountManagementScene {
 
     // Refreshes an account table when changes are made.
     private void setAccountTableItems() {
-        setAccountTableItems(FXCollections.observableArrayList());
-    }
-    private void setAccountTableItems(ObservableList<Account> accounts) {
-        if (accounts.isEmpty()) {
-            if (UIHelpers.currentUserLevel == 0) {
-                accounts.addAll(CheckingAccount.search(UIHelpers.currentUser.id));
-                accounts.addAll(LoanAccount.search(UIHelpers.currentUser.id));
-                accounts.addAll(CD.search(UIHelpers.currentUser.id));
-            }
-        }
-        if (!accounts.isEmpty()) {
-            if (accounts.get(0) instanceof CheckingAccount) {
+        setDisplayedAccounts();
+        switch (UIHelpers.selectedAccountType) {
+            case CHECKING:
                 ObservableList<CheckingAccount> checkingAccounts = FXCollections.observableArrayList();
                 for (Account account : accounts) {
                     checkingAccounts.add((CheckingAccount) account);
                 }
                 checkingTable.setItems(checkingAccounts);
                 checkingTable.refresh();
-            } else if (accounts.get(0) instanceof LoanAccount) {
+                break;
+            case LOAN:
                 ObservableList<LoanAccount> loanAccounts = FXCollections.observableArrayList();
                 for (Account account : accounts) {
                     loanAccounts.add((LoanAccount) account);
                 }
                 loanTable.setItems(loanAccounts);
                 loanTable.refresh();
-            } else if (accounts.get(0) instanceof CD) {
+                break;
+            case CD:
                 ObservableList<CD> cds = FXCollections.observableArrayList();
                 for (Account account : accounts) {
                     cds.add((CD) account);
                 }
                 cdTable.setItems(cds);
                 cdTable.refresh();
-            } else if (accounts.get(0) instanceof SavingAccount) {
+                break;
+            case SAVING:
                 ObservableList<SavingAccount> savingAccounts = FXCollections.observableArrayList();
                 for (Account account : accounts) {
                     savingAccounts.add((SavingAccount) account);
                 }
                 savingsTable.setItems(savingAccounts);
                 savingsTable.refresh();
-            }
+                break;
         }
     }
 

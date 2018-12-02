@@ -1,4 +1,6 @@
 import Enums.AccountType;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -21,6 +23,11 @@ public class AccountTypeSelectionScene {
     AccountTypeSelectionScene() {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
 
+        Label nameLabel = new Label(UIHelpers.currentUser.lastName + ", " + UIHelpers.currentUser.firstName +
+                " - " + UIHelpers.userLevels.get(UIHelpers.currentUserLevel));
+        nameLabel.setAlignment(Pos.BASELINE_RIGHT);
+        fieldVBox.getChildren().add(nameLabel);
+
         if (UIHelpers.currentUserLevel == 0) {
             int customerId = UIHelpers.currentUser.id;
             if (CheckingAccount.search(customerId) != null) {
@@ -41,7 +48,8 @@ public class AccountTypeSelectionScene {
             UIHelpers.createButton("Savings", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.SAVING));
             UIHelpers.createButton("CDs", fieldVBox, x -> UIHelpers.navigateToAccountManagementScene(AccountType.CD));
         }
-        UIHelpers.createButton("Back", fieldVBox, x ->
-                UIHelpers.navigateToScene(new NavigationScene().root));
+        if (UIHelpers.currentUserLevel > 0) {
+            UIHelpers.createButton("Back", fieldVBox, x -> UIHelpers.navigateToScene(new NavigationScene().root));
+        }
     }
 }

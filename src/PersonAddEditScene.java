@@ -123,14 +123,19 @@ public class PersonAddEditScene {
         String errorMessage = "";
 
         errorMessage += UIHelpers.checkNumberField("Social Security #", socialSecurityProperty);
-        if (socialSecurityProperty.get().length() != 9) {
+        if (socialSecurityProperty.get().length() != 9 || !UIHelpers.checkNumberField("SSN", socialSecurityProperty).isEmpty()) {
             errorMessage += "Social Security # field must contain exactly nine digits.\n";
+        } else if (Person.searchPeopleByCustomerID(Integer.parseInt(socialSecurityProperty.get())) != null) {
+            errorMessage += "A user with this SSN already exists.\n";
         }
 
         errorMessage += UIHelpers.checkTextField("Street Address", streetAddressProperty);
         errorMessage += UIHelpers.checkTextField("City", cityProperty);
         errorMessage += UIHelpers.checkTextField("State", stateProperty);
         errorMessage += UIHelpers.checkNumberField("Zip Code", zipCodeProperty);
+        if (zipCodeProperty.get().length() < 5) {
+            errorMessage += "Zip Code must contain five or greater digits.";
+        }
         errorMessage += UIHelpers.checkTextField("First Name", firstNameProperty);
         errorMessage += UIHelpers.checkTextField("Last Name", lastNameProperty);
         errorMessage += UIHelpers.checkTextField("User Level", userLevelProperty);
