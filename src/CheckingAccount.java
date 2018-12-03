@@ -22,6 +22,7 @@ public class CheckingAccount extends Account{
 
     //getters and setters
     public Boolean getHasOverdraftProtection() {return hasOverdraftProtection;}
+    public void setOverdraftProtection(Boolean hasOverdraftProtection) {this.hasOverdraftProtection = hasOverdraftProtection;}
     public Boolean getConnectedToATMCard() {return connectedToATMCard;}
     public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
     public int getWithdrawsToday() {return withdrawsToday;}
