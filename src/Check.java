@@ -174,10 +174,10 @@ public class Check{
         if(foundCheck != null && foundCheck.getDateHonored() == null){
 
             //set isStopped to true
-            check.setIsStopped(true);
+            foundCheck.setIsStopped(true);
             
             //get the checking account of this customer
-            CheckingAccount customerChecking = CheckingAccount.search(check.getCustomerID());
+            CheckingAccount customerChecking = CheckingAccount.search(foundCheck.getCustomerID());
     
             //charge the account $15
             customerChecking.setAccountBalance(customerChecking.getAccountBalance() - 15.0);
