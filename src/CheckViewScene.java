@@ -188,7 +188,7 @@ public class CheckViewScene {
                     "You've overdrawn from this account and will be charged a fee.");
             return;
         }
-        Check.checks.add(new Check(id, checkId+1, cost, payToProperty.get(), date, desc));
+        Check.checks.add(new Check(id, checkId+1, cost, payToProperty.get(), date, desc, false));
         try {
             Check.exportFile();
             checkTable.setItems(FXCollections.observableArrayList(Check.searchChecksByCustomerID(id)));
@@ -206,6 +206,7 @@ public class CheckViewScene {
         TableColumn<Check, String> dateHonored = new TableColumn<>("Date Honored");
         TableColumn<Check, String> memo = new TableColumn<>("Details");
         TableColumn<Check, String> payTo = new TableColumn<>("Pay To");
+        TableColumn<Check, String> isStopped = new TableColumn<>("Stopped?");
 
         checkNum.setCellValueFactory(new PropertyValueFactory<>("checkID"));
         amount.setCellValueFactory(new PropertyValueFactory<>("checkAmt"));
@@ -213,8 +214,9 @@ public class CheckViewScene {
         dateHonored.setCellValueFactory(new PropertyValueFactory<>("dateHonored"));
         memo.setCellValueFactory(new PropertyValueFactory<>("memo"));
         payTo.setCellValueFactory(new PropertyValueFactory<>("payTo"));
+        isStopped.setCellValueFactory(new PropertyValueFactory<>("isStopped"));
 
-        checkTable.getColumns().addAll(checkNum, amount, dateCheck, dateHonored, memo, payTo);
+        checkTable.getColumns().addAll(checkNum, amount, dateCheck, dateHonored, memo, payTo, isStopped);
 
         if (customerId != 0) {
             ObservableList checks = FXCollections.observableArrayList(Check.searchChecksByCustomerID(customerId));

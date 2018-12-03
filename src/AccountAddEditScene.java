@@ -27,8 +27,10 @@ import java.util.Date;
 
 class AccountAddEditScene {
     // "fieldVBox" stacks all UI elements of the scene vertically.
+    // "buttonHBox" holds the buttons at the bottom of the scene.
     // "root" contains all UI of the scene (this is transferred on navigation to another page).
     private VBox fieldVBox = new VBox();
+    private HBox buttonHBox = new HBox();
     StackPane root = new StackPane(fieldVBox);
 
     private Account editedAccount; // The account being edited.
@@ -49,7 +51,6 @@ class AccountAddEditScene {
     private final Property<LocalDate> dateCDDueProperty = new SimpleObjectProperty<>();
 
     // Boxes to Hold Nodes
-    private HBox buttonHBox = new HBox();
     private VBox savingsAccountFieldsVBox = new VBox();
     private VBox checkingAccountFieldsVBox = new VBox();
     private VBox loanFieldsVBox = new VBox();
@@ -150,8 +151,6 @@ class AccountAddEditScene {
             }
         });
         buttonHBox.getChildren().add(saveButton);
-
-        fieldVBox.getChildren().add(buttonHBox);
     }
 
     // Creates fields used by checking accounts.
@@ -194,32 +193,21 @@ class AccountAddEditScene {
 
         switch (UIHelpers.selectedAccountType) {
             case CD:
-                if (accountBalance <= 0.01) {
-                    errorMessage += "CD balance cannot be less than $0.01.\n";
-                }
+                if (accountBalance <= 0.01) errorMessage += "CD balance cannot be less than $0.01.\n";
                 break;
             case LOAN:
                 if (loanTypeProperty.get().equalsIgnoreCase("credit card")) {
-                    if (accountBalance < 0) {
-                        errorMessage += "Credit card balance cannot be less than $0.00.\n";
-                    }
+                    if (accountBalance < 0) errorMessage += "Credit card balance cannot be less than $0.00.\n";
                 } else {
-                    if (accountBalance <= 0.01) {
-                        errorMessage += "Loan account balance cannot be less than $0.01.\n";
-                    }
+                    if (accountBalance <= 0.01) errorMessage += "Loan account balance cannot be less than $0.01.\n";
                 }
                 break;
             case SAVING:
-                if (accountBalance < 0) {
-                    errorMessage += "Savings account balance cannot be less than $0.00.\n";
-                }
+                if (accountBalance < 0) errorMessage += "Savings account balance cannot be less than $0.00.\n";
                 break;
         }
 
-        if (accountTypeProperty.get().isEmpty()) {
-            errorMessage += "Account Type must be selected.\n";
-        }
-
+        if (accountTypeProperty.get().isEmpty()) errorMessage += "Account Type must be selected.\n";
 
         if (!errorMessage.isEmpty()) {
             // Shows error messages (if any).
@@ -227,7 +215,7 @@ class AccountAddEditScene {
         } else {
             switch (UIHelpers.selectedAccountType) {
                 case SAVING:
-                    if (editedAccount != null) CheckingAccount.checkingAccounts.remove(editedAccount);
+                    if (editedAccount != null) SavingAccount.savingAccounts.remove(editedAccount);
                     else if (SavingAccount.search(customerId) != null) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION,
                                 "This user already has a Savings account. Are you sure you selected the correct SSN?");
@@ -235,7 +223,7 @@ class AccountAddEditScene {
                     }
                     break;
                 case CHECKING:
-                    if (editedAccount != null) SavingAccount.savingAccounts.remove(editedAccount);
+                    if (editedAccount != null)CheckingAccount.checkingAccounts.remove(editedAccount);
                     else if (CheckingAccount.search(customerId) != null) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION,
                                 "This user already has a Checking account. Are you sure you selected the correct SSN?");
@@ -257,11 +245,6 @@ class AccountAddEditScene {
 
             switch (UIHelpers.selectedAccountType) {
                 case SAVING:
-                    if (overdraftProtectionProperty.get().equals("True") && SavingAccount.search(customerId) == null) {
-                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "This account cannot have overdraft" +
-                                "protection because this customer does not have a savings account.");
-                    }
-
                     double savingInterestRate;
                     try {
                         savingInterestRate = Double.parseDouble(interestRateProperty.get());
