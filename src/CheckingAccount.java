@@ -24,6 +24,7 @@ public class CheckingAccount extends Account{
     public Boolean getHasOverdraftProtection() {return hasOverdraftProtection;}
     public Boolean getConnectedToATMCard() {return connectedToATMCard;}
     public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
+    public int getWithdrawsToday() {return withdrawsToday;}
 
     //current method to grab data from the checkings textfile in "memory"
     public static void importFile() throws IOException, ParseException {
