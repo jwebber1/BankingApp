@@ -42,8 +42,7 @@ public class Person {
         //while loop to go through the file
         while ((line = personsBR.readLine()) != null) {
 
-            //if the file has a header, this if statement is to avoid that
-            //remove "if" if final file has no header
+            //if the file has a header, this if statement is to avoid that; remove "if" if final file has no header
             if(lineNum > 0) {
 
                 //split the line into an array of strings
@@ -111,22 +110,13 @@ public class Person {
         return searchResults;
     }
 
-    //Getters and setters for Person Class
     //getters and setters
     public int getId() {return id;}
-    public void setId(int id) {this.id = id;}
     public String getStreetAddress() {return streetAddress;}
-    public void setStreetAddress(String streetAddress) {this.streetAddress = streetAddress;}
     public String getCity() {return city;}
-    public void setCity(String city) {this.city = city;}
     public String getState() {return state;}
-    public void setState(String state) {this.state = state;}
     public String getZipCode() {return zipCode;}
-    public void setZipCode(String zipCode) {this.zipCode = zipCode;}
     public String getFirstName() {return firstName;}
-    public void setfirstName(String firstName) {this.firstName = firstName;}
     public String getLastName() {return lastName;}
-    public void setlastName(String lastName) {this.lastName = lastName;}
     public int getUserLevel() {return userLevel;}
-    public void setUserLevel(int userLevel) {this.userLevel = userLevel;}
 }//end of Person
