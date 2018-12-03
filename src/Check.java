@@ -41,17 +41,11 @@ public class Check{
 
     //getters and setters
     public int getCustomerID() {return customerID;}
-    public void setCustomerID(int customerID) {this.customerID = customerID;}
     public int getCheckID() {return checkID;}
-    public void setCheckID(int checkID) {this.checkID = checkID;}
     public double getCheckAmt() {return checkAmt;}
-    public void setCheckAmt(double checkAmt) {this.checkAmt = checkAmt;}
     public String getPayTo() {return payTo;}
-    public void setPayTo(String payTo) {this.payTo = payTo;}
     public Date getDateCheck() {return dateCheck;}
-    public void setDateCheck(Date dateCheck) {this.dateCheck = dateCheck;}
     public String getMemo() {return memo;}
-    public void setMemo(String memo) {this.memo = memo;}
     public Date getDateHonored() {return dateHonored;}
     public void setDateHonored(Date dateHonored) {this.dateHonored = dateHonored;}
     public Boolean getIsStopped() {return isStopped;}
@@ -76,8 +70,7 @@ public class Check{
         //while loop to go through the file
         while ((line = checksBR.readLine()) != null) {
 
-            //if the file has a header, this if statement is to avoid that
-            //remove "if" if final file has no header
+            //if the file has a header, this if statement is to avoid that; remove "if" if final file has no header
             if(lineNum > 0) {
 
                 //split the line into an array of strings
@@ -100,9 +93,6 @@ public class Check{
                     Date dateHonored = new SimpleDateFormat("MM/dd/yyyy").parse(splitLine[6]);
                     checks.add(new Check(cusID, checkID, checkAmt, payTo, dateCheck, memo,  isStopped, dateHonored));
                 }
-
-                //debugging importPersons
-                //System.out.println("count: " + (lineNum) + "\t" + checks.get(lineNum-1).toString());
             }
 
             //increment the line number
@@ -221,5 +211,4 @@ public class Check{
             setDateHonored(new Date());
         }
     }//end of honorCheck
-
 }//end of Check
