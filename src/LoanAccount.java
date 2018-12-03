@@ -5,6 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+/**  The LoanAccount class creates new credit card, short term, or long term loan accounts. It includes the
+ *   functionality to make a payment, change the interest rate (and update any related fields), make a credit
+ *   card purchase, search through loan account with either just a SSN or both a SSN and account type, and the
+ *   functionality to import and export loan accounts from and to the loans.txt text file.
+ */
+
 /*   For CC's initialAmount is the credit card limit,
  *   accountBalance is the sum of purchases including interest,
  *   currentPaymentDue is the sum of purchases for current payment cycle.
@@ -74,7 +81,6 @@ public class LoanAccount extends Account{
         }
     }//end of smallest possible loan account constructor
 
-    //TODO: test with credit cards
     //changes the interest rate for a specific account and updates related fields
     private double changeInterestRate(double newRate){
         //if the account is a credit card
@@ -99,7 +105,6 @@ public class LoanAccount extends Account{
         return newRate;
     }//end of changeInterestRate
 
-    //TODO: Use this when to show how much is needed to pay off a short or long term loan
     //calculates the amount to pay off the loan right now
     double calcPayOff(){
         double calculation = (calcLength() - getPaymentsMade()) * getCurrentPaymentDue();
@@ -146,7 +151,6 @@ public class LoanAccount extends Account{
         return payments;
     }//end of calcLength
 
-    //TODO: implement into the GUI and test
     //creates a CreditCardPurchase tied to a specific account's ssn
     void makeCCPurchase(double cost, String desc, Date date){
         //if the purchase would not put account over the limit
@@ -173,7 +177,6 @@ public class LoanAccount extends Account{
         return date.after(getDatePaymentDue());
     }//end of checkIfLate
 
-    //TODO: test credit card payments
     //Makes a payment on a selected loan account
     void makePayment(double amount){
         Date now = new Date();
@@ -261,12 +264,6 @@ public class LoanAccount extends Account{
         }
         return date;
     }//end of calcFirstPaymentDate
-
-    //TODO: deprecate this method, and use a combination of calcPayOff and a message
-    //completely pays off loan account balance
-    void payOffLoan() {
-        return;
-    }//end of payOffLoan
 
     //calculate the current payment due based on account type
     private double calcCurrentPayment(){

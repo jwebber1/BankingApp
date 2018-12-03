@@ -5,6 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+/** The CreditCardPurchase class creates new credit card purchases, imports and exports credit card purchases
+ *  from and too the text file ccpurchases.txt, and searchs through credit card purchases using a SSN.
+ */
 public class CreditCardPurchase {
     private final static SimpleDateFormat ccDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
     private final static DecimalFormat ccDecimalFormatter = new DecimalFormat("0.00");
