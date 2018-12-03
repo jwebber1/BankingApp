@@ -29,6 +29,8 @@ public class CheckingAccount extends Account{
     public Boolean getConnectedToATMCard() {return connectedToATMCard;}
     public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
     public int getWithdrawsToday() {return withdrawsToday;}
+    public double getInterestRate() {return interestRate;}
+    public void setInterestRate(double interestRate){this.interestRate = interestRate;}
 
     //current method to grab data from the checkings textfile in "memory"
     public static void importFile() throws IOException, ParseException {
