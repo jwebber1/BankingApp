@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class CheckingAccount extends Account{
+    private double interestRate;
     private Boolean hasOverdraftProtection;
     private Boolean connectedToATMCard;
     private int overdraftsThisMonth;
@@ -14,6 +15,8 @@ public class CheckingAccount extends Account{
     //constructor for the Checking Account
     public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
         super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >= 1000.0) ? "gold" : "regular"));
+        if(accBalIn >= 1000.0){ this.interestRate = setGoldInterestRate();}
+        else{ this.interestRate = 0.0; }
         this.hasOverdraftProtection = OvProIn;
         this.connectedToATMCard = atm;
         this.overdraftsThisMonth = odThisMonth;
@@ -252,4 +255,19 @@ public class CheckingAccount extends Account{
         if(accountType.equals("regular") && accountBalance >= 1000.0){accountType = "gold";}
 
     }//end of transferFrom
+
+    public double setGoldInterestRate(){
+
+        //get the customer saving account if it exists
+        SavingAccount savingAccount = SavingAccount.search(customerID);
+
+        //return half of the saving account interest rate
+        if(savingAccount != null){
+            return savingAccount.getCurrentInterestRate()/2.0;
+        }
+
+        //return a default if there is no saving account
+        return 0.5;
+    }//end of setGoldInterestRate
+
 }//end of CheckingAccount
