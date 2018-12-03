@@ -14,7 +14,6 @@ public class CheckingAccount extends Account{
     //constructor for the Checking Account
     public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
         super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >= 1000.0) ? "gold" : "regular"));
-
         this.hasOverdraftProtection = OvProIn;
         this.connectedToATMCard = atm;
         this.overdraftsThisMonth = odThisMonth;
@@ -23,13 +22,8 @@ public class CheckingAccount extends Account{
 
     //getters and setters
     public Boolean getHasOverdraftProtection() {return hasOverdraftProtection;}
-    public void setHasOverdraftProtection(Boolean hasOverdraftProtection) {this.hasOverdraftProtection = hasOverdraftProtection;}
     public Boolean getConnectedToATMCard() {return connectedToATMCard;}
-    public void setConnectedToATMCard(Boolean connectedToATMCard) {this.connectedToATMCard = connectedToATMCard;}
     public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
-    public void setOverdraftsThisMonth(int overdraftsThisMonth) {this.overdraftsThisMonth = overdraftsThisMonth;}
-    public int getWithdrawsToday() {return withdrawsToday;}
-    public void setWithdrawsToday(int withdrawsToday) {this.overdraftsThisMonth = withdrawsToday;}
 
     //current method to grab data from the checkings textfile in "memory"
     public static void importFile() throws IOException, ParseException {
@@ -144,22 +138,16 @@ public class CheckingAccount extends Account{
             //get the customer's saving account
             SavingAccount customersSaving = SavingAccount.search(customerID);
 
-            //subtract the remaining balance not covered by the checking and set the new Savings balance (will be negative)
-//            customerSaving.setAccountBalance((customerSaving.getAccountBalance()+accountBalance) - withdrawAmt);
-            //todo- ^^^ will need to modify when Jacob finishes his withdraw method from SavingAccount
             //set temporary variably to determine if there is enough in the savings account to withdraw from
             boolean savingsNotEnough = (((customersSaving.getAccountBalance()+accountBalance) - withdrawAmt) < 0.0);
 
             if(savingsNotEnough){
 
-                //get the new balance for checking after the overdraft
-                double overdraftAmt = ((customersSaving.getAccountBalance()+accountBalance+charge) - withdrawAmt);
-
                 //drain the Savings account to $0
                 customersSaving.setAccountBalance(0.0);
 
                 //set the checking to the new, overdrafted amount;
-                accountBalance = overdraftAmt;
+                accountBalance = ((customersSaving.getAccountBalance()+accountBalance+charge) - withdrawAmt);
 
                 //increment overdraftsThisMonth and apply $20 overdraft charge
                 overdraftsThisMonth++;
@@ -176,9 +164,10 @@ public class CheckingAccount extends Account{
                 //set the checking balance to $0
                 setAccountBalance(0.0);
             }
-
         }
-        else{ setAccountBalance(accountBalance - withdrawAmt); }
+        else{ 
+            setAccountBalance(accountBalance - withdrawAmt); 
+        }
 
         //apply any charges accrued to the account
         accountBalance -= charge;
@@ -261,5 +250,4 @@ public class CheckingAccount extends Account{
         if(accountType.equals("regular") && accountBalance >= 1000.0){accountType = "gold";}
 
     }//end of transferFrom
-
 }//end of CheckingAccount
