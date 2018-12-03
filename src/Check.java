@@ -173,26 +173,17 @@ public class Check{
         //if the check was found AND it has not been honored yet...
         if(foundCheck != null && foundCheck.getDateHonored() == null){
 
-            //go through each check...
-            for(Check check: Check.checks){
+            //set isStopped to true
+            check.setIsStopped(true);
+            
+            //get the checking account of this customer
+            CheckingAccount customerChecking = CheckingAccount.search(check.getCustomerID());
+    
+            //charge the account $15
+            customerChecking.setAccountBalance(customerChecking.getAccountBalance() - 15.0);
 
-                //if it finds the check, charge checking and break out
-                if(foundCheck.equals(check)){
-                    //get the checking account of this customer
-                    CheckingAccount customerChecking = CheckingAccount.search(check.getCustomerID());
-                    
-                    //set isStopped to true
-                    check.setIsStopped(true);
-                    
-                    //charge the account $15
-                    customerChecking.setAccountBalance(customerChecking.getAccountBalance() - 15.0);
-
-                    //change account type if fall below $1000 (just in case)
-                    if(customerChecking.getAccountType().equals("gold") && customerChecking.getAccountBalance() < 1000.0){customerChecking.setAccountType("regular");}
-
-                    break;
-                }
-            }
+            //change account type if fall below $1000 (just in case)
+            if(customerChecking.getAccountType().equals("gold") && customerChecking.getAccountBalance() < 1000.0){customerChecking.setAccountType("regular");}
         }
     }//end of stopCheck
 
