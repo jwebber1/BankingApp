@@ -36,11 +36,11 @@ class LoginScene {
             scene.getStylesheets().add("stylesheet.css");
             Main.primaryStage.setScene(scene);
             Person.importFile();
-            CheckingAccount.importFile();
             CD.importFile();
             LoanAccount.importFile();
             Check.importFile();
             SavingAccount.importFile();
+            CheckingAccount.importFile();
             CreditCardPurchase.importFile();
 
         } catch (Exception e) {
@@ -75,10 +75,6 @@ class LoginScene {
             person = Person.searchPeopleByCustomerID(socialSecurityNumber);
             if (person == null) {
                 errorMessage += "No user with the specified SSN exists.\n";
-            } else if (socialSecurityNumber <= 2) {
-                person.userLevel = socialSecurityNumber;
-            } else {
-                person.userLevel = 0;
             }
         }
 

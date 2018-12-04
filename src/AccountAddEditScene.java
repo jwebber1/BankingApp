@@ -40,7 +40,7 @@ class AccountAddEditScene {
     private final StringProperty customerProperty = new SimpleStringProperty("");
     private final StringProperty accountTypeProperty = new SimpleStringProperty("");
     private final StringProperty accountBalanceProperty = new SimpleStringProperty("$");
-    private final StringProperty interestRateProperty = new SimpleStringProperty("2.0");
+    private final StringProperty interestRateProperty = new SimpleStringProperty("0.2");
 
     // Checking Account Specific Fields
     private final StringProperty checkingAccountTypeProperty = new SimpleStringProperty("");
@@ -223,7 +223,7 @@ class AccountAddEditScene {
                     }
                     break;
                 case CHECKING:
-                    if (editedAccount != null)CheckingAccount.checkingAccounts.remove(editedAccount);
+                    if (editedAccount != null) CheckingAccount.checkingAccounts.remove(editedAccount);
                     else if (CheckingAccount.search(customerId) != null) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION,
                                 "This user already has a Checking account. Are you sure you selected the correct SSN?");
@@ -250,7 +250,7 @@ class AccountAddEditScene {
                         savingInterestRate = Double.parseDouble(interestRateProperty.get());
                     } catch (NumberFormatException | NullPointerException e) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be a decimal " +
-                                "number (such as \"2.0\" for 2%).");
+                                "number (such as \"0.20\" for 20%).");
                         return;
                     }
                     if (savingInterestRate < 0.001 || savingInterestRate > 100.0) {
