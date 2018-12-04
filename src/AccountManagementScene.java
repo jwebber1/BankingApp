@@ -141,13 +141,15 @@ class AccountManagementScene {
                 TableColumn<CheckingAccount, String> dateOpened = new TableColumn<>("Date Opened");
                 TableColumn<CheckingAccount, String> balance = new TableColumn<>("Balance");
                 TableColumn<CheckingAccount, String> interestRate = new TableColumn<>("Interest Rate");
+                TableColumn<CheckingAccount, String> connectedToAtmCard = new TableColumn<>("ATM Card");
 
                 type.setCellValueFactory(new PropertyValueFactory<>("accountType"));
                 dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
                 balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
                 interestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
+                connectedToAtmCard.setCellValueFactory(new PropertyValueFactory<>("connectedToAtmCard"));
 
-                checkingTable.getColumns().addAll(type, dateOpened, balance, interestRate);
+                checkingTable.getColumns().addAll(type, dateOpened, balance, interestRate, connectedToAtmCard);
                 fieldVBox.getChildren().addAll(checkingTable, buttonHBox);
 
                 Button viewChecksButton = new Button("View Checks");

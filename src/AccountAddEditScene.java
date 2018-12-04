@@ -43,7 +43,7 @@ class AccountAddEditScene {
     private final StringProperty interestRateProperty = new SimpleStringProperty("0.2");
 
     // Checking Account Specific Fields
-    private final StringProperty checkingAccountTypeProperty = new SimpleStringProperty("");
+    private final StringProperty atmConnectedProperty = new SimpleStringProperty("False");
     private final StringProperty overdraftProtectionProperty = new SimpleStringProperty("False");
 
     // Loan Specific Fields
@@ -70,9 +70,7 @@ class AccountAddEditScene {
         customerProperty.set(customer.lastName + ", " + customer.firstName);
         accountBalanceProperty.set(String.valueOf("$" + editedAccount.accountBalance));
 
-        if (editedAccount instanceof CheckingAccount) {
-            checkingAccountTypeProperty.set(((CheckingAccount) editedAccount).accountType);
-        } else if (editedAccount instanceof LoanAccount) {
+        if (editedAccount instanceof LoanAccount) {
             loanTypeProperty.set(((LoanAccount) editedAccount).accountType);
             if (editedAccount.accountType.equalsIgnoreCase("LT")) {
                 loanTypeProperty.set("Long Term");
@@ -155,8 +153,10 @@ class AccountAddEditScene {
 
     // Creates fields used by checking accounts.
     private void createCheckingFields() {
-        ComboBox checkingAccountTypeBox = UIHelpers.createComboBox(UIHelpers.checkingAccountTypes, checkingAccountTypeProperty);
-        checkingAccountFieldsVBox.getChildren().add(UIHelpers.createHBox("Checking Account Type:", checkingAccountTypeBox));
+        ComboBox atmConnectedCombo = UIHelpers.createComboBox(
+                FXCollections.observableArrayList("True", "False"), atmConnectedProperty);
+        checkingAccountFieldsVBox.getChildren().add(UIHelpers.createHBox(
+                "ATM Connected:", atmConnectedCombo));
 
         ComboBox overdraftProtectionCombo = UIHelpers.createComboBox(
                 FXCollections.observableArrayList("True", "False"), overdraftProtectionProperty);
@@ -275,7 +275,7 @@ class AccountAddEditScene {
                             customerId,
                             accountBalance,
                             overdraftProtectionProperty.get().equals("True"),
-                            false,
+                            atmConnectedProperty.get().equals("True"),
                             editedAccount == null ? 0 : ((CheckingAccount) editedAccount).getOverdraftsThisMonth(),
                             editedAccount == null ? new Date() : editedAccount.getDateAccountOpened()
                     );

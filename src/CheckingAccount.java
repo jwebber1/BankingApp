@@ -7,18 +7,18 @@ import java.util.Date;
 public class CheckingAccount extends Account{
     private double interestRate;
     private Boolean hasOverdraftProtection;
-    private Boolean connectedToATMCard;
+    private Boolean connectedToAtmCard;
     private int overdraftsThisMonth;
     private int withdrawsToday;
     static ArrayList<CheckingAccount> checkingAccounts = new ArrayList<>();
 
     //constructor for the Checking Account
-    public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened){
+    public CheckingAccount(int cusIdIn, double accBalIn, Boolean OvProIn, Boolean atm, int odThisMonth, Date dateAccOpened) {
         super(cusIdIn,accBalIn, dateAccOpened, ((accBalIn >= 1000.0) ? "gold" : "regular"));
         if(accBalIn >= 1000.0){ this.interestRate = setGoldInterestRate();}
         else{ this.interestRate = 0.0; }
         this.hasOverdraftProtection = OvProIn;
-        this.connectedToATMCard = atm;
+        this.connectedToAtmCard = atm;
         this.overdraftsThisMonth = odThisMonth;
         this.withdrawsToday = 0;
     }
@@ -26,7 +26,7 @@ public class CheckingAccount extends Account{
     //getters and setters
     public Boolean getHasOverdraftProtection() {return hasOverdraftProtection;}
     public void setOverdraftProtection(Boolean hasOverdraftProtection) {this.hasOverdraftProtection = hasOverdraftProtection;}
-    public Boolean getConnectedToATMCard() {return connectedToATMCard;}
+    public Boolean getConnectedToAtmCard() {return connectedToAtmCard;}
     public int getOverdraftsThisMonth() {return overdraftsThisMonth;}
     public int getWithdrawsToday() {return withdrawsToday;}
     public double getInterestRate() {return interestRate;}
@@ -90,7 +90,7 @@ public class CheckingAccount extends Account{
             checkingWriter.println(checking.getCustomerID() + "," +
                     checking.getAccountBalance() + "," +
                     checking.getHasOverdraftProtection() + "," +
-                    checking.getConnectedToATMCard() + "," +
+                    checking.getConnectedToAtmCard() + "," +
                     checking.getOverdraftsThisMonth() + "," +
                     new SimpleDateFormat("MM/dd/yyy").format(checking.getDateAccountOpened()) + ",");
             checkingWriter.flush();

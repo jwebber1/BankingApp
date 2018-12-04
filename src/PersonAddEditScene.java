@@ -170,6 +170,7 @@ public class PersonAddEditScene {
                 e.printStackTrace();
             }
             UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
+            UIHelpers.navigateToScene(new PersonManagementScene().root);
         }
     }
 } // End of PersonAddEditScene
