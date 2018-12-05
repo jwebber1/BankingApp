@@ -171,7 +171,7 @@ public class Check{
         Check foundCheck = searchChecksByCheckID(checkID);
 
         //if the check was found AND it has not been honored yet...
-        if(foundCheck != null && foundCheck.getDateHonored() == null){
+        if(foundCheck != null && foundCheck.getDateHonored() == null && !foundCheck.getIsStopped()){
 
             //set isStopped to true
             foundCheck.setIsStopped(true);
