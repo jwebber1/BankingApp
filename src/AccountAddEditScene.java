@@ -67,10 +67,12 @@ class AccountAddEditScene {
 
         initScene();
 
+        // Customer
         Person customer = Person.searchPeopleByCustomerID(editedAccount.customerID);
         customerProperty.set(customer.lastName + ", " + customer.firstName);
         accountBalanceProperty.set(String.valueOf("$" + editedAccount.accountBalance));
 
+        // Account Type-Specific Fields
         if (editedAccount instanceof LoanAccount) {
             loanTypeProperty.set(((LoanAccount) editedAccount).accountType);
             if (editedAccount.accountType.equalsIgnoreCase("LT")) {
@@ -214,6 +216,7 @@ class AccountAddEditScene {
             // Shows error messages (if any).
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
+            // Removes old account (if any).
             switch (UIHelpers.selectedAccountType) {
                 case SAVING:
                     if (editedAccount != null) SavingAccount.savingAccounts.remove(editedAccount);
@@ -244,6 +247,7 @@ class AccountAddEditScene {
                     break;
             }
 
+            // Final validation and actual account saving and exporting.
             switch (UIHelpers.selectedAccountType) {
                 case SAVING:
                     double savingInterestRate;

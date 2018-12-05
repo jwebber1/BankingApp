@@ -93,6 +93,7 @@ class DepositWithdrawScene {
                 return;
             }
             if (editedAccount instanceof CheckingAccount) {
+                // Checking Account
                 if (isWithdraw) {
                     if (UIHelpers.currentUserLevel == 0) {
                         if( amount > 500) {

@@ -1,7 +1,6 @@
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -51,6 +50,7 @@ public class TransferScene {
         Label savingBalanceLabel = new Label("Saving Balance: $" + savingAccount.accountBalance);
         fieldVBox.getChildren().add(savingBalanceLabel);
 
+        // Transfer Type ComboBox
         ComboBox transferTypeField = UIHelpers.createComboBox(FXCollections.observableArrayList("Checking to Savings",
                 "Savings to Checking"), transferTypeProperty);
         fieldVBox.getChildren().add(UIHelpers.createHBox("Transfer Type:", transferTypeField));
@@ -71,6 +71,7 @@ public class TransferScene {
         fieldVBox.getChildren().add(buttonHBox);
     }
 
+    // The "Save" button click event. Performs the actual transfer.
     private void transfer() {
         double amount = Double.parseDouble(amountProperty.get().replace("$", ""));
         if (transferTypeProperty.get().equals("Checking to Savings")) {

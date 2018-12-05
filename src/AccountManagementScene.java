@@ -137,6 +137,7 @@ class AccountManagementScene {
                     checkingTable.getColumns().add(ssn);
                 }
 
+                // Creates fields and binds data.
                 TableColumn<CheckingAccount, String> type = new TableColumn<>("Type");
                 TableColumn<CheckingAccount, String> dateOpened = new TableColumn<>("Date Opened");
                 TableColumn<CheckingAccount, String> balance = new TableColumn<>("Balance");
@@ -149,9 +150,11 @@ class AccountManagementScene {
                 interestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
                 connectedToAtmCard.setCellValueFactory(new PropertyValueFactory<>("connectedToAtmCard"));
 
+                // Inject columns and nodes into table and UI.
                 checkingTable.getColumns().addAll(type, dateOpened, balance, interestRate, connectedToAtmCard);
                 fieldVBox.getChildren().addAll(checkingTable, buttonHBox);
 
+                // View Checks Button
                 Button viewChecksButton = new Button("View Checks");
                 viewChecksButton.setOnAction(x -> {
                     int customerId = UIHelpers.currentUser.id;
@@ -177,6 +180,7 @@ class AccountManagementScene {
                     savingsTable.getColumns().add(ssn);
                 }
 
+                // Creates fields and binds data.
                 TableColumn<SavingAccount, String> dateOpened = new TableColumn<>("Date Opened");
                 TableColumn<SavingAccount, String> balance = new TableColumn<>("Balance");
                 TableColumn<SavingAccount, String> currentInterestRate = new TableColumn<>("Interest");
@@ -185,6 +189,7 @@ class AccountManagementScene {
                 balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
                 currentInterestRate.setCellValueFactory(new PropertyValueFactory<>("currentInterestRate"));
 
+                // Inject columns and nodes into table and UI.
                 savingsTable.getColumns().addAll(dateOpened, balance, currentInterestRate);
                 fieldVBox.getChildren().addAll(savingsTable, buttonHBox);
                 break;
@@ -197,6 +202,7 @@ class AccountManagementScene {
                     loanTable.getColumns().add(ssn);
                 }
 
+                // Creates fields and binds data.
                 TableColumn<LoanAccount, String> type = new TableColumn<>("Type");
                 TableColumn<LoanAccount, String> dateOpened = new TableColumn<>("Date Opened");
                 TableColumn<LoanAccount, String> balance = new TableColumn<>("Balance");
@@ -220,6 +226,7 @@ class AccountManagementScene {
                 TableColumn<LoanAccount, String> paymentsLeft = new TableColumn<>("Payments Made");
                 paymentsLeft.setCellValueFactory(new PropertyValueFactory<>("paymentsMade"));
 
+                // Inject columns and nodes into table and UI.
                 loanTable.getColumns().addAll(type, dateOpened, balance, calculatedBalance, interestRate, interestDue, datePaymentDue, currentPayment, paymentsLeft);
                 fieldVBox.getChildren().addAll(loanTable, buttonHBox);
                 break;
@@ -232,6 +239,7 @@ class AccountManagementScene {
                     cdTable.getColumns().add(ssn);
                 }
 
+                // Creates fields and binds data.
                 TableColumn<CD, String> dateOpened = new TableColumn<>("Date Opened");
                 TableColumn<CD, String> balance = new TableColumn<>("Balance");
 
@@ -241,6 +249,7 @@ class AccountManagementScene {
                 TableColumn<CD, String> dateCDDue = new TableColumn<>("Date Due");
                 dateCDDue.setCellValueFactory(new PropertyValueFactory<>("dateCDDue"));
 
+                // Inject columns and nodes into table and UI.
                 cdTable.getColumns().addAll(dateOpened, balance, dateCDDue);
                 fieldVBox.getChildren().addAll(cdTable, buttonHBox);
                 break;
@@ -280,11 +289,12 @@ class AccountManagementScene {
         return selectedAccount;
     }
 
+    // Ensures the correct accounts are displayed (the selected type and only the current user's if they are only a
+    // customer level user).
     private void setDisplayedAccounts() {
-        // Ensures the correct accounts are displayed (the selected type and only the current user's if they are only a
-        // customer level user).
-
         int customerId = 0;
+
+        // Gets correct customer ID if the user is teller or admin level.
         if (customerBox != null && customerBox.getSelectionModel().getSelectedIndex() >= 0) {
             int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
             Person selectedCustomer = Person.people.get(selectedCustomerId);
@@ -292,6 +302,7 @@ class AccountManagementScene {
         }
 
         if (UIHelpers.currentUserLevel == 0) {
+            // Set accounts for customer user level.
             switch (UIHelpers.selectedAccountType) {
                 case CHECKING:
                     accounts = FXCollections.observableArrayList(CheckingAccount.search(UIHelpers.currentUser.id));
@@ -307,6 +318,7 @@ class AccountManagementScene {
                     break;
             }
         } else if (customerId <= 0) {
+            // Set accounts for teller and manager user level if no customer is selected.
             switch (UIHelpers.selectedAccountType) {
                 case CHECKING:
                     accounts = FXCollections.observableArrayList(CheckingAccount.checkingAccounts);
@@ -322,6 +334,7 @@ class AccountManagementScene {
                     break;
             }
         } else {
+            // Set accounts for teller and manager user level if customer is selected.
             switch (UIHelpers.selectedAccountType) {
                 case CHECKING:
                     accounts = FXCollections.observableArrayList(CheckingAccount.search(customerId));
@@ -400,11 +413,13 @@ class AccountManagementScene {
                 setAccountTableItems();
             }
         } else {
+            // Account Close Confirmation
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                     "Close account? (This action cannot be undone.)", ButtonType.YES, ButtonType.NO);
             alert.showAndWait();
 
             if (alert.getResult() == ButtonType.YES) {
+                // User confirms that they want to close the account.
                 try {
                     switch (UIHelpers.selectedAccountType) {
                         case LOAN:
