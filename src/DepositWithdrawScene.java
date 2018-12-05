@@ -93,7 +93,21 @@ class DepositWithdrawScene {
                 return;
             }
             if (editedAccount instanceof CheckingAccount) {
-                if (isWithdraw) ((CheckingAccount)editedAccount).withdraw(amount);
+                if (isWithdraw) {
+                    if (UIHelpers.currentUserLevel == 0) {
+                        if( amount > 500) {
+                            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "As a customer, you cannot withdraw " +
+                                    "more than $500 at a time from a checking account.");
+                            return;
+                        }
+                        if (((CheckingAccount) editedAccount).getWithdrawsToday() > 2) {
+                            UIHelpers.showAlert(Alert.AlertType.INFORMATION, "As a customer, you cannot withdraw " +
+                                    "more than twice a day.");
+                            return;
+                        }
+                    }
+                    ((CheckingAccount)editedAccount).withdraw(amount);
+                }
                 else ((CheckingAccount)editedAccount).deposit(amount);
                 CheckingAccount.exportFile();
             } else if (editedAccount instanceof LoanAccount) {

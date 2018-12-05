@@ -232,18 +232,16 @@ class AccountManagementScene {
                     cdTable.getColumns().add(ssn);
                 }
 
-                TableColumn<CD, String> type = new TableColumn<>("Type");
                 TableColumn<CD, String> dateOpened = new TableColumn<>("Date Opened");
                 TableColumn<CD, String> balance = new TableColumn<>("Balance");
 
-                type.setCellValueFactory(new PropertyValueFactory<>("mainAccountType"));
                 dateOpened.setCellValueFactory(new PropertyValueFactory<>("dateAccountOpened"));
                 balance.setCellValueFactory(new PropertyValueFactory<>("accountBalance"));
 
                 TableColumn<CD, String> dateCDDue = new TableColumn<>("Date Due");
                 dateCDDue.setCellValueFactory(new PropertyValueFactory<>("dateCDDue"));
 
-                cdTable.getColumns().addAll(type, dateOpened, balance, dateCDDue);
+                cdTable.getColumns().addAll(dateOpened, balance, dateCDDue);
                 fieldVBox.getChildren().addAll(cdTable, buttonHBox);
                 break;
             }
