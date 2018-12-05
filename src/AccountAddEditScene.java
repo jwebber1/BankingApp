@@ -14,6 +14,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
@@ -265,6 +266,11 @@ class AccountAddEditScene {
                     );
                     SavingAccount.savingAccounts.add(savingAccount);
                     SavingAccount.exportFile();
+                    try {
+                        CheckingAccount.importFile();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case CHECKING:
                     if (overdraftProtectionProperty.get().equals("True") && SavingAccount.search(customerId) == null) {
