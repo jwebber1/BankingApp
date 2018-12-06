@@ -67,9 +67,11 @@ class AccountAddEditScene {
 
         initScene();
 
-        // Customer
+        // Customer Field
         Person customer = Person.searchPeopleByCustomerID(editedAccount.customerID);
         customerProperty.set(customer.lastName + ", " + customer.firstName);
+
+        // Account Balance Field
         accountBalanceProperty.set(String.valueOf("$" + editedAccount.accountBalance));
 
         // Account Type-Specific Fields

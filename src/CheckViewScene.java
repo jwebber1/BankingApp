@@ -203,6 +203,7 @@ public class CheckViewScene {
 
     // Injects the correct fields into the check table and binds the data to it.
     private void setupCheckTable() {
+        // Creates check fields for table and binds data to fields.
         TableColumn<Check, String> checkNum = new TableColumn<>("Check #");
         TableColumn<Check, String> amount = new TableColumn<>("Amount");
         TableColumn<Check, String> dateCheck = new TableColumn<>("Date");
@@ -219,8 +220,10 @@ public class CheckViewScene {
         payTo.setCellValueFactory(new PropertyValueFactory<>("payTo"));
         isStopped.setCellValueFactory(new PropertyValueFactory<>("isStopped"));
 
+        // Injects check fields into table.
         checkTable.getColumns().addAll(checkNum, amount, dateCheck, dateHonored, memo, payTo, isStopped);
 
+        // Updates table source.
         if (customerId != 0) {
             ObservableList checks = FXCollections.observableArrayList(Check.searchChecksByCustomerID(customerId));
             checkTable.setItems(checks);
@@ -229,6 +232,7 @@ public class CheckViewScene {
 
     // The "Honor Check" button's click event. Honors the check and does any necessary error checking.
     private void honorCheck() {
+        // Error checking.
         Check check = checkTable.getSelectionModel().getSelectedItem();
         if (check == null) {
             UIHelpers.showAlert(Alert.AlertType.INFORMATION,
@@ -240,6 +244,8 @@ public class CheckViewScene {
                     "This check has already been honored.");
             return;
         }
+
+        // Honor and export check.
         check.honorCheck();
         try {
             Check.exportFile();
@@ -247,6 +253,7 @@ public class CheckViewScene {
             e.printStackTrace();
         }
 
+        // Update table.
         int id = customerId;
         if (customerId == 0) {
             int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
@@ -262,6 +269,7 @@ public class CheckViewScene {
         int cusId = selectedCustomer.id;
         CheckingAccount account = CheckingAccount.search(cusId);
 
+        // Update Account Balance field.
         account.accountBalance -= check.checkAmt;
         try {
             CheckingAccount.exportFile();
@@ -273,6 +281,7 @@ public class CheckViewScene {
 
     // The "Stop Check" button's click event. Stops the check and does any necessary error checking.
     private void stopCheck() {
+        // Error checking.
         Check check = checkTable.getSelectionModel().getSelectedItem();
         if (check == null) {
             UIHelpers.showAlert(Alert.AlertType.INFORMATION,
@@ -284,12 +293,16 @@ public class CheckViewScene {
                     "This check has already been honored, so it cannot be stopped.");
             return;
         }
+
+        // Stop check and export.
         Check.stopCheck(check.checkID);
         try {
             Check.exportFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        // Update check table.
         checkTable.setItems(FXCollections.observableArrayList());
         int id = customerId;
         if (customerId == 0) {

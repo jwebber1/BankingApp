@@ -31,7 +31,7 @@ class PersonManagementScene {
         UIHelpers.setBaseSceneSettings(root, fieldVBox);
         UIHelpers.setButtonSettings(buttonHBox);
 
-        setupPersonTable();
+        setupPersonTable(); // Initializes person table.
 
         // Edit Button
         Button addButton = new Button("Add");
