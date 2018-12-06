@@ -83,6 +83,7 @@ class DepositWithdrawScene {
     // The "Withdraw" and "Deposit" buttons click events.
     private void withdrawOrDeposit() {
         try {
+            // Get amount and validate it.
             double amount = Double.parseDouble(depositOrWithdrawAmount.get().replace("$", ""));
             if (amount <= 0.01) {
                 UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot enter an amount less than $0.01.");
@@ -92,6 +93,8 @@ class DepositWithdrawScene {
                 UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The amount you've entered is too large!");
                 return;
             }
+
+            // Extra checks for Checking if Customer user level and withdrawing.
             if (editedAccount instanceof CheckingAccount) {
                 // Checking Account
                 if (isWithdraw) {
@@ -112,6 +115,7 @@ class DepositWithdrawScene {
                 else ((CheckingAccount)editedAccount).deposit(amount);
                 CheckingAccount.exportFile();
             } else if (editedAccount instanceof LoanAccount) {
+                // Extra checks if Loan Account.
                 if (amount > editedAccount.getAccountBalance()) {
                     UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot make a payment larger than " +
                             "a loan's total balance.");
@@ -131,6 +135,7 @@ class DepositWithdrawScene {
                         return;
                     }
                 } else {
+                    // Make payment and export loans.
                     ((LoanAccount)editedAccount).makePayment(amount);
                     LoanAccount.exportFile();
                 }
@@ -139,11 +144,13 @@ class DepositWithdrawScene {
                     UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot withdraw more money than is in the account.");
                     return;
                 }
+
+                // Deposit/Withdraw and update Savings.
                 if (isWithdraw) ((SavingAccount) editedAccount).withdraw(amount);
                 else ((SavingAccount) editedAccount).deposit(amount);
                 LoanAccount.exportFile();
             }
-            UIHelpers.navigateBackToAccountManagement();
+            UIHelpers.navigateBackToAccountManagement(); // Always navigate back when process fully completes.
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

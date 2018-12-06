@@ -418,9 +418,10 @@ class AccountManagementScene {
                     "Close account? (This action cannot be undone.)", ButtonType.YES, ButtonType.NO);
             alert.showAndWait();
 
+            // User has confirmed that they want to close the account.
             if (alert.getResult() == ButtonType.YES) {
-                // User confirms that they want to close the account.
                 try {
+                    // If loan, do an extra check if it is not paid off, else, close the account.
                     switch (UIHelpers.selectedAccountType) {
                         case LOAN:
                             if (!selectedAccount.accountType.equalsIgnoreCase("credit card")) {
@@ -452,7 +453,7 @@ class AccountManagementScene {
         }
     }
 
-    // Refreshes an account table when changes are made.
+    // Refreshes an account table when changes are made, ensuring that the items shown are the selected account type.
     private void setAccountTableItems() {
         setDisplayedAccounts();
         switch (UIHelpers.selectedAccountType) {

@@ -50,6 +50,7 @@ public class CreditCardViewScene {
         UIHelpers.setButtonSettings(buttonHBox);
 
         if (customerId == 0) {
+            // Create customer field and its change event.
             ObservableList<String> personNames = FXCollections.observableArrayList();
             for (Person person : Person.people) {
                 personNames.add(person.lastName + ", " + person.firstName);
@@ -58,6 +59,7 @@ public class CreditCardViewScene {
             customerBox = UIHelpers.createComboBox(personNames, customerProperty);
             fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
             customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> {
+                // Set shown items.
                 int selectedCustomerId = customerBox.getSelectionModel().getSelectedIndex();
                 Person selectedCustomer = Person.people.get(selectedCustomerId);
                 int id = selectedCustomer.id;
@@ -67,6 +69,7 @@ public class CreditCardViewScene {
                 creditCardPurchaseTable.setItems(purchases);
                 creditCardPurchaseTable.refresh();
 
+                // Set Balance Label
                 LoanAccount account = LoanAccount.search(id, "credit card");
                 if (account == null) {
                     balanceLabel.textProperty().set("Account Balance: $????");
@@ -79,9 +82,11 @@ public class CreditCardViewScene {
         }
         fieldVBox.getChildren().add(balanceLabel);
 
+        // Basic table setup.
         setupCreditCardPurchaseTable();
         fieldVBox.getChildren().add(creditCardPurchaseTable);
 
+        // If not user, allows for purchase creation.
         if (UIHelpers.currentUserLevel != 0) {
             Label makePurchaseLabel = new Label("Make Purchase");
             fieldVBox.getChildren().add(makePurchaseLabel);
@@ -116,6 +121,7 @@ public class CreditCardViewScene {
 
     // Runs on clicking the "Save Purchase" button. Saves the purchase created.
     private void saveCreditCardPurchase() {
+        // Detailed error checking.
         int id = customerId;
         if (customerId == 0) {
             if (customerProperty.get() == null) {
@@ -159,10 +165,13 @@ public class CreditCardViewScene {
 
         Date date = Date.from(dateProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
 
+        // Actual purchase creation and saving/exporting.
         loan.makeCCPurchase(cost, descriptionProperty.get(), date);
         try {
             LoanAccount.exportFile();
             CreditCardPurchase.exportFile();
+
+            // Update UI.
             creditCardPurchaseTable.setItems(FXCollections.observableArrayList(CreditCardPurchase.search(id)));
             creditCardPurchaseTable.refresh();
 

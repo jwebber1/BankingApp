@@ -59,6 +59,7 @@ class PersonManagementScene {
 
     // Injects fields into person table and binds the data to it.
     public void setupPersonTable() {
+        // Creates columns and binds data to them.
         TableColumn<Person, String> id = new TableColumn<>("SSN");
         TableColumn<Person, String> fName = new TableColumn<>("First Name");
         TableColumn<Person, String> lName = new TableColumn<>("Last Name");
@@ -75,6 +76,8 @@ class PersonManagementScene {
         state.setCellValueFactory(new PropertyValueFactory<>("state"));
         address.setCellValueFactory(new PropertyValueFactory<>("streetAddress"));
         zipCode.setCellValueFactory(new PropertyValueFactory<>("zipCode"));
+
+        // Injects columns into table and sets source for the table.
         personTable.getColumns().addAll(id, fName, lName, city, state, zipCode, address);
         personTable.setItems(list);
     }

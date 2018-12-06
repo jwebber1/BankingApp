@@ -122,8 +122,8 @@ public class PersonAddEditScene {
 
     // Runs when the "Save" button is pressed.
     private void savePerson() {
+        // Error checking.
         String errorMessage = "";
-
         errorMessage += UIHelpers.checkNumberField("Social Security #", socialSecurityProperty);
         if (socialSecurityProperty.get().length() != 9 || !UIHelpers.checkNumberField("SSN", socialSecurityProperty).isEmpty()) {
             errorMessage += "Social Security # field must contain exactly nine digits.\n";
@@ -147,10 +147,7 @@ public class PersonAddEditScene {
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
             try {
-                ArrayList<ArrayList> accounts = new ArrayList<>();
-                accounts.add(new ArrayList());
-                accounts.add(new ArrayList());
-                accounts.add(new ArrayList());
+                // Creates new Person object.
                 Person person = new Person(
                         Integer.parseInt(socialSecurityProperty.get()),
                         streetAddressProperty.get(),
@@ -161,14 +158,17 @@ public class PersonAddEditScene {
                         lastNameProperty.get(),
                         UIHelpers.userLevels.indexOf(userLevelProperty.get())
                 );
+                // Removes old Person object if it exists.
                 if (editedPerson != null) {
                     Person.people.remove(editedPerson);
                 }
+                // Saves the newly created person.
                 Person.people.add(person);
                 Person.exportFile();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            // Show success Alert and navigate back.
             UIHelpers.showAlert(Alert.AlertType.INFORMATION, "The user has been saved successfully.");
             UIHelpers.navigateToScene(new PersonManagementScene().root);
         }

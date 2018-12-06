@@ -38,10 +38,10 @@ class UIHelpers {
     private static double fieldHeight = 20; // The default field height.
 
     static AccountType selectedAccountType; // The account type selected at the AccountTypeSelectionScene.
-    private static ArrayList<Account> selectedAccounts;
+    private static ArrayList<Account> selectedAccounts; // Accounts to be shown in the AccountManagementScene
 
+    // Lists of important terms.
     static ObservableList<String> accountTypes = FXCollections.observableArrayList();
-
     static ObservableList<String> loanTypes = FXCollections.observableArrayList(
             "Long Term",
             "Short Term",
@@ -51,13 +51,13 @@ class UIHelpers {
             "Regular",
             "Gold"
     );
-
     static ObservableList<String> userLevels = FXCollections.observableArrayList(
             "Customer",
             "Teller",
             "Manager"
     );
 
+    // Sets base settings for a scene and its field box.
     static void setBaseSceneSettings(Pane root, VBox fieldVBox) {
         fieldVBox.setSpacing(8);
         root.setPadding(new Insets(20));
@@ -74,6 +74,7 @@ class UIHelpers {
         return hBox;
     }
 
+    // Creates a balance field and sets it's base settings.
     static TextField createBalanceField(StringProperty property) {
         TextField textField = new TextField();
         textField.textProperty().bindBidirectional(property);

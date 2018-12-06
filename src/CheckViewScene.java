@@ -175,6 +175,7 @@ public class CheckViewScene {
             return;
         }
 
+        // Gets the largest checkID (this value is incremented for the newest check).
         Date date = Date.from(dateProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
         int checkId = 0;
         for (Check check : Check.checks) {
@@ -188,6 +189,8 @@ public class CheckViewScene {
                     "You've overdrawn from this account and will be charged a fee.");
             return;
         }
+
+        // Save Check and Export
         Check.checks.add(new Check(id, checkId+1, cost, payToProperty.get(), date, desc, false));
         try {
             Check.exportFile();

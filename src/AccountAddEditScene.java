@@ -181,8 +181,8 @@ class AccountAddEditScene {
 
     // Runs when the "Save" button is pressed.
     private void saveAccount() throws IOException {
+        // Error checking.
         String errorMessage = "";
-
         int customerId = 0;
         if (customerProperty.get().isEmpty()) {
             errorMessage += "Customer must be selected.\n";
@@ -193,7 +193,6 @@ class AccountAddEditScene {
         }
 
         double accountBalance = Double.parseDouble(accountBalanceProperty.get().replace("$", ""));
-
         switch (UIHelpers.selectedAccountType) {
             case CD:
                 if (accountBalance <= 0.01) errorMessage += "CD balance cannot be less than $0.01.\n";
@@ -209,14 +208,13 @@ class AccountAddEditScene {
                 if (accountBalance < 0) errorMessage += "Savings account balance cannot be less than $0.00.\n";
                 break;
         }
-
         if (accountTypeProperty.get().isEmpty()) errorMessage += "Account Type must be selected.\n";
 
         if (!errorMessage.isEmpty()) {
             // Shows error messages (if any).
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
         } else {
-            // Removes old account (if any).
+            // Removes old account if editing and any exists, else if one exists and not editing, then inform user.
             switch (UIHelpers.selectedAccountType) {
                 case SAVING:
                     if (editedAccount != null) SavingAccount.savingAccounts.remove(editedAccount);
@@ -250,6 +248,7 @@ class AccountAddEditScene {
             // Final validation and actual account saving and exporting.
             switch (UIHelpers.selectedAccountType) {
                 case SAVING:
+                    // Final error checking for Saving Accounts.
                     double savingInterestRate;
                     try {
                         savingInterestRate = Double.parseDouble(interestRateProperty.get());
@@ -262,12 +261,15 @@ class AccountAddEditScene {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be greater than or equal to 0.001 and less than or equal to 100.0.");
                         return;
                     }
+                    // Create the new Saving Account.
                     SavingAccount savingAccount = new SavingAccount(
                             customerId,
                             accountBalance,
                             savingInterestRate,
                             new Date()
                     );
+                    // Save and export the new Saving Account, then reimport Checking Accounts (because their interest
+                    // can be based off their saving account.)
                     SavingAccount.savingAccounts.add(savingAccount);
                     SavingAccount.exportFile();
                     try {
@@ -277,10 +279,12 @@ class AccountAddEditScene {
                     }
                     break;
                 case CHECKING:
+                    // Final error checking for Checking Accounts.
                     if (overdraftProtectionProperty.get().equals("True") && SavingAccount.search(customerId) == null) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "This account cannot have overdraft" +
                                 "protection because this customer does not have a savings account.");
                     }
+                    // Create the new Checking Account.
                     CheckingAccount checkingAccount = new CheckingAccount(
                             customerId,
                             accountBalance,
@@ -289,10 +293,12 @@ class AccountAddEditScene {
                             editedAccount == null ? 0 : ((CheckingAccount) editedAccount).getOverdraftsThisMonth(),
                             editedAccount == null ? new Date() : editedAccount.getDateAccountOpened()
                     );
+                    // Save and export the new Checking Account.
                     CheckingAccount.checkingAccounts.add(checkingAccount);
                     CheckingAccount.exportFile();
                     break;
                 case LOAN:
+                    // Final error checking for Loans.
                     double loanInterestRate;
                     try {
                         loanInterestRate = Double.parseDouble(interestRateProperty.get());
@@ -307,6 +313,7 @@ class AccountAddEditScene {
                     }
                     String loanType = loanTypeProperty.get();
                     LoanAccount loanAccount;
+                    // Create the new Loan Account.
                     if (editedAccount != null) {
                         loanAccount = new LoanAccount(
                                 customerId,
@@ -329,10 +336,12 @@ class AccountAddEditScene {
                                 loanType.toLowerCase()
                         );
                     }
+                    // Save and export the new Loan Account.
                     LoanAccount.loans.add(loanAccount);
                     LoanAccount.exportFile();
                     break;
                 case CD:
+                    // Final error checking for CDs.
                     double cdInterestRate;
                     if (dateCDDueProperty.getValue() == null) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "A CD must have a date due.");
@@ -349,6 +358,7 @@ class AccountAddEditScene {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "Interest rate must be greater than or equal to 0.001.");
                         return;
                     }
+                    // Create the new CD.
                     CD cd = new CD(
                             customerId,
                             accountBalance,
@@ -357,6 +367,7 @@ class AccountAddEditScene {
                             Date.from(dateCDDueProperty.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()),
                             CD.cds.get(CD.cds.size() - 1).cdNumber + 1
                     );
+                    // Save and export the CD.
                     CD.cds.add(cd);
                     CD.exportFile();
                     break;
