@@ -148,8 +148,8 @@ class UIHelpers {
         }
 
         // Contains Numbers
-        if (!property.get().matches("^[a-zA-Z]*$")) {
-            errorMessage += fieldName + " field cannot contain numbers or special characters.\n";
+        if (!property.get().matches("^[.0-9a-zA-Z ]*$")) {
+            errorMessage += fieldName + " field cannot contain special characters.\n";
         }
 
         return errorMessage;

@@ -116,9 +116,9 @@ class DepositWithdrawScene {
                 CheckingAccount.exportFile();
             } else if (editedAccount instanceof LoanAccount) {
                 // Extra checks if Loan Account.
-                if (amount > editedAccount.getAccountBalance()) {
+                if (amount > ((LoanAccount) editedAccount).calcPayOff()) {
                     UIHelpers.showAlert(Alert.AlertType.INFORMATION, "You cannot make a payment larger than " +
-                            "a loan's total balance.");
+                            "a loan's payoff amount.");
                     return;
                 }
 
@@ -137,6 +137,10 @@ class DepositWithdrawScene {
                 } else {
                     // Make payment and export loans.
                     ((LoanAccount)editedAccount).makePayment(amount);
+                    if (editedAccount.accountBalance <= 0) {
+                        UIHelpers.showAlert(Alert.AlertType.INFORMATION, "This loan has been fully paid off, and will be closed.");
+                        LoanAccount.loans.remove(editedAccount);
+                    }
                     LoanAccount.exportFile();
                 }
             } else if (editedAccount instanceof SavingAccount) {

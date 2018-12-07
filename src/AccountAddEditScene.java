@@ -121,7 +121,6 @@ class AccountAddEditScene {
         for (Person person : Person.people) {
             personNames.add(person.lastName + ", " + person.firstName);
         }
-        Collections.sort(personNames);
         customerBox = UIHelpers.createComboBox(personNames, customerProperty);
         fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
 
@@ -284,7 +283,8 @@ class AccountAddEditScene {
                     // Final error checking for Checking Accounts.
                     if (overdraftProtectionProperty.get().equals("True") && SavingAccount.search(customerId) == null) {
                         UIHelpers.showAlert(Alert.AlertType.INFORMATION, "This account cannot have overdraft" +
-                                "protection because this customer does not have a savings account.");
+                                " protection because this customer does not have a savings account.");
+                        return;
                     }
                     // Create the new Checking Account.
                     CheckingAccount checkingAccount = new CheckingAccount(

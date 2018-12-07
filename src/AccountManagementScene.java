@@ -51,7 +51,6 @@ class AccountManagementScene {
             for (Person person : Person.people) {
                 personNames.add(person.lastName + ", " + person.firstName);
             }
-            Collections.sort(personNames);
             customerBox = UIHelpers.createComboBox(personNames, customerProperty);
             fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
             customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> changeSelectedCustomer());

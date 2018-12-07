@@ -55,7 +55,6 @@ public class CreditCardViewScene {
             for (Person person : Person.people) {
                 personNames.add(person.lastName + ", " + person.firstName);
             }
-            Collections.sort(personNames);
             customerBox = UIHelpers.createComboBox(personNames, customerProperty);
             fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
             customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> {
@@ -145,17 +144,17 @@ public class CreditCardViewScene {
 
         double cost = Double.parseDouble(costProperty.get().replace("$", ""));
         if (loan.ccPurchaseIsTooMuch(cost)) {
-            errorMessage += "This purchase goes beyond this CC account's limit, and has been denied.";
+            errorMessage += "This purchase goes beyond this CC account's limit, and has been denied.\n";
         }
         if (cost <= 0) {
-            errorMessage += "A purchase must be greater than $0.00.";
+            errorMessage += "A purchase must be greater than $0.00.\n";
         }
         if (dateProperty.getValue() == null) {
-            errorMessage += "You must enter a date.";
+            errorMessage += "You must enter a date.\n";
         }
         String desc = descriptionProperty.get();
         if (desc.isEmpty() || desc.length() > 255) {
-            errorMessage += "A description must not be empty or exceed a length of 255 characters.";
+            errorMessage += "A description must not be empty or exceed a length of 255 characters.\n";
         }
 
         if (!errorMessage.isEmpty()) {

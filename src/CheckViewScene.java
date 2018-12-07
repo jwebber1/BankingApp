@@ -58,7 +58,6 @@ public class CheckViewScene {
             for (Person person : Person.people) {
                 personNames.add(person.lastName + ", " + person.firstName);
             }
-            Collections.sort(personNames);
             customerBox = UIHelpers.createComboBox(personNames, customerProperty);
             fieldVBox.getChildren().add(UIHelpers.createHBox("Customer:", customerBox));
             customerBox.getSelectionModel().selectedIndexProperty().addListener(x -> {
@@ -244,6 +243,16 @@ public class CheckViewScene {
                     "This check has already been honored.");
             return;
         }
+        if (check.isStopped) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "This check is stopped and cannot be honored. Would you like to unstop it and honor it?",
+                    ButtonType.YES, ButtonType.NO);
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.NO) {
+                return;
+            }
+            check.isStopped = false;
+        }
 
         // Honor and export check.
         check.honorCheck();
@@ -270,7 +279,6 @@ public class CheckViewScene {
         CheckingAccount account = CheckingAccount.search(cusId);
 
         // Update Account Balance field.
-        account.accountBalance -= check.checkAmt;
         try {
             CheckingAccount.exportFile();
         } catch (FileNotFoundException e) {

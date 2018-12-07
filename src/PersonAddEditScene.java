@@ -136,12 +136,11 @@ public class PersonAddEditScene {
         errorMessage += UIHelpers.checkTextField("State", stateProperty);
         errorMessage += UIHelpers.checkNumberField("Zip Code", zipCodeProperty);
         if (zipCodeProperty.get().length() < 5) {
-            errorMessage += "Zip Code must contain five or greater digits.";
+            errorMessage += "Zip Code must contain five or greater digits.\n";
         }
         errorMessage += UIHelpers.checkTextField("First Name", firstNameProperty);
         errorMessage += UIHelpers.checkTextField("Last Name", lastNameProperty);
         errorMessage += UIHelpers.checkTextField("User Level", userLevelProperty);
-        errorMessage += UIHelpers.checkTextField("Street Address", streetAddressProperty);
 
         if (!errorMessage.isEmpty()) {
             UIHelpers.showAlert(Alert.AlertType.ERROR, errorMessage);
